@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HTML → 分享链接 · RCJ9527</title>
+  <meta name="description" content="把 vibe coding 生成的 HTML 一键变成可分享链接：粘贴 / 上传代码，实时预览，生成带内容的短链。纯前端，无需服务器。" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
+  <style>
+    :root{--blue:#1e88e5;--blue-d:#1565c0;--ink:#0f172a;--sub:#64748b;--line:#e2e8f0;--bg:#f8fafc;--card:#fff;}
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;}
+    a{color:var(--blue);text-decoration:none;}
+    .topbar{background:linear-gradient(135deg,#1e88e5,#1565c0);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;}
+    .topbar .logo{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;}
+    .topbar h1{font-size:16px;margin:0;font-weight:700;}
+    .topbar .sub{font-size:12px;opacity:.85;margin-left:auto;}
+    .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 48px;}
+    .intro{font-size:13.5px;color:var(--sub);margin:0 0 18px;}
+    .intro b{color:var(--ink);}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    @media(max-width:860px){.grid{grid-template-columns:1fr;}}
+    .pane{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:420px;}
+    .pane-head{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);}
+    .pane-head .spacer{margin-left:auto;}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);}
+    textarea{width:100%;flex:1;border:none;outline:none;resize:none;padding:14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.55;color:var(--ink);min-height:340px;background:#fcfdfe;}
+    .preview{width:100%;flex:1;border:none;background:#fff;min-height:340px;}
+    .btn{border:1px solid var(--line);background:#fff;color:var(--ink);font-size:13px;font-weight:600;padding:7px 13px;border-radius:9px;cursor:pointer;transition:.15s;}
+    .btn:hover{border-color:var(--blue);color:var(--blue);}
+    .btn-primary{background:var(--blue);border-color:var(--blue);color:#fff;}
+    .btn-primary:hover{background:var(--blue-d);color:#fff;}
+    .file-label{font-size:12.5px;color:var(--sub);display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:7px 12px;border:1px dashed var(--line);border-radius:9px;}
+    .file-label:hover{border-color:var(--blue);color:var(--blue);}
+    input[type=file]{display:none;}
+    .result{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;}
+    .result h3{margin:0 0 10px;font-size:14px;}
+    .result .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .result input[type=text]{flex:1;min-width:240px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:13px;color:var(--sub);background:#f8fafc;}
+    .note{font-size:12px;color:var(--sub);margin-top:10px;line-height:1.7;}
+    .warn{color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:9px 12px;font-size:12.5px;margin-top:10px;display:none;}
+    .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;z-index:99;display:none;box-shadow:0 8px 30px rgba(0,0,0,.3);}
+    .tag{font-size:11px;background:#e7f1fb;color:#1e6091;border:1px solid #cfe3f5;border-radius:20px;padding:2px 9px;font-weight:600;}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo">R</div>
+    <h1>HTML → 分享链接</h1>
+    <span class="sub">纯前端 · 内容编码进链接 · 不经服务器</span>
+  </div>
+
+  <div class="wrap">
+    <p class="intro">把 <b>vibe coding</b> 生成的 HTML 一键变成可分享链接：粘贴或上传代码 → 实时预览 → 生成带内容的短链。所有数据编码在链接本身，<b>不发任何服务器</b>，适合分享小 demo / 落地页 / 原型。</p>
+
+    <div class="grid">
+      <!-- 编辑器 -->
+      <div class="pane">
+        <div class="pane-head">✍️ 代码 <span class="spacer"><span class="tag" id="sizeTag">0 B</span></span></div>
+        <div class="toolbar">
+          <label class="file-label">📁 上传 .html 文件<input type="file" id="fileInput" accept=".html,.htm,text/html" /></label>
+          <button class="btn" id="sampleBtn">载入示例</button>
+          <button class="btn" id="clearBtn">清空</button>
+        </div>
+        <textarea id="code" spellcheck="false" placeholder="在这里粘贴你的 HTML 代码，或点「上传 .html 文件」…&#10;&#10;例如：&lt;h1&gt;Hello RCJ&lt;/h1&gt;&lt;p&gt;一个可分享的 demo&lt;/p&gt;"></textarea>
+      </div>
+
+      <!-- 预览 -->
+      <div class="pane">
+        <div class="pane-head">👁 实时预览</div>
+        <iframe class="preview" id="preview" sandbox="allow-scripts allow-same-origin allow-popups allow-modals allow-forms"></iframe>
+      </div>
+    </div>
+
+    <div class="result">
+      <h3>🔗 生成分享链接</h3>
+      <div class="row">
+        <input type="text" id="shareUrl" readonly placeholder="点「生成分享链接」后会在这里出现…" />
+        <button class="btn btn-primary" id="genBtn">生成分享链接</button>
+        <button class="btn" id="copyBtn">复制</button>
+        <button class="btn" id="openBtn">打开</button>
+      </div>
+      <div class="warn" id="warn"></div>
+      <p class="note">
+        • 链接形如 <code>…/share/view.html#v=…</code>，完整 HTML 内容在 <code>#v=</code> 片段里，复制发给任何人都能直接打开，<b>无需后端、无需登录</b>。<br />
+        • 已用 LZ-string 压缩；过大的 HTML（链接超过约 3 万字符）在部分浏览器 / 聊天软件里可能被截断，建议先精简再分享。<br />
+        • 预览与分享内容以<b>沙箱 iframe</b>运行，请勿打开来源不明的分享链接。
+      </p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="lz-string.min.js"></script>
+  <script>
+  (function(){
+    "use strict";
+    var code = document.getElementById("code");
+    var preview = document.getElementById("preview");
+    var sizeTag = document.getElementById("sizeTag");
+    var shareUrl = document.getElementById("shareUrl");
+    var warn = document.getElementById("warn");
+    var toastEl = document.getElementById("toast");
+
+    function toast(msg){
+      toastEl.textContent = msg; toastEl.style.display = "block";
+      clearTimeout(toastEl._t); toastEl._t = setTimeout(function(){ toastEl.style.display="none"; }, 3000);
+    }
+    function fmtBytes(n){ if(n<1024) return n+" B"; if(n<1048576) return (n/1024).toFixed(1)+" KB"; return (n/1048576).toFixed(2)+" MB"; }
+
+    function updatePreview(){
+      var html = code.value;
+      sizeTag.textContent = fmtBytes(html.length);
+      try { preview.srcdoc = html; } catch(e){}
+    }
+    function updateSize(){ sizeTag.textContent = fmtBytes(code.value.length); }
+
+    code.addEventListener("input", updateSize);
+
+    document.getElementById("fileInput").addEventListener("change", function(e){
+      var f = e.target.files && e.target.files[0];
+      if(!f) return;
+      var r = new FileReader();
+      r.onload = function(){ code.value = r.result; updatePreview(); };
+      r.readAsText(f);
+    });
+
+    document.getElementById("sampleBtn").addEventListener("click", function(){
+      code.value = '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><style>body{font-family:system-ui;background:linear-gradient(135deg,#1e88e5,#1565c0);color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;text-align:center}h1{font-size:42px;margin:0}button{margin-top:18px;padding:10px 22px;border:none;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer}</style></head><body><h1>Hello RCJ 👋</h1><p>这是一个用 vibe coding 做的可分享 demo</p><button onclick="alert(\'Hi from shared HTML!\')">点我</button></body></html>';
+      updatePreview();
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", function(){
+      code.value = ""; updatePreview(); shareUrl.value = ""; warn.style.display="none";
+    });
+
+    // 编码：优先 LZString，失败退回 base64
+    function encodeHTML(html){
+      if (window.LZString && window.LZString.compressToEncodedURIComponent){
+        try { return "L" + window.LZString.compressToEncodedURIComponent(html); } catch(e){}
+      }
+      return "B" + btoa(unescape(encodeURIComponent(html)));
+    }
+
+    document.getElementById("genBtn").addEventListener("click", function(){
+      var html = code.value;
+      if (!html.trim()){ toast("先粘贴或上传 HTML 代码"); return; }
+      var enc = encodeHTML(html);
+      var url = location.origin + location.pathname.replace(/index\.html$/, "") + "view.html#v=" + enc;
+      shareUrl.value = url;
+      if (enc.length > 30000){
+        warn.style.display = "block";
+        warn.textContent = "⚠️ 链接较长（" + enc.length + " 字符），部分聊天软件可能截断。建议精简 HTML 后再生成。";
+      } else { warn.style.display = "none"; }
+      toast("分享链接已生成");
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", function(){
+      if (!shareUrl.value){ toast("请先生成分享链接"); return; }
+      var u = shareUrl.value;
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(u).then(function(){ toast("链接已复制 ✓"); }, function(){ fallbackCopy(u); });
+      } else { fallbackCopy(u); }
+    });
+    function fallbackCopy(u){
+      shareUrl.select();
+      try { document.execCommand("copy"); toast("链接已复制 ✓"); } catch(e){ toast("复制失败，请手动复制"); }
+    }
+
+    document.getElementById("openBtn").addEventListener("click", function(){
+      if (!shareUrl.value){ toast("请先生成分享链接"); return; }
+      window.open(shareUrl.value, "_blank");
+    });
+
+    updatePreview();
+  })();
+  </script>
+</body>
+</html>
