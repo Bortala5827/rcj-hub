@@ -127,6 +127,17 @@ ul { list-style: none; }
   margin-left: 6px; vertical-align: middle;
 }
 
+/* ============== Hub CTA（底部居中胶囊）============== */
+.hub-cta { padding: 48px 0 72px; text-align: center; }
+.hub-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 600;
+  padding: 11px 22px; border-radius: 999px;
+  background: var(--ink); color: #fff;
+  transition: all 0.2s ease;
+}
+.hub-pill:hover { background: #1f2937; transform: translateY(-1px); }
+
 /* ============== Projects ============== */
 .projects { padding-top: 72px; }
 .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
