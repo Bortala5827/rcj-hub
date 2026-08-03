@@ -64,7 +64,7 @@ ul { list-style: none; }
 .avatar {
   width: 88px; height: 88px; border-radius: 50%;
   background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
-  color: #fff; font-size: 30px; font-weight: 700; letter-spacing: -1px;
+  color: #fff; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
   display: grid; place-items: center; margin: 0 auto 28px;
   box-shadow: 0 8px 24px rgba(30, 136, 229, 0.25);
 }
@@ -227,7 +227,7 @@ ul { list-style: none; }
   .contact-grid { grid-template-columns: 1fr; }
   .empty { padding: 40px 22px; }
   .site-footer { margin-top: 60px; }
-  .avatar { width: 76px; height: 76px; font-size: 26px; }
+  .avatar { width: 76px; height: 76px; font-size: 19px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
