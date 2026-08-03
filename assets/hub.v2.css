@@ -154,24 +154,51 @@ ul { list-style: none; }
   display: grid; place-items: center; width: 42px; height: 42px;
   border-radius: 12px; font-size: 20px; background: var(--bg-soft);
 }
-.card-exam  .chip { background: #e8f1fc; }
-.card-fj    .chip { background: #e0f5f3; }
-.card-xf    .chip { background: #fdeaea; }
-.card-build .chip { background: #fef3e2; }
-.card-meta  .chip { background: #f1f5f9; color: var(--ink); font-weight: 700; }
+.card-exam   .chip { background: #e8f1fc; }
+.card-fj     .chip { background: #e0f5f3; }
+.card-xf     .chip { background: #fdeaea; }
+.card-media  .chip { background: #f3e8fd; }
+.card-build  .chip { background: #fef3e2; }
+.card-meta   .chip { background: #f1f5f9; color: var(--ink); font-weight: 700; }
+.chip-reserve        { background: #f8fafc; border: 1px dashed var(--ink-4); }
 
 .tag { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--bg-soft); color: var(--ink-2); }
-.card-exam  .tag { background: #e8f1fc; color: #1565c0; }
-.card-fj    .tag { background: #e0f5f3; color: #0d9488; }
-.card-xf    .tag { background: #fdeaea; color: #dc2626; }
-.card-build .tag { background: #fef3e2; color: #b45309; }
-.card-meta  .tag { background: #f1f5f9; color: #475569; }
+.card-exam   .tag { background: #e8f1fc; color: #1565c0; }
+.card-fj     .tag { background: #e0f5f3; color: #0d9488; }
+.card-xf     .tag { background: #fdeaea; color: #dc2626; }
+.card-media  .tag { background: #f3e8fd; color: #7c3aed; }
+.card-build  .tag { background: #fef3e2; color: #b45309; }
+.card-meta   .tag { background: #f1f5f9; color: #475569; }
+.tag-reserve         { background: #f8fafc; color: var(--ink-3); border: 1px dashed var(--ink-4); }
 
 .card h3 { font-size: 17px; font-weight: 650; color: var(--ink); margin-bottom: 9px; line-height: 1.45; }
-.card p { font-size: 14px; color: var(--ink-2); line-height: 1.65; margin-bottom: 18px; flex: 1; }
-.card-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--accent); }
-.card-link .arrow { transition: transform 0.2s ease; }
-.card:hover .card-link .arrow { transform: translateX(4px); }
+.card p { font-size: 14px; color: var(--ink-2); line-height: 1.65; margin-bottom: 0; flex: 1; }
+
+/* 整张卡右上角 → 角标（hover 时位移，表示整卡可点） */
+.card::after {
+  content: "→";
+  position: absolute; top: 22px; right: 22px;
+  font-size: 18px; font-weight: 600; color: var(--ink-3);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.card:hover::after { transform: translateX(4px); color: var(--accent); }
+
+/* 预留产品卡（待开张） */
+.card-reserve {
+  background: #fafbfc;
+  border: 1px dashed var(--ink-4);
+  cursor: default;
+  animation: fadeIn 0.6s ease both 0.34s;
+}
+.card-reserve:hover { transform: none; box-shadow: none; border-color: var(--ink-4); }
+.card-reserve::after { content: ""; }
+.card-reserve p { color: var(--ink-2); }
+.reserve-note {
+  display: inline-block; margin-top: 8px;
+  font-size: 12px; color: var(--ink-3);
+  background: #fff; padding: 2px 8px; border-radius: 6px;
+  border: 1px solid var(--line-2);
+}
 
 /* ============== Writing (empty) ============== */
 .writing { padding-top: 72px; }
