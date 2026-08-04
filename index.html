@@ -63,8 +63,27 @@
       <header class="section-head">
         <p class="sh-eyebrow">VIBE CODING · 友链</p>
         <h2>Vibe Coding 工具箱（友链）</h2>
-        <p class="sh-sub"><b>支持 GitHub PR 换链：</b>提一个 PR 到本仓库 <a href="https://github.com/ZHOUQIANG5827/rcj-hub/blob/main/links.md" target="_blank" rel="noopener"><code>links.md</code></a> 加你的项目，审核通过后我回链你站。优先收录国内开发者的 Vibe Coding 项目。邮箱告诉我也可。</p>
+        <p class="sh-sub"><b>两种方式加入：</b>① <b>GitHub PR 换链</b>——提 PR 到本仓库 <a href="https://github.com/ZHOUQIANG5827/rcj-hub/blob/main/links.md" target="_blank" rel="noopener"><code>links.md</code></a>，审核通过后回链；② <b>不会用 GitHub？</b>直接在下面留个言填你的网址，我筛选通过后会出现在下面。<b>优先收录国内开发者的 Vibe Coding 项目。</b></p>
       </header>
+
+      <div id="link-list" class="link-list" aria-live="polite">
+        <p class="muted">加载中…</p>
+      </div>
+
+      <form id="link-form" class="link-form" action="/api/link" method="POST" novalidate>
+        <p class="lf-title">不会用 GitHub？直接留个言</p>
+        <p class="lf-sub">填你的项目名 + 网址，我筛选通过后会出现在上面。垃圾 / 无关链接直接删。</p>
+        <div class="lf-row">
+          <input name="name" required maxlength="40" placeholder="项目名 / 你的昵称" aria-label="项目名" />
+          <input name="url" required type="url" placeholder="https://你的网址" aria-label="网址" />
+        </div>
+        <textarea name="desc" maxlength="120" placeholder="一句话介绍（可选）" aria-label="介绍"></textarea>
+        <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <div class="lf-actions">
+          <button type="submit">提交申请</button>
+          <span class="lf-msg" id="lf-msg" role="status"></span>
+        </div>
+      </form>
     </section>
 
     <!-- ============== VIBE CODING · 海外（4 个我自己用过的）============== -->
@@ -111,5 +130,7 @@
       <p class="muted">© 2026 RCJ9527 · Powered by Cloudflare Pages · 955827.xyz</p>
     </div>
   </footer>
+
+  <script src="/assets/links.js" defer></script>
 </body>
 </html>

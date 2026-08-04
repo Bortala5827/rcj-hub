@@ -2,7 +2,11 @@
 
 这里收录国内开发者的 Vibe Coding 项目，按提交顺序排列。
 
-## 如何加入（GitHub PR 换链）
+## 如何加入（两种方式）
+
+**① 不会用 GitHub？** 直接在主页 [`955827.xyz/#vibe`](https://955827.xyz/#vibe) 的「不会用 GitHub？直接留个言」表单填你的项目名 + 网址，我筛选通过后会出现在友链区。
+
+**② GitHub PR 换链**（开发者推荐）：
 
 1. **Fork** 本仓库 [`ZHOUQIANG5827/rcj-hub`](https://github.com/ZHOUQIANG5827/rcj-hub)
 2. 编辑 `links.md`，在下方「友链列表」追加一行，格式：
