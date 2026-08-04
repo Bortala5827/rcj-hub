@@ -1,6 +1,6 @@
 -- rcj-hub 友链 D1 表结构
 -- 在 Cloudflare 后台 D1 控制台执行，或用：
---   wrangler d1 execute rcj-hub-links --file=./schema.sql --remote
+--   wrangler d1 execute rcj-hub-d1 --file=./schema.sql --remote
 CREATE TABLE IF NOT EXISTS links (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   name        TEXT    NOT NULL,
