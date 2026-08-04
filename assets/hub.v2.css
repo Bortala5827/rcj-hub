@@ -138,125 +138,8 @@ ul { list-style: none; }
 }
 .hub-pill:hover { background: #1f2937; transform: translateY(-1px); }
 
-/* ============== Projects ============== */
-.projects { padding-top: 72px; }
-
-/* 产品矩阵 · 两层分组 */
-.matrix-group { margin-bottom: 48px; }
-.matrix-group:last-child { margin-bottom: 0; }
-.matrix-label {
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.05em; color: var(--ink-2);
-  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
-}
-.ml-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-.ml-free { background: var(--accent); box-shadow: 0 0 0 3px rgba(30,136,229,0.12); }
-.ml-pay  { background: #e53935; box-shadow: 0 0 0 3px rgba(229,57,53,0.12); }
-
-/* 付费标签（闲鱼红） */
-.tag-pay { background: #fdeaea; color: #c62828; font-weight: 700; }
-
-/* Vibe Coding 卡片（内链，箭头改下指） */
-.card-vibe .chip { background: #fef3e2; }
-.card-vibe .tag { background: #fef3e2; color: #b45309; }
-.card-vibe::after { content: "↓" !important; }
-
-/* 付费层 · 底部闲鱼成交 CTA */
-.pay-cta {
-  margin-top: 18px; padding: 16px 22px;
-  background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
-  color: #fff; border-radius: var(--radius);
-  font-size: 14px; line-height: 1.65; text-align: center;
-}
-.pay-cta b { font-weight: 700; color: #fff; }
-
-/* ============== Vibe Coding 聚合 ============== */
+/* ============== Vibe Coding（留空）============== */
 .vibe { padding-top: 72px; }
-.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-
-/* ============== 友链交换（GitHub PR 换链） ============== */
-.friends { padding-top: 72px; }
-.friend-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
-.friend-empty {
-  background: var(--bg-soft); border: 1px dashed var(--line);
-  border-radius: var(--radius); padding: 26px 24px;
-  font-size: 14px; color: var(--ink-2); line-height: 1.75;
-}
-.friend-empty b { color: var(--ink); font-weight: 650; }
-.friend-empty code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12.5px; background: #fff; border: 1px solid var(--line-2);
-  padding: 1px 6px; border-radius: 6px; color: var(--accent);
-}
-
-.card {
-  display: flex; flex-direction: column;
-  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 26px 24px; position: relative; overflow: hidden;
-  opacity: 0; animation: fadeIn 0.6s ease both;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-.card:nth-child(1) { animation-delay: 0.04s; }
-.card:nth-child(2) { animation-delay: 0.10s; }
-.card:nth-child(3) { animation-delay: 0.16s; }
-.card:nth-child(4) { animation-delay: 0.22s; }
-.card:nth-child(5) { animation-delay: 0.28s; }
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 34px rgba(16, 24, 40, 0.08);
-  border-color: var(--accent-weak);
-}
-
-.card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.chip {
-  display: grid; place-items: center; width: 42px; height: 42px;
-  border-radius: 12px; font-size: 20px; background: var(--bg-soft);
-}
-.card-exam   .chip { background: #e8f1fc; }
-.card-fj     .chip { background: #e0f5f3; }
-.card-xf     .chip { background: #fdeaea; }
-.card-media  .chip { background: #f3e8fd; }
-.card-build  .chip { background: #fef3e2; }
-.card-meta   .chip { background: #f1f5f9; color: var(--ink); font-weight: 700; }
-.chip-reserve        { background: #f8fafc; border: 1px dashed var(--ink-4); }
-
-.tag { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--bg-soft); color: var(--ink-2); }
-.card-exam   .tag { background: #e8f1fc; color: #1565c0; }
-.card-fj     .tag { background: #e0f5f3; color: #0d9488; }
-.card-xf     .tag { background: #fdeaea; color: #dc2626; }
-.card-media  .tag { background: #f3e8fd; color: #7c3aed; }
-.card-build  .tag { background: #fef3e2; color: #b45309; }
-.card-meta   .tag { background: #f1f5f9; color: #475569; }
-.tag-reserve         { background: #f8fafc; color: var(--ink-3); border: 1px dashed var(--ink-4); }
-
-.card h3 { font-size: 17px; font-weight: 650; color: var(--ink); margin-bottom: 9px; line-height: 1.45; }
-.card p { font-size: 14px; color: var(--ink-2); line-height: 1.65; margin-bottom: 0; flex: 1; }
-
-/* 整张卡右上角 → 角标（hover 时位移，表示整卡可点） */
-.card::after {
-  content: "→";
-  position: absolute; top: 22px; right: 22px;
-  font-size: 18px; font-weight: 600; color: var(--ink-3);
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-.card:hover::after { transform: translateX(4px); color: var(--accent); }
-
-/* 预留产品卡（待开张） */
-.card-reserve {
-  background: #fafbfc;
-  border: 1px dashed var(--ink-4);
-  cursor: default;
-  animation: fadeIn 0.6s ease both 0.34s;
-}
-.card-reserve:hover { transform: none; box-shadow: none; border-color: var(--ink-4); }
-.card-reserve::after { content: ""; }
-.card-reserve p { color: var(--ink-2); }
-.reserve-note {
-  display: inline-block; margin-top: 8px;
-  font-size: 12px; color: var(--ink-3);
-  background: #fff; padding: 2px 8px; border-radius: 6px;
-  border: 1px solid var(--line-2);
-}
 
 /* ============== Writing (empty) ============== */
 .writing { padding-top: 72px; }
@@ -267,12 +150,6 @@ ul { list-style: none; }
   padding: 56px 32px;
   text-align: center;
   animation: fadeUp 0.5s ease both 0.1s;
-}
-.empty-mark {
-  width: 56px; height: 56px; border-radius: 16px;
-  background: #fff; border: 1px solid var(--line);
-  color: var(--ink-3); font-size: 24px;
-  display: grid; place-items: center; margin: 0 auto 18px;
 }
 .empty-title { font-size: 18px; font-weight: 650; color: var(--ink); margin-bottom: 10px; }
 .empty-desc { font-size: 14px; color: var(--ink-2); line-height: 1.7; max-width: 540px; margin: 0 auto 22px; }
@@ -305,23 +182,16 @@ ul { list-style: none; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* ============== Responsive ============== */
-@media (max-width: 920px) {
-  .card-grid { grid-template-columns: repeat(2, 1fr); }
-}
 @media (max-width: 720px) {
   .container { padding: 0 20px; }
   .hero { padding: 64px 0 56px; }
-  .now, .projects, .writing, .contact, .vibe, .friends { padding-top: 56px; }
-  .card-grid { grid-template-columns: 1fr; gap: 14px; }
+  .now, .writing, .contact, .vibe { padding-top: 56px; }
   .contact-grid { grid-template-columns: 1fr; }
   .empty { padding: 40px 22px; }
   .site-footer { margin-top: 60px; }
   .avatar { width: 76px; height: 76px; font-size: 19px; }
-  .matrix-group { margin-bottom: 32px; }
-  .pay-cta { padding: 14px 18px; font-size: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; scroll-behavior: auto; }
-  .card { opacity: 1; }
 }
