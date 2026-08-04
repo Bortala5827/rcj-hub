@@ -12,13 +12,17 @@
 
 极简单页，零 JS：
 
-- Header：品牌 + 锚点导航（Vibe Coding）
-- Hero：自我介绍 + 入口按钮（免费真题库 / 面试搭子）
+- Header：品牌字标
+- Hero：自我介绍 + 入口按钮
 - Now：最近在做什么（active / 规划中）
-- Vibe Coding：暂留空
-- Writing：博客空状态
-- Contact：GitHub / 邮箱 / Exam Hub / 面试搭子
-- Footer：邮箱 + 闲鱼/公众号 RCJ9527
+- Vibe Coding 友链征集区：国内开发者项目，支持 GitHub PR 换链（详见 `links.md`）
+- Vibe Coding 工具箱（海外）：Cursor / v0 / Bolt.new / Lovable
+- 前往 RCJ Exam Hub 胶囊：醒目蓝色按钮
+- Footer：邮箱 + 版权
+
+## 友链换链
+
+详见 [`links.md`](./links.md)。提交 PR 到 `links.md` 加你的项目，审核通过后会在主页「Vibe Coding 工具箱（友链）」区块回链。
 
 ## 更新
 
