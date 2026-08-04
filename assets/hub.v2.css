@@ -128,15 +128,16 @@ ul { list-style: none; }
 }
 
 /* ============== Hub CTA（底部居中胶囊）============== */
-.hub-cta { padding: 48px 0 72px; text-align: center; }
+.hub-cta { padding: 56px 0 80px; text-align: center; }
 .hub-pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 14px; font-weight: 600;
-  padding: 11px 22px; border-radius: 999px;
-  background: var(--ink); color: #fff;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 650; letter-spacing: 0.02em;
+  padding: 14px 30px; border-radius: 999px;
+  background: var(--accent); color: #fff;
+  box-shadow: 0 6px 18px rgba(30,136,229,0.25);
   transition: all 0.2s ease;
 }
-.hub-pill:hover { background: #1f2937; transform: translateY(-1px); }
+.hub-pill:hover { background: #1565c0; transform: translateY(-2px); box-shadow: 0 10px 24px rgba(30,136,229,0.32); }
 
 /* ============== Vibe Coding（留空）============== */
 .vibe { padding-top: 72px; }
