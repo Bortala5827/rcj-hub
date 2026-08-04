@@ -141,6 +141,35 @@ ul { list-style: none; }
 /* ============== Projects ============== */
 .projects { padding-top: 72px; }
 
+/* 产品矩阵 · 两层分组 */
+.matrix-group { margin-bottom: 48px; }
+.matrix-group:last-child { margin-bottom: 0; }
+.matrix-label {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--ink-2);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.ml-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.ml-free { background: var(--accent); box-shadow: 0 0 0 3px rgba(30,136,229,0.12); }
+.ml-pay  { background: #e53935; box-shadow: 0 0 0 3px rgba(229,57,53,0.12); }
+
+/* 付费标签（闲鱼红） */
+.tag-pay { background: #fdeaea; color: #c62828; font-weight: 700; }
+
+/* Vibe Coding 卡片（内链，箭头改下指） */
+.card-vibe .chip { background: #fef3e2; }
+.card-vibe .tag { background: #fef3e2; color: #b45309; }
+.card-vibe::after { content: "↓" !important; }
+
+/* 付费层 · 底部闲鱼成交 CTA */
+.pay-cta {
+  margin-top: 18px; padding: 16px 22px;
+  background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+  color: #fff; border-radius: var(--radius);
+  font-size: 14px; line-height: 1.65; text-align: center;
+}
+.pay-cta b { font-weight: 700; color: #fff; }
+
 /* ============== Vibe Coding 聚合 ============== */
 .vibe { padding-top: 72px; }
 .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
@@ -288,6 +317,8 @@ ul { list-style: none; }
   .empty { padding: 40px 22px; }
   .site-footer { margin-top: 60px; }
   .avatar { width: 76px; height: 76px; font-size: 19px; }
+  .matrix-group { margin-bottom: 32px; }
+  .pay-cta { padding: 14px 18px; font-size: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
