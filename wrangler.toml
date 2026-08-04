@@ -8,5 +8,5 @@ compatibility_date = "2024-09-23"
 
 [[d1_databases]]
 binding = "DB"                       # Functions 里用 env.DB 访问
-database_name = "rcj-hub-links"     # 在 CF 后台 D1 创建的数据库名
-database_id = "在此填入你的 D1 database_id"
+database_name = "rcj-hub-d1"        # D1 数据库名（与 CF 后台一致）
+database_id = "b18ad841-ee76-4454-97f6-4515f32bb5bf"
