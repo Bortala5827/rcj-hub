@@ -25,9 +25,9 @@ export async function onRequestGet({ request, env }) {
 
   try {
     const { results } = await env.DB.prepare(
-      "SELECT id, name, url, desc, status, created_at FROM links WHERE status = 'pending' ORDER BY created_at DESC LIMIT 50"
+      "SELECT id, name, url, desc, status, created_at FROM links ORDER BY created_at DESC LIMIT 100"
     ).all();
-    return json({ ok: true, pending: results || [] });
+    return json({ ok: true, links: results || [] });
   } catch {
     return json({ error: '数据库查询失败' }, 500);
   }
@@ -48,11 +48,15 @@ export async function onRequestPost({ request, env }) {
       await env.DB.prepare("UPDATE links SET status = 'approved' WHERE id = ?").bind(id).run();
       return json({ ok: true, msg: '已通过' });
     }
+    if (action === 'revoke') {
+      await env.DB.prepare("UPDATE links SET status = 'pending' WHERE id = ?").bind(id).run();
+      return json({ ok: true, msg: '已撤回' });
+    }
     if (action === 'delete') {
       await env.DB.prepare('DELETE FROM links WHERE id = ?').bind(id).run();
       return json({ ok: true, msg: '已删除' });
     }
-    return json({ error: 'action 只能是 approve 或 delete' }, 400);
+    return json({ error: 'action 只能是 approve / revoke / delete' }, 400);
   } catch (e) {
     return json({ error: '数据库操作失败: ' + e.message }, 500);
   }

@@ -46,12 +46,20 @@
       transition: box-shadow .15s;
     }
     .item:hover { box-shadow: 0 2px 8px rgba(15,23,42,.06); }
+    .item.pending { border-left: 4px solid #f59e0b; }
+    .item.approved { border-left: 4px solid #16a34a; }
     .item-body { flex: 1; min-width: 0; }
     .item-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
     .item-url { font-size: 13px; color: var(--accent); word-break: break-all; margin-bottom: 4px; }
     .item-desc { font-size: 13px; color: var(--muted); }
     .item-time { font-size: 12px; color: #94a3b8; margin-top: 6px; }
     .item-actions { display: flex; gap: 8px; flex-shrink: 0; padding-top: 2px; }
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px;
+      border-radius: 6px; margin-left: 6px; vertical-align: middle;
+    }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-approved { background: #dcfce7; color: #166534; }
     .btn {
       padding: 7px 16px; font-size: 13px; font-weight: 600; border: none; border-radius: 8px;
       cursor: pointer; transition: background .15s;
@@ -60,6 +68,8 @@
     .btn-approve:hover { background: #bbf7d0; }
     .btn-delete { background: #fee2e2; color: #991b1b; }
     .btn-delete:hover { background: #fecaca; }
+    .btn-revoke { background: #e0e7ff; color: #3730a3; }
+    .btn-revoke:hover { background: #c7d2fe; }
     .btn:disabled { opacity: .5; cursor: default; }
 
     .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
@@ -68,6 +78,19 @@
     .btn-logout { font-size: 13px; color: var(--muted); cursor: pointer; background: none; border: none; }
     .btn-logout:hover { color: var(--danger); }
     .error { background: #fef2f2; color: #991b1b; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--line); }
+    .tab {
+      padding: 10px 18px; font-size: 14px; font-weight: 600; cursor: pointer;
+      border: none; background: none; color: var(--muted); border-bottom: 2px solid transparent;
+      margin-bottom: -2px; transition: color .15s, border-color .15s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-count {
+      display: inline-block; min-width: 20px; text-align: center; font-size: 11px;
+      background: var(--line); color: var(--muted); padding: 1px 6px; border-radius: 10px; margin-left: 4px;
+    }
+    .tab.active .tab-count { background: var(--accent); color: #fff; }
   </style>
 </head>
 <body>
@@ -77,7 +100,8 @@
 (function(){
   var el = document.getElementById('app');
   var pw = localStorage.getItem('admin_pw') || '';
-  var pending = [];
+  var allLinks = [];
+  var currentTab = 'pending';
 
   function renderLogin(err) {
     el.innerHTML = '<div class="login-box">' +
@@ -105,36 +129,66 @@
       .then(function(r){ return r.json(); })
       .then(function(d){
         if (d.error) { pw=''; localStorage.removeItem('admin_pw'); renderLogin(d.error); return; }
-        pending = d.pending || [];
+        allLinks = d.links || [];
         renderList();
       })
       .catch(function(){ el.innerHTML = '<p class="error">网络错误，请刷新重试</p>'; });
   }
 
   function renderList() {
-    var top = '<div class="topbar"><h1>📋 待审核友链</h1><button class="btn-logout" onclick="logout()">退出</button></div>';
-    if (!pending.length) {
-      el.innerHTML = top + '<div class="empty-state"><p>✅ 暂无待审核的友链</p></div>';
+    var pending = allLinks.filter(function(l){ return l.status === 'pending'; });
+    var approved = allLinks.filter(function(l){ return l.status === 'approved'; });
+
+    var top = '<div class="topbar">' +
+      '<h1>📋 友链管理</h1>' +
+      '<button class="btn-logout" onclick="logout()">退出</button>' +
+      '</div>';
+
+    var tabs = '<div class="tabs">' +
+      '<button class="tab' + (currentTab==='pending' ? ' active' : '') + '" onclick="switchTab(\'pending\')">待审核<span class="tab-count">' + pending.length + '</span></button>' +
+      '<button class="tab' + (currentTab==='approved' ? ' active' : '') + '" onclick="switchTab(\'approved\')">已通过<span class="tab-count">' + approved.length + '</span></button>' +
+      '<button class="tab' + (currentTab==='all' ? ' active' : '') + '" onclick="switchTab(\'all\')">全部<span class="tab-count">' + allLinks.length + '</span></button>' +
+      '</div>';
+
+    var list = currentTab === 'pending' ? pending : currentTab === 'approved' ? approved : allLinks;
+
+    if (!list.length) {
+      var emptyMsg = currentTab === 'pending' ? '✅ 暂无待审核的友链' :
+                    currentTab === 'approved' ? '📭 还没有已通过的友链' : '📭 暂无友链';
+      el.innerHTML = top + tabs + '<div class="empty-state"><p>' + emptyMsg + '</p></div>';
       return;
     }
-    var html = top + '<div class="list">';
-    pending.forEach(function(l){
-      html += '<div class="item">' +
+
+    var html = top + tabs + '<div class="list">';
+    list.forEach(function(l){
+      var isPending = l.status === 'pending';
+      html += '<div class="item ' + l.status + '">' +
         '<div class="item-body">' +
-          '<p class="item-name">' + esc(l.name) + '</p>' +
+          '<p class="item-name">' + esc(l.name) +
+            '<span class="badge ' + (isPending ? 'badge-pending' : 'badge-approved') + '">' + (isPending ? '待审核' : '已通过') + '</span>' +
+          '</p>' +
           '<p class="item-url">' + esc(l.url) + '</p>' +
           (l.desc ? '<p class="item-desc">' + esc(l.desc) + '</p>' : '') +
           '<p class="item-time">' + fmtTime(l.created_at) + '</p>' +
         '</div>' +
-        '<div class="item-actions">' +
-          '<button class="btn btn-approve" data-id="' + l.id + '" onclick="approve(this)">✓ 通过</button>' +
-          '<button class="btn btn-delete" data-id="' + l.id + '" onclick="del(this)">✗ 删除</button>' +
+        '<div class="item-actions">';
+      if (isPending) {
+        html += '<button class="btn btn-approve" data-id="' + l.id + '" onclick="approve(this)">✓ 通过</button>';
+      } else {
+        html += '<button class="btn btn-revoke" data-id="' + l.id + '" onclick="revoke(this)">↩ 撤回</button>';
+      }
+      html += '<button class="btn btn-delete" data-id="' + l.id + '" onclick="del(this)">✗ 删除</button>' +
         '</div>' +
       '</div>';
     });
     html += '</div>';
     el.innerHTML = html;
   }
+
+  window.switchTab = function(tab) {
+    currentTab = tab;
+    renderList();
+  };
 
   window.approve = function(btn){
     btn.disabled = true;
@@ -150,8 +204,22 @@
       });
   };
 
+  window.revoke = function(btn){
+    btn.disabled = true;
+    var id = parseInt(btn.dataset.id);
+    fetch('/api/admin/links', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: pw, action: 'revoke', id: id })
+    }).then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d.ok) loadList();
+        else alert(d.error || '失败');
+      });
+  };
+
   window.del = function(btn){
-    if (!confirm('确定删除这条提交？')) return;
+    if (!confirm('确定删除这条提交？此操作不可恢复。')) return;
     btn.disabled = true;
     var id = parseInt(btn.dataset.id);
     fetch('/api/admin/links', {
