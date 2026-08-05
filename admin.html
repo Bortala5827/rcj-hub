@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>友链审核 · RCJ Hub</title>
+  <style>
+    :root {
+      --bg: #f8fafc; --surface: #fff; --text: #0f172a; --muted: #64748b;
+      --accent: #1e88e5; --danger: #dc2626; --line: #e2e8f0; --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 760px; margin: 0 auto; padding: 40px 20px; }
+    h1 { font-size: 22px; margin-bottom: 8px; }
+    .sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+    /* Login */
+    .login-box {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 28px; max-width: 400px; margin: 60px auto;
+    }
+    .login-box label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .login-box input {
+      width: 100%; padding: 11px 14px; font-size: 15px; border: 1px solid var(--line);
+      border-radius: 8px; outline: none; transition: border-color .2s;
+    }
+    .login-box input:focus { border-color: var(--accent); }
+    .login-box button {
+      width: 100%; margin-top: 16px; padding: 11px; font-size: 15px; font-weight: 600;
+      background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer;
+      transition: background .2s;
+    }
+    .login-box button:hover { background: #1565c0; }
+
+    /* List */
+    .list { display: flex; flex-direction: column; gap: 12px; }
+    .item {
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 18px 20px; display: flex; align-items: flex-start; gap: 16px;
+      transition: box-shadow .15s;
+    }
+    .item:hover { box-shadow: 0 2px 8px rgba(15,23,42,.06); }
+    .item-body { flex: 1; min-width: 0; }
+    .item-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .item-url { font-size: 13px; color: var(--accent); word-break: break-all; margin-bottom: 4px; }
+    .item-desc { font-size: 13px; color: var(--muted); }
+    .item-time { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+    .item-actions { display: flex; gap: 8px; flex-shrink: 0; padding-top: 2px; }
+    .btn {
+      padding: 7px 16px; font-size: 13px; font-weight: 600; border: none; border-radius: 8px;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-approve { background: #dcfce7; color: #166534; }
+    .btn-approve:hover { background: #bbf7d0; }
+    .btn-delete { background: #fee2e2; color: #991b1b; }
+    .btn-delete:hover { background: #fecaca; }
+    .btn:disabled { opacity: .5; cursor: default; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state p { font-size: 15px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .btn-logout { font-size: 13px; color: var(--muted); cursor: pointer; background: none; border: none; }
+    .btn-logout:hover { color: var(--danger); }
+    .error { background: #fef2f2; color: #991b1b; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+<div class="container" id="app"></div>
+
+<script>
+(function(){
+  var el = document.getElementById('app');
+  var pw = localStorage.getItem('admin_pw') || '';
+  var pending = [];
+
+  function renderLogin(err) {
+    el.innerHTML = '<div class="login-box">' +
+      '<h1>🔐 友链审核</h1>' +
+      '<p class="sub">输入管理员密码</p>' +
+      (err ? '<div class="error">' + esc(err) + '</div>' : '') +
+      '<label>密码</label>' +
+      '<input type="password" id="pw-input" placeholder="输入密码…" autofocus />' +
+      '<button onclick="login()">登录</button>' +
+      '</div>';
+    document.getElementById('pw-input').addEventListener('keydown', function(e){ if(e.key==='Enter') login(); });
+  }
+
+  function login() {
+    var v = document.getElementById('pw-input').value.trim();
+    if (!v) return;
+    pw = v;
+    localStorage.setItem('admin_pw', v);
+    loadList();
+  }
+
+  function loadList() {
+    el.innerHTML = '<p style="text-align:center;color:var(--muted);padding:60px">加载中…</p>';
+    fetch('/api/admin/links?password=' + encodeURIComponent(pw))
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d.error) { pw=''; localStorage.removeItem('admin_pw'); renderLogin(d.error); return; }
+        pending = d.pending || [];
+        renderList();
+      })
+      .catch(function(){ el.innerHTML = '<p class="error">网络错误，请刷新重试</p>'; });
+  }
+
+  function renderList() {
+    var top = '<div class="topbar"><h1>📋 待审核友链</h1><button class="btn-logout" onclick="logout()">退出</button></div>';
+    if (!pending.length) {
+      el.innerHTML = top + '<div class="empty-state"><p>✅ 暂无待审核的友链</p></div>';
+      return;
+    }
+    var html = top + '<div class="list">';
+    pending.forEach(function(l){
+      html += '<div class="item">' +
+        '<div class="item-body">' +
+          '<p class="item-name">' + esc(l.name) + '</p>' +
+          '<p class="item-url">' + esc(l.url) + '</p>' +
+          (l.desc ? '<p class="item-desc">' + esc(l.desc) + '</p>' : '') +
+          '<p class="item-time">' + fmtTime(l.created_at) + '</p>' +
+        '</div>' +
+        '<div class="item-actions">' +
+          '<button class="btn btn-approve" data-id="' + l.id + '" onclick="approve(this)">✓ 通过</button>' +
+          '<button class="btn btn-delete" data-id="' + l.id + '" onclick="del(this)">✗ 删除</button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  window.approve = function(btn){
+    btn.disabled = true;
+    var id = parseInt(btn.dataset.id);
+    fetch('/api/admin/links', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: pw, action: 'approve', id: id })
+    }).then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d.ok) loadList();
+        else alert(d.error || '失败');
+      });
+  };
+
+  window.del = function(btn){
+    if (!confirm('确定删除这条提交？')) return;
+    btn.disabled = true;
+    var id = parseInt(btn.dataset.id);
+    fetch('/api/admin/links', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: pw, action: 'delete', id: id })
+    }).then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d.ok) loadList();
+        else alert(d.error || '失败');
+      });
+  };
+
+  window.logout = function(){
+    pw = '';
+    localStorage.removeItem('admin_pw');
+    renderLogin();
+  };
+
+  window.login = login;
+
+  function esc(s) {
+    return String(s||'').replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function fmtTime(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) +
+      ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+
+  // init
+  if (pw) loadList(); else renderLogin();
+})();
+</script>
+</body>
+</html>
