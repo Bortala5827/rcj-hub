@@ -42,13 +42,13 @@ ul { list-style: none; }
   font-size: 14px; font-weight: 800; letter-spacing: -0.5px;
 }
 .wm-text { font-size: 15px; letter-spacing: 0.1px; color: var(--ink); }
-.nav-links { display: flex; gap: 22px; align-items: center; }
-.nav-links a { font-size: 14px; color: var(--ink-2); transition: color 0.2s ease; }
-.nav-links a:hover { color: var(--accent); }
-
-@media (max-width: 640px) {
-  .nav-links { display: none; }
+.nav-github {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 10px;
+  color: var(--ink-2); transition: color 0.2s ease, background 0.2s ease;
 }
+.nav-github:hover { color: var(--ink); background: var(--bg-soft); }
+.nav-github svg { display: block; }
 
 /* ============== HERO ============== */
 .hero { position: relative; overflow: hidden; padding: 88px 0 72px; }
