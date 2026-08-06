@@ -147,32 +147,6 @@ ul { list-style: none; }
   .dir-grid { grid-template-columns: 1fr; }
 }
 
-/* ============== Now ============== */
-.now { padding-top: 64px; }
-.now-list {
-  display: flex; flex-direction: column; gap: 4px;
-  border-top: 1px solid var(--line-2);
-}
-.now-list li {
-  display: grid; grid-template-columns: 24px 1fr; gap: 18px;
-  padding: 22px 4px; border-bottom: 1px solid var(--line-2);
-  align-items: flex-start;
-}
-.now-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  margin-top: 8px;
-}
-.dot-active { background: #1e88e5; box-shadow: 0 0 0 4px rgba(30,136,229,0.12); }
-.dot-soon  { background: #cbd5e1; }
-.now-title { font-size: 16px; font-weight: 650; color: var(--ink); margin-bottom: 4px; display: inline; }
-.now-meta { font-size: 14px; color: var(--ink-2); line-height: 1.65; }
-.badge-soon {
-  display: inline-block; font-size: 11px; font-weight: 600;
-  padding: 2px 8px; border-radius: 999px;
-  background: var(--bg-soft); color: var(--ink-3);
-  margin-left: 6px; vertical-align: middle;
-}
-
 /* ============== Vibe / Writing ============== */
 .vibe { padding-top: 72px; }
 .writing { padding-top: 72px; }
@@ -324,7 +298,7 @@ ul { list-style: none; }
   .container { padding: 0 20px; }
   .hero { padding: 64px 0 56px; }
   .directions { padding: 56px 0 8px; }
-  .now, .writing, .contact, .vibe { padding-top: 56px; }
+  .writing, .contact, .vibe { padding-top: 56px; }
   .contact-grid { grid-template-columns: 1fr; }
   .link-list { grid-template-columns: 1fr; }
   .lf-row { grid-template-columns: 1fr; }
