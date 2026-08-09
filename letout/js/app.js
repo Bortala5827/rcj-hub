@@ -147,7 +147,7 @@ function wireRecord() {
     recState = 'recording';
     fitCanvas(liveWave, 72);
     liveStop = mountLiveBars(liveWave, recorder.analyser, {
-      color: currentMode.live,
+      color: '#6f9b8a',
       minBarHeight: currentMode.tension ? 4 : 2,
       alpha: currentMode.tension ? 1 : 0.9,
     });
