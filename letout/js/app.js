@@ -218,20 +218,21 @@ async function renderShadows() {
 }
 
 function renderShadowInner(zone, data) {
-  const items = (data.items || []).map((it) => `
-    <div class="shadow-item">
-      ${it.title ? `<div class="shadow-title">${esc(it.title)}</div>` : ''}
-      <div class="shadow-text">${esc(it.text)}</div>
-      ${it.audio ? `<audio class="shadow-audio" src="${esc(it.audio)}" controls preload="none"></audio>` : ''}
-    </div>
-  `).join('');
+  const items = data.items || [];
+  // 单次只出一条（随机），不列清单
+  const it = items.length ? items[Math.floor(Math.random() * items.length)] : null;
+  if (!it) { zone.innerHTML = ''; return; }
   zone.innerHTML = `
     <div class="shadow-card">
       <div class="shadow-head">
         <span class="shadow-label">情绪影子</span>
         <span class="shadow-batch">${esc(data.batch && data.batch.label ? data.batch.label : '')}</span>
       </div>
-      ${items}
+      <div class="shadow-item">
+        ${it.title ? `<div class="shadow-title">${esc(it.title)}</div>` : ''}
+        <div class="shadow-text">${esc(it.text)}</div>
+        ${it.audio ? `<audio class="shadow-audio" src="${esc(it.audio)}" controls preload="none"></audio>` : ''}
+      </div>
     </div>`;
 }
 
