@@ -242,6 +242,13 @@ async function renderLog() {
 // ---------------- 声音档案（观察，不评分） ----------------
 function buildVoiceProfile(rows) {
   const count = rows.length;
+  if (count === 0) {
+    return `
+    <div class="voice-profile">
+      <div class="vp-head">声音档案 · 观察，不评分</div>
+      <div class="vp-empty" style="color:#9a8f86;font-size:13px;line-height:1.7">还没有声音记录。录第一条后，这里会出现你的声音档案——记录次数、第一次开口是哪天、常提到的话题。</div>
+    </div>`;
+  }
   const first = Math.min(...rows.map((r) => r.createdAt));
   const days = Math.max(1, Math.floor((Date.now() - first) / 864e5));
   const freq = {};
