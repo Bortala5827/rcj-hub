@@ -2,6 +2,8 @@
 
 `955827.xyz` 的个人主页。Cloudflare Pages 托管，零后端依赖。
 
+> 📐 **产品定位与设计规范**见 [`RCJ-Hub-总体设计规范.md`](./RCJ-Hub-总体设计规范.md)（改版前先读，确保不把产品做歪）。本文件只管技术部署与更新。
+
 ## 部署
 
 - 仓库：`github.com/ZHOUQIANG5827/rcj-hub`

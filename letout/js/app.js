@@ -58,8 +58,8 @@ function renderHome() {
     <h1 class="home-title">今天，把心里那点东西，放出来。</h1>
     <p class="home-sub">低连接时代的情绪出口。不评价、不留存、不 Therapy。</p>
 
-    <div class="mode-row" id="modeRow">
-      ${MODES.map((m) => `<button class="mode-pill" data-mode="${m.id}">${m.emoji} ${m.label}</button>`).join('')}
+    <div class="mode-grid" id="modeRow">
+      ${MODES.map((m) => `<button class="mode-tile" data-mode="${m.id}"><span class="mt-emoji">${m.emoji}</span><span class="mt-label">${m.label}</span></button>`).join('')}
     </div>
 
     <div class="release-zone" style="--mode-live:${currentMode.live}">
@@ -74,7 +74,7 @@ function renderHome() {
     </label>
   `;
 
-  view.querySelectorAll('.mode-pill').forEach((b) => {
+  view.querySelectorAll('.mode-tile').forEach((b) => {
     b.classList.toggle('active', b.dataset.mode === currentMode.id);
     b.onclick = () => { currentMode = MODE_MAP[b.dataset.mode]; syncModeUI(); };
   });
@@ -88,7 +88,7 @@ function renderHome() {
 }
 
 function syncModeUI() {
-  view.querySelectorAll('.mode-pill').forEach((b) =>
+  view.querySelectorAll('.mode-tile').forEach((b) =>
     b.classList.toggle('active', b.dataset.mode === currentMode.id));
   const zone = view.querySelector('.release-zone');
   if (zone) zone.style.setProperty('--mode-live', currentMode.live);
@@ -198,7 +198,7 @@ async function renderLog() {
 
   rows.forEach((r) => {
     const holder = view.querySelector(`.player[data-id="${r.id}"]`);
-    if (holder) players.add(mountPlayer(holder, r, { played: '#c45c3e', rest: '#ead5ce' }));
+    if (holder) players.add(mountPlayer(holder, r, { played: '#e07850', rest: '#3a2b23' }));
   });
 
   view.querySelectorAll('[data-act]').forEach((btn) => {

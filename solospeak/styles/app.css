@@ -29,6 +29,17 @@ body {
   padding: 0 var(--space) calc(var(--space) * 3);
 }
 
+/* 系列切换条：回转 Hub + 兄弟站（安静、不抢主视觉） */
+.series-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px; letter-spacing: .08em;
+}
+.series-bar a { color: var(--muted); text-decoration: none; transition: color .15s; }
+.series-bar a:hover { color: var(--accent); }
+.series-bar .series-name { color: #a9a49a; }
+
 /* 顶栏 */
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
