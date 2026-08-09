@@ -1,79 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LetOut · 大声说 — 即将开放</title>
-  <meta name="description" content="LetOut 大声说 —— 低连接时代里的情绪出口。允许一个人的内在状态，被真实地释放出来。" />
-  <meta name="theme-color" content="#b45309" />
-  <style>
-    :root { --warm: #e07a3f; --warm-2: #b45309; --bg: #0f1115; --fg: #f5f3ee; --muted: #9aa0aa; }
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(1200px 600px at 70% -10%, #2a1c12 0%, var(--bg) 55%);
-      color: var(--fg); font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
-
-    .card { width: min(520px, 88vw); padding: 48px 36px 40px; text-align: center; }
-
-    .badge { display: inline-block; font-size: 11px; letter-spacing: .2em; color: var(--warm);
-      border: 1px solid rgba(224,122,63,.35); border-radius: 999px; padding: 5px 16px; margin-bottom: 28px;
-      text-transform: uppercase; font-weight: 500; }
-
-    h1 { font-size: 32px; margin: 0 0 8px; letter-spacing: .03em; font-weight: 700; }
-    .sub { color: var(--warm); font-size: 15px; margin-bottom: 32px; font-weight: 500; }
-
-    .desc { color: var(--muted); line-height: 1.85; font-size: 14.5px; margin: 0 auto 36px; max-width: 400px; }
-
-    /* 五种模式标签 */
-    .modes { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px; }
-    .mode-tag {
-      font-size: 12px; color: var(--muted); background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08); border-radius: 999px; padding: 5px 14px;
-      transition: border-color .2s;
-    }
-    .mode-tag:hover { border-color: rgba(224,122,63,.35); color: var(--fg); }
-
-    .soon { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted);
-      background: rgba(224,122,63,.06); border: 1px solid rgba(224,122,63,.15); border-radius: 10px; padding: 9px 18px; margin-bottom: 36px; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--warm); animation: pulse 1.8s infinite; }
-    @keyframes pulse { 0%,100%{opacity:.25} 50%{opacity:1} }
-
-    .links { display: flex; gap: 10px; justify-content: center; }
-    a.btn {
-      color: var(--fg); text-decoration: none; border: 1px solid rgba(255,255,255,.14);
-      border-radius: 10px; padding: 11px 20px; font-size: 13.5px; transition: .2s; font-weight: 500;
-    }
-    a.btn:hover { border-color: var(--warm); color: var(--warm); }
-    a.primary { background: var(--warm); border-color: var(--warm); color: #1a120a; font-weight: 600; }
-    a.primary:hover { background: var(--warm-2); border-color: var(--warm-2); color: #fff; }
-
-    .slogan { margin-top: 44px; color: var(--muted); font-size: 12px; letter-spacing: .05em; opacity: .7; }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>LetOut · 大声说</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#e07850" />
+  <link rel="stylesheet" href="styles/app.css" />
 </head>
 <body>
-  <div class="card">
-    <span class="badge">Speak Series · 开口系列</span>
-    <h1>LetOut · 大声说</h1>
-    <div class="sub">低连接时代里的情绪出口</div>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">LetOut <span class="brand-sub">大声说</span></div>
+      <nav class="nav">
+        <button class="nav-btn active" data-route="home">释放</button>
+        <button class="nav-btn" data-route="log">库房</button>
+        <button class="nav-btn" data-route="about">关于</button>
+      </nav>
+    </header>
 
-    <p class="desc">允许一个人的内在状态，被真实地释放出来。<br />这里不要求你坚强，只是给「表达」留一个地方。</p>
+    <main id="view" class="view"></main>
 
-    <div class="modes">
-      <span class="mode-tag">说出来</span>
-      <span class="mode-tag">喊出来</span>
-      <span class="mode-tag">唱出来</span>
-      <span class="mode-tag">哭出来</span>
-      <span class="mode-tag">安静一下</span>
-    </div>
-
-    <div class="soon"><span class="dot"></span> 正在打磨中，敬请期待</div>
-
-    <div class="links">
-      <a class="btn primary" href="https://955827.xyz/">← 返回 RCJ Hub</a>
-      <a class="btn" href="/solospeak/">先试试 SoloSpeak 独声 →</a>
-    </div>
-
-    <p class="slogan">开口，本身就是一种力量。</p>
+    <footer class="site-footer">
+      <p class="foot-links">
+        <a href="https://955827.xyz/" target="_blank" rel="noopener">RCJ Hub</a>
+        <a href="https://ms.955827.xyz/" target="_blank" rel="noopener">FaceTalk</a>
+      </p>
+      <p class="foot-copy">© 2026 RCJ9527 · 释放，不是发泄</p>
+    </footer>
   </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
