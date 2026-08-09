@@ -234,6 +234,10 @@ select { width: 100%; }
   margin: 0 8px; transition: color .15s;
 }
 .foot-links a:hover { color: var(--accent); }
+.brand-line {
+  font-size: 11px; color: var(--muted); letter-spacing: .1em;
+  margin: 0 0 12px;
+}
 
 /* Toast */
 .toast {

@@ -203,6 +203,10 @@ body {
 }
 .foot-links a:hover { color: var(--accent-hot); }
 .foot-copy { color: #6b574c; font-size: 10px; letter-spacing: .06em; }
+.brand-line {
+  font-size: 11px; color: var(--muted); letter-spacing: .1em;
+  margin: 0 0 12px;
+}
 
 /* Toast */
 .toast {
