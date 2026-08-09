@@ -9,6 +9,7 @@ import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN, QUOTE } fro
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
 import { exportData, exportAudio } from './export.js';
 import { getDailyQuote } from './quotes.js';
+import { markHighVolumeToday } from './streak.js';
 
 const view = document.getElementById('view');
 const toastEl = document.getElementById('toast');
@@ -86,6 +87,7 @@ async function renderHome() {
 
     <div class="record-zone">
       <canvas class="wave-canvas" id="liveWave"></canvas>
+      <div class="vol-meter-live"><div class="vml-fill" id="volMeterFill"></div></div>
       <div class="rec-timer" id="recTimer">00:00</div>
       <button class="rec-btn" id="recBtn" aria-label="点击开始录音">●</button>
       <div class="rec-hint">点一下开始，再点一下停止。不评价好坏，先开口。停顿、重复、沉默、笑，都可以。</div>
@@ -120,6 +122,15 @@ async function renderHome() {
     recState = 'starting';
     try {
       recorder = new Recorder();
+      recorder.onLevel = (max) => {
+        const fill = document.getElementById('volMeterFill');
+        if (!fill) return;
+        fill.style.width = Math.max(4, Math.round(max * 100)) + '%';
+        let c = '#b9b3a8'; // 灰：低音量
+        if (max >= 0.58) c = '#e3a857'; // 橙：高音量触发
+        else if (max >= 0.25) c = '#6f9b8a'; // 绿：中音量
+        fill.style.background = c;
+      };
       await recorder.start();
     } catch (e) {
       toast('独声需要麦克风权限');
@@ -165,6 +176,7 @@ async function renderHome() {
     if (dur < 500) { toast('按住说话'); return; } // 误触
     if (!result || !result.blob || result.blob.size === 0) { toast('没有录到声音'); return; }
 
+    const streak = markHighVolumeToday(result.level);
     await putRecording({
       durationMs: result.durationMs,
       topicId: currentTopic ? currentTopic.id : null,
@@ -178,15 +190,23 @@ async function renderHome() {
     });
     await addSpoken(result.durationMs);
     toast('已留下你的声音');
-    showFeedbackCard(result, { topicText: currentTopic ? currentTopic.text : null });
+    showFeedbackCard(result, { topicText: currentTopic ? currentTopic.text : null, streak });
   };
 
-  // 录音结束反馈卡：音量小结 + AI 引导（自备 Key）+ 今日金句
+  // 录音结束反馈卡：音量小结 + 连击→FaceTalk 引导 + AI 引导（自备 Key）+ 今日金句
   function showFeedbackCard(result, meta) {
     const lvl = result.level || {};
     const peakPct = Math.round((lvl.max || 0) * 100);
     const durSec = Math.round(result.durationMs / 1000);
     const q = getDailyQuote();
+    const high = !!lvl.highTriggered;
+    const streak = meta.streak || 0;
+    const letoutNote = high
+      ? '状态打开了 🔥 这份劲儿，去 <a href="https://955827.xyz/letout/" target="_blank" rel="noopener">LetOut</a> 把情绪彻底释放一下 →'
+      : '想更放得开一点，可以试试 <a href="https://955827.xyz/letout/" target="_blank" rel="noopener">LetOut</a> 释放一下 →';
+    const faceTalkBanner = streak >= 3
+      ? `<div class="ft-banner">连续 ${streak} 天，你都放得很开 🔥<br>想试试对着真人练？去 <a href="https://ms.955827.xyz/" target="_blank" rel="noopener">FaceTalk · 面试搭子</a> 真人对练一下 →</div>`
+      : '';
     view.innerHTML = `
       <div class="recap">
         <div class="recap-head">这次开口，留下来了</div>
@@ -194,10 +214,9 @@ async function renderHome() {
         <div class="vol-card">
           <div class="vol-row"><span>音量峰值</span><b>${peakPct}%</b></div>
           <div class="vol-meter"><div class="vol-fill" style="width:${peakPct}%"></div></div>
-          <div class="vol-note">${lvl.highTriggered
-            ? '这次有放得很开的高音量 🔥 状态在打开。'
-            : '想更放得开一点，可以试试 <a href="https://955827.xyz/letout/" target="_blank" rel="noopener">LetOut</a> 释放一下 →'}</div>
+          <div class="vol-note">${letoutNote}</div>
         </div>
+        ${faceTalkBanner}
         <div class="ai-guide" id="aiGuide"></div>
         <div class="recap-quote">今日金句 · ${esc(q.author)}：${esc(q.text)}</div>
         <div class="recap-actions">

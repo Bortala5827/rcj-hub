@@ -315,6 +315,26 @@ select { width: 100%; }
 .vol-note a { color: var(--accent); text-decoration: none; }
 .vol-note a:hover { text-decoration: underline; }
 
+/* 录音中实时音量条（灰=低 / 绿=中 / 橙=高） */
+.vol-meter-live {
+  height: 6px; border-radius: 999px; background: var(--line);
+  overflow: hidden; margin: 2px 0 0;
+}
+.vml-fill {
+  height: 100%; width: 4%; border-radius: 999px;
+  background: #b9b3a8; transition: width .06s linear, background .25s;
+}
+
+/* 连续高音量 → FaceTalk 引导横幅 */
+.ft-banner {
+  background: linear-gradient(180deg, rgba(111,125,90,.16), rgba(111,125,90,.05));
+  border: 1px solid var(--accent-soft); border-left: 3px solid var(--accent);
+  border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px;
+  font-size: 13.5px; line-height: 1.7; color: var(--ink);
+}
+.ft-banner a { color: var(--accent-deep); text-decoration: none; font-weight: 600; }
+.ft-banner a:hover { text-decoration: underline; }
+
 /* AI 引导（反馈卡内） */
 .ai-guide { margin-bottom: 14px; }
 .ai-guide-locked {

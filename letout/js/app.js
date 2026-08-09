@@ -3,6 +3,8 @@ import { putRelease, getAllReleases, deleteRelease } from './db.js';
 import { Recorder } from './recorder.js';
 import { mountLiveBars, fitCanvas } from './waveform.js';
 import { mountPlayer } from './player.js';
+import { startGhostGuide } from './ghost-guide.js';
+import { getEmotionShadows } from './resource.js';
 
 const MODES = [
   { id: 'say',   label: '说出来',   emoji: '💬', live: '#ef9e7d', hint: '把堵在胸口的那句话，慢慢说出来。停顿、重复、沉默，都可以。' },
@@ -32,6 +34,8 @@ let recorder = null;
 let liveStop = null;
 let recStartTs = 0;
 let keepAudio = false;
+let ghostStop = null;       // 轮换引导语计时器清除函数
+let shadowCache = null;     // 情绪影子按天缓存，避免每次重渲染都拉取
 const players = new Set(); // 活跃 player，切页时销毁
 
 function toast(msg) {
@@ -52,6 +56,7 @@ function setRoute(r) {
   document.querySelectorAll('.nav-btn').forEach((b) =>
     b.classList.toggle('active', b.dataset.route === r));
   destroyPlayers();
+  if (ghostStop) { ghostStop(); ghostStop = null; }
   if (r === 'home') renderHome();
   else if (r === 'log') renderLog();
   else if (r === 'about') renderAbout();
@@ -74,6 +79,7 @@ function renderHome() {
 
     <div class="release-zone" style="--mode-live:${currentMode.live}">
       <canvas class="wave-canvas" id="liveWave"></canvas>
+      <div class="ghost-guide" id="ghostGuide">想到什么就说什么。</div>
       <div class="rec-timer" id="recTimer">00:00</div>
       <button class="rec-btn" id="recBtn" aria-label="开始释放">●</button>
       <div class="rec-hint" id="recHint">${currentMode.hint}</div>
@@ -82,6 +88,8 @@ function renderHome() {
     <label class="keep-toggle">
       <input type="checkbox" id="keepChk" /> 保留这段音频（默认不保留，阅后即焚）
     </label>
+
+    <div class="shadow-zone" id="shadowZone"></div>
   `;
 
   view.querySelectorAll('.mode-tile').forEach((b) => {
@@ -104,6 +112,7 @@ function renderHome() {
 
   syncModeUI();
   wireRecord();
+  renderShadows();
 }
 
 function syncModeUI() {
@@ -121,6 +130,10 @@ function wireRecord() {
   const timer = document.getElementById('recTimer');
 
   let recState = 'idle';
+
+  // 计时器上方轮换引导语（每 3 秒）
+  if (ghostStop) ghostStop();
+  ghostStop = startGhostGuide(document.getElementById('ghostGuide'), 3000);
 
   const startRec = async () => {
     if (recState !== 'idle') return;
@@ -194,6 +207,34 @@ function wireRecord() {
   });
 }
 
+// ---------------- 情绪影子（资源库 / 占位） ----------------
+async function renderShadows() {
+  const zone = document.getElementById('shadowZone');
+  if (!zone) return;
+  if (shadowCache) { renderShadowInner(zone, shadowCache); return; }
+  const data = await getEmotionShadows();
+  shadowCache = data;
+  renderShadowInner(zone, data);
+}
+
+function renderShadowInner(zone, data) {
+  const items = (data.items || []).map((it) => `
+    <div class="shadow-item">
+      ${it.title ? `<div class="shadow-title">${esc(it.title)}</div>` : ''}
+      <div class="shadow-text">${esc(it.text)}</div>
+      ${it.audio ? `<audio class="shadow-audio" src="${esc(it.audio)}" controls preload="none"></audio>` : ''}
+    </div>
+  `).join('');
+  zone.innerHTML = `
+    <div class="shadow-card">
+      <div class="shadow-head">
+        <span class="shadow-label">情绪影子</span>
+        <span class="shadow-batch">${esc(data.batch && data.batch.label ? data.batch.label : '')}</span>
+      </div>
+      ${items}
+    </div>`;
+}
+
 // ---------------- 库房（释放记录） ----------------
 async function renderLog() {
   destroyPlayers();
@@ -264,6 +305,9 @@ function renderAbout() {
 }
 
 // ---------------- 工具 ----------------
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
 function fmtFull(ts) {
   const d = new Date(ts);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
