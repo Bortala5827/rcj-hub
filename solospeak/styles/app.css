@@ -261,3 +261,87 @@ select { width: 100%; }
   font-size: 13px; z-index: 100; opacity: 0; transition: opacity .25s;
 }
 .toast.show { opacity: 1; }
+
+/* 顶栏齿轮（不突兀的小入口） */
+.nav-gear {
+  border: none; background: transparent; color: var(--muted);
+  font-size: 17px; padding: 6px 8px; margin-left: 2px; cursor: pointer;
+  border-radius: 999px; transition: all .2s; line-height: 1;
+}
+.nav-gear:hover { color: var(--accent); background: var(--surface); }
+
+/* AI 设置弹层 */
+.ai-overlay {
+  position: fixed; inset: 0; background: rgba(40, 38, 33, .42);
+  display: none; align-items: center; justify-content: center; z-index: 200;
+  padding: 20px;
+}
+.ai-overlay.show { display: flex; }
+.ai-panel {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  width: 100%; max-width: 420px; padding: 22px; box-shadow: 0 12px 40px rgba(0,0,0,.18);
+  max-height: 88vh; overflow-y: auto;
+}
+.ai-panel-head { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.ai-panel-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+.ai-check { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink); margin-bottom: 12px; cursor: pointer; }
+.ai-field { display: block; font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+.ai-field input {
+  display: block; width: 100%; margin-top: 5px; padding: 9px 11px;
+  border: 1px solid var(--line); border-radius: 10px; background: #fff;
+  font-size: 13px; color: var(--ink); font-family: inherit;
+}
+.ai-field input:focus { outline: none; border-color: var(--accent-soft); }
+.ai-tut { font-size: 12px; color: var(--muted); margin: 2px 0 12px; }
+.ai-tut a { color: var(--accent); text-decoration: none; }
+.ai-tut a:hover { text-decoration: underline; }
+.ai-test-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.ai-test-res { font-size: 12px; line-height: 1.5; }
+.ai-panel-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* 录音结束反馈卡 */
+.recap { padding-top: 14px; }
+.recap-head { font-size: 17px; font-weight: 600; color: var(--ink); }
+.recap-meta { font-size: 12px; color: var(--muted); margin: 4px 0 16px; }
+.vol-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 14px;
+}
+.vol-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; color: var(--muted); }
+.vol-row b { font-size: 22px; color: var(--accent-deep); font-weight: 600; }
+.vol-meter { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; margin: 10px 0 8px; }
+.vol-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #9bb39a, #6f9b8a 55%, #e3a857); }
+.vol-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.vol-note a { color: var(--accent); text-decoration: none; }
+.vol-note a:hover { text-decoration: underline; }
+
+/* AI 引导（反馈卡内） */
+.ai-guide { margin-bottom: 14px; }
+.ai-guide-locked {
+  background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius);
+  padding: 14px; font-size: 13px; color: var(--muted); text-align: center; line-height: 1.7;
+}
+.ai-guide-locked .link-btn { margin: 0 4px; }
+.ai-guide-tip { font-size: 11px; color: #a9a49a; margin-top: 4px; }
+.ai-guide-ready {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px;
+}
+.ai-guide-title { font-size: 13px; color: var(--accent-deep); font-weight: 600; margin-bottom: 8px; }
+.ai-note {
+  display: block; width: 100%; min-height: 56px; resize: vertical;
+  padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fff;
+  font-size: 13px; color: var(--ink); font-family: inherit; margin-bottom: 10px;
+}
+.ai-note:focus { outline: none; border-color: var(--accent-soft); }
+.ai-go { width: 100%; }
+.ai-result { margin-top: 12px; font-size: 13px; line-height: 1.75; }
+.ai-loading { color: var(--muted); }
+.ai-body { color: var(--ink); white-space: normal; }
+.ai-err { color: #b4452f; font-size: 12px; line-height: 1.6; }
+
+.recap-quote {
+  font-size: 13px; color: var(--accent-deep); line-height: 1.7;
+  border-left: 3px solid var(--accent-soft); padding: 4px 0 4px 12px; margin-bottom: 18px;
+}
+.recap-actions { display: flex; }
+.recap-actions .big-btn { flex: 1; }

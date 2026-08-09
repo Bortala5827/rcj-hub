@@ -6,7 +6,7 @@
   <title>SoloSpeak · 独声</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#6f7d5a" />
-  <link rel="stylesheet" href="styles/app.css?v=20260809g" />
+  <link rel="stylesheet" href="styles/app.css?v=20260809h" />
 </head>
 <body>
   <div id="app">
@@ -23,6 +23,7 @@
         <button class="nav-btn" data-route="log">声音日志</button>
         <button class="nav-btn" data-route="export">导出</button>
         <button class="nav-btn" data-route="about">关于</button>
+        <button class="nav-gear" id="aiSettingsBtn" title="AI 引导设置（自备 Key）" aria-label="AI 设置">⚙</button>
       </nav>
     </header>
 
@@ -39,6 +40,33 @@
 
   <div id="toast" class="toast" hidden></div>
 
+  <div id="aiSettingsOverlay" class="ai-overlay">
+    <div class="ai-panel">
+      <div class="ai-panel-head">🤖 AI 引导设置（自备 Key）</div>
+      <div class="ai-panel-desc">Key 只存在你浏览器本地，不会上传到任何服务器。分析在你本机发起。</div>
+      <label class="ai-check"><input type="checkbox" id="aiEnabled"> 启用 AI 引导</label>
+      <label class="ai-field">API Base URL
+        <input type="text" id="aiBaseUrl" placeholder="https://api.siliconflow.cn/v1" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="ai-field">API Key
+        <input type="password" id="aiApiKey" placeholder="sk-..." autocomplete="off" spellcheck="false">
+      </label>
+      <label class="ai-field">模型名
+        <input type="text" id="aiModel" placeholder="deepseek-ai/DeepSeek-V3 · Qwen/Qwen3-... · ..." autocomplete="off" spellcheck="false">
+      </label>
+      <div class="ai-tut">没有 Key？看 <a href="https://exam.rcj9527.dpdns.org/tutorials/api-key.html" target="_blank" rel="noopener">RCJ · 国内大模型免费 API 获取教程</a></div>
+      <div class="ai-test-row">
+        <button class="mini-btn" id="aiTestBtn">测试连接</button>
+        <span class="ai-test-res" id="aiTestResult"></span>
+      </div>
+      <div class="ai-panel-actions">
+        <button class="mini-btn" id="aiSettingsClose">取消</button>
+        <button class="big-btn ai-save" id="aiSettingsSave">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/ai-settings.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

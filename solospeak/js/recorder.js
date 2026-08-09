@@ -1,8 +1,9 @@
 // recorder.js — 录音引擎（MediaRecorder 生命周期）
-// 产出：{ blob, durationMs, peaks }
+// 产出：{ blob, durationMs, peaks, level }
 // 不自动上传、不留存服务器；本地优先。
 
 const TARGET_POINTS = 320; // 峰值数组长度（见 SPEC §4）
+const HIGH_THRESHOLD = 0.58; // 橙色高音量阈值（0..1，时域最大振幅）
 
 export class Recorder {
   constructor() {
@@ -15,6 +16,9 @@ export class Recorder {
     this.startTime = 0;
     this._chunks = [];
     this._resolveStop = null;
+    this.onLevel = null;     // (max:0..1) => void  实时音量回调（UI 画音量条用）
+    this._maxLevel = 0;     // 本次录音最高振幅
+    this._highTriggered = false; // 是否出现过橙色高音量
   }
 
   get isRecording() { return !!this.mediaRecorder && this.mediaRecorder.state === 'recording'; }
@@ -32,6 +36,8 @@ export class Recorder {
 
     this._frames = [];
     this._chunks = [];
+    this._maxLevel = 0;
+    this._highTriggered = false;
     const mime = pickMime();
     this.mediaRecorder = new MediaRecorder(this.stream, mime ? { mimeType: mime } : undefined);
     this.mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size) this._chunks.push(e.data); };
@@ -54,6 +60,9 @@ export class Recorder {
         if (v > max) max = v;
       }
       this._frames.push(max);
+      if (max > this._maxLevel) this._maxLevel = max;
+      if (max >= HIGH_THRESHOLD) this._highTriggered = true;
+      if (this.onLevel) this.onLevel(max);
       this._raf = requestAnimationFrame(tick);
     };
     this._raf = requestAnimationFrame(tick);
@@ -74,8 +83,14 @@ export class Recorder {
     const blob = new Blob(this._chunks, { type: this.mediaRecorder?.mimeType || 'audio/webm' });
     const durationMs = Math.max(0, Math.round(performance.now() - this.startTime));
     const peaks = downsample(this._frames, TARGET_POINTS);
+    const highCount = this._frames.filter((f) => f >= HIGH_THRESHOLD).length;
+    const level = {
+      max: Math.max(0, this._maxLevel),
+      highRatio: this._frames.length ? highCount / this._frames.length : 0,
+      highTriggered: this._highTriggered,
+    };
     this.analyser = null; this.stream = null; this.mediaRecorder = null;
-    return { blob, durationMs, peaks };
+    return { blob, durationMs, peaks, level };
   }
 }
 

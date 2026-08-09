@@ -8,6 +8,7 @@ import { mountPlayer } from './player.js';
 import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN, QUOTE } from './topics.js';
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
 import { exportData, exportAudio } from './export.js';
+import { getDailyQuote } from './quotes.js';
 
 const view = document.getElementById('view');
 const toastEl = document.getElementById('toast');
@@ -177,8 +178,39 @@ async function renderHome() {
     });
     await addSpoken(result.durationMs);
     toast('已留下你的声音');
-    renderHome();
+    showFeedbackCard(result, { topicText: currentTopic ? currentTopic.text : null });
   };
+
+  // 录音结束反馈卡：音量小结 + AI 引导（自备 Key）+ 今日金句
+  function showFeedbackCard(result, meta) {
+    const lvl = result.level || {};
+    const peakPct = Math.round((lvl.max || 0) * 100);
+    const durSec = Math.round(result.durationMs / 1000);
+    const q = getDailyQuote();
+    view.innerHTML = `
+      <div class="recap">
+        <div class="recap-head">这次开口，留下来了</div>
+        <div class="recap-meta">${durSec} 秒${meta.topicText ? ' · ' + esc(meta.topicText) : ''}</div>
+        <div class="vol-card">
+          <div class="vol-row"><span>音量峰值</span><b>${peakPct}%</b></div>
+          <div class="vol-meter"><div class="vol-fill" style="width:${peakPct}%"></div></div>
+          <div class="vol-note">${lvl.highTriggered
+            ? '这次有放得很开的高音量 🔥 状态在打开。'
+            : '想更放得开一点，可以试试 <a href="https://955827.xyz/letout/" target="_blank" rel="noopener">LetOut</a> 释放一下 →'}</div>
+        </div>
+        <div class="ai-guide" id="aiGuide"></div>
+        <div class="recap-quote">今日金句 · ${esc(q.author)}：${esc(q.text)}</div>
+        <div class="recap-actions">
+          <button class="big-btn" id="recapBack">回到今天</button>
+        </div>
+      </div>`;
+    if (window.RCJ_AI) {
+      window.RCJ_AI.mountAiGuide(document.getElementById('aiGuide'), {
+        durationMs: result.durationMs, level: lvl, topicText: meta.topicText,
+      });
+    }
+    document.getElementById('recapBack').onclick = () => renderHome();
+  }
 
   // 点击切换：点一下开始，再点一下停止（用户偏好，非按住录音）
   recBtn.addEventListener('click', () => {
