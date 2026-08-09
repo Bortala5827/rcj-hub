@@ -152,6 +152,21 @@ body {
 
 /* 导出 */
 .section-title { font-size: 15px; font-weight: 600; margin: 4px 0 14px; }
+.voice-profile {
+  background: var(--surface); border: 1px solid var(--line);
+  border-left: 3px solid var(--accent); border-radius: 10px;
+  padding: 16px 18px; margin-bottom: 22px;
+}
+.vp-head { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: .03em; margin-bottom: 12px; }
+.vp-stats { display: flex; gap: 28px; }
+.vp-stat { display: flex; flex-direction: column; }
+.vp-num { font-size: 24px; font-weight: 800; color: var(--ink); line-height: 1.1; }
+.vp-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.vp-topics { margin-top: 12px; font-size: 13px; color: var(--muted); line-height: 1.8; }
+.vp-chip {
+  display: inline-block; background: var(--bg); border: 1px solid var(--line);
+  border-radius: 999px; padding: 2px 10px; margin: 0 4px 4px 0; color: var(--ink);
+}
 .field { margin-bottom: 16px; }
 .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
 select, .big-btn {

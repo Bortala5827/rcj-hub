@@ -14,6 +14,15 @@ const MODES = [
 const MODE_MAP = Object.fromEntries(MODES.map((m) => [m.id, m]));
 const MODE_LABEL = Object.fromEntries(MODES.map((m) => [m.id, m.label]));
 
+// 情绪出口分类：纯 UI 临时选择，不存库、不分析（守「不过度收集」原则）
+const MOODS = [
+  { id: 'rant',  emoji: '😤', label: '抱怨一下' },
+  { id: 'happy', emoji: '😂', label: '开心一下' },
+  { id: 'sing',  emoji: '🎤', label: '唱两句' },
+  { id: 'rage',  emoji: '🔥', label: '发泄一下' },
+  { id: 'random', emoji: '🌧', label: '随便说说' },
+];
+
 const view = document.getElementById('view');
 const toastEl = document.getElementById('toast');
 
@@ -62,6 +71,11 @@ function renderHome() {
       ${MODES.map((m) => `<button class="mode-tile" data-mode="${m.id}"><span class="mt-emoji">${m.emoji}</span><span class="mt-label">${m.label}</span></button>`).join('')}
     </div>
 
+    <div class="mood-row">
+      <span class="mood-label">今天想：</span>
+      ${MOODS.map((m) => `<button class="mood-chip" data-mood="${m.id}"><span class="m-emoji">${m.emoji}</span><span class="m-label">${m.label}</span></button>`).join('')}
+    </div>
+
     <div class="release-zone" style="--mode-live:${currentMode.live}">
       <canvas class="wave-canvas" id="liveWave"></canvas>
       <div class="rec-timer" id="recTimer">00:00</div>
@@ -77,6 +91,15 @@ function renderHome() {
   view.querySelectorAll('.mode-tile').forEach((b) => {
     b.classList.toggle('active', b.dataset.mode === currentMode.id);
     b.onclick = () => { currentMode = MODE_MAP[b.dataset.mode]; syncModeUI(); };
+  });
+
+  // 情绪出口分类：纯临时高亮，不存库、不分析
+  view.querySelectorAll('.mood-chip').forEach((b) => {
+    b.onclick = () => {
+      const on = b.classList.contains('active');
+      view.querySelectorAll('.mood-chip').forEach((x) => x.classList.remove('active'));
+      if (!on) b.classList.add('active');
+    };
   });
 
   const keepChk = document.getElementById('keepChk');

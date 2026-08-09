@@ -105,6 +105,25 @@ body {
 }
 .mode-tile.active .mt-emoji { filter: none; }
 
+/* 情绪出口分类：纯 UI 临时选择，不存库不分析 */
+.mood-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 22px; }
+.mood-label { font-size: 13px; color: var(--muted); margin-right: 2px; }
+.mood-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px; border: 1px solid var(--line); background: var(--bg-2);
+  border-radius: 999px; cursor: pointer; color: var(--muted);
+  transition: .15s; font-size: 12.5px;
+}
+.mood-chip:hover { border-color: #4d382d; color: var(--text); }
+.mood-chip .m-emoji { font-size: 14px; line-height: 1; }
+.mood-chip.active {
+  border-color: var(--accent); color: var(--text);
+  background: linear-gradient(180deg, rgba(224,120,80,.2), rgba(224,120,80,.05));
+}
+@media (max-width: 380px) {
+  .mood-chip { padding: 6px 10px; font-size: 11.5px; }
+}
+
 /* 释放区：全幅、无卡片包裹 */
 .release-zone { text-align: center; padding: 4px 0 2px; position: relative; }
 .wave-canvas { width: 100%; height: 84px; display: block; margin-bottom: 10px; }

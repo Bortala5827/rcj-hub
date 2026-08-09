@@ -196,7 +196,7 @@ async function renderLog() {
     view.innerHTML = `<div class="empty">还没有声音。<br>回到「今天」，给自己一次开口的机会。</div>`;
     return;
   }
-  view.innerHTML = `<div class="section-title">声音日志（${rows.length}）</div>` + rows.map((r) => `
+  view.innerHTML = buildVoiceProfile(rows) + `<div class="section-title">声音日志（${rows.length}）</div>` + rows.map((r) => `
     <div class="log-item" data-id="${r.id}">
       <div class="log-head">
         <span class="log-date">${fmtFull(r.createdAt)}</span>
@@ -237,6 +237,31 @@ async function renderLog() {
       }
     };
   });
+}
+
+// ---------------- 声音档案（观察，不评分） ----------------
+function buildVoiceProfile(rows) {
+  const count = rows.length;
+  const first = Math.min(...rows.map((r) => r.createdAt));
+  const days = Math.max(1, Math.floor((Date.now() - first) / 864e5));
+  const freq = {};
+  rows.forEach((r) => {
+    const t = (r.topicText || '').trim();
+    if (t) freq[t] = (freq[t] || 0) + 1;
+  });
+  const top = Object.entries(freq)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map((x) => x[0]);
+  return `
+    <div class="voice-profile">
+      <div class="vp-head">声音档案 · 观察，不评分</div>
+      <div class="vp-stats">
+        <div class="vp-stat"><span class="vp-num">${count}</span><span class="vp-label">次声音记录</span></div>
+        <div class="vp-stat"><span class="vp-num">${days}</span><span class="vp-label">天前第一次开口</span></div>
+      </div>
+      ${top.length ? `<div class="vp-topics">常提到：${top.map((t) => `<span class="vp-chip">${esc(t)}</span>`).join('')}</div>` : ''}
+    </div>`;
 }
 
 // ---------------- 导出 ----------------
