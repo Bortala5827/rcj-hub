@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SoloSpeak · 独声</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#6f7d5a" />
+  <link rel="stylesheet" href="styles/app.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">SoloSpeak <span class="brand-sub">独声</span></div>
+      <nav class="nav">
+        <button class="nav-btn active" data-route="home">今天</button>
+        <button class="nav-btn" data-route="log">声音日志</button>
+        <button class="nav-btn" data-route="export">导出</button>
+        <button class="nav-btn" data-route="about">关于</button>
+      </nav>
+    </header>
+
+    <main id="view" class="view"></main>
+
+    <footer class="site-footer">
+      <p class="mother-slogan">开口，本身就是一种力量。</p>
+      <p class="series-tag">SoloSpeak 属于 Speak Series · 开口系列</p>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

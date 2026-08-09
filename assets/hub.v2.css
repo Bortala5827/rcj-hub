@@ -114,6 +114,7 @@ section[id] { scroll-margin-top: 84px; }
 /* ============== 核心产品区 ============== */
 .directions { padding: 72px 0 24px; background: var(--bg-soft); border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); }
 .dir-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.dir-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .dir-card {
   position: relative; display: flex; flex-direction: column; gap: 10px;
   padding: 28px 24px; background: #fff;
@@ -171,8 +172,22 @@ section[id] { scroll-margin-top: 84px; }
 .dir-talk .dir-cta { color: #7c3aed; }
 .dir-talk:hover { border-color: #ddcff7; }
 
+.dir-solo::before { background: linear-gradient(90deg, #6f7d5a, #55613f); }
+.dir-solo .dir-icon { background: #e7ebdf; }
+.dir-solo .dir-cta { color: #6f7d5a; }
+.dir-solo:hover { border-color: #cdd4bf; }
+
+.dir-letout::before { background: linear-gradient(90deg, #e07a3f, #b45309); }
+.dir-letout .dir-icon { background: #fbe9dd; }
+.dir-letout .dir-cta { color: #b45309; }
+.dir-letout:hover { border-color: #f3cdb4; }
+
+@media (max-width: 960px) {
+  .dir-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 720px) {
   .dir-grid { grid-template-columns: 1fr; }
+  .dir-grid-3 { grid-template-columns: 1fr; }
   .build-list { grid-template-columns: 1fr; }
   .block-eyebrow { margin: 36px 0 14px; }
 }
