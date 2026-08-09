@@ -1,6 +1,6 @@
 /* LetOut —— 夜色街头（与 SoloSpeak 的京都白日形成反差）
    SoloSpeak: 浅暖灰 / 明朝衬线 / 圆角卡片 / 安静
-   LetOut  : 暖黑夜色 / 无衬线重字 / 锐角直角 / 热烈        */
+   LetOut  : 暖黑夜色 / 无衬线重字 / 锐角直边 / 热烈 */
 
 :root {
   --bg: #17120f;          /* 暖黑 */
@@ -73,56 +73,45 @@ body {
 
 .view { flex: 1; padding: 22px 18px 28px; }
 
-/* 首页：大字标语，左对齐 */
-.brand-eyebrow {
-  font-size: 10px; letter-spacing: .42em; font-weight: 700;
-  color: var(--accent); text-transform: uppercase;
-}
-.home-title {
-  font-size: 30px; font-weight: 800; line-height: 1.22;
-  letter-spacing: -.02em; margin: 10px 0 8px;
-}
-.home-sub { color: var(--muted); font-size: 12px; letter-spacing: .05em; margin-bottom: 22px; }
+/* ===== 首页：模式网格即主角（无标题块，打开即选） ===== */
 
-/* 模式：方块 tile 网格（SoloSpeak 无此结构） */
-.mode-grid {
-  display: grid; grid-template-columns: repeat(5, 1fr);
-  gap: 6px; margin-bottom: 22px;
-}
-.mode-tile {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 11px 2px 9px;
-  border: 1px solid var(--line); background: var(--bg-2);
-  border-radius: var(--r); cursor: pointer; transition: .15s;
-  color: var(--muted);
-}
-.mode-tile:hover { border-color: #4d382d; color: var(--text); }
-.mt-emoji { font-size: 17px; line-height: 1; filter: grayscale(.5); }
-.mt-label { font-size: 11px; letter-spacing: .02em; white-space: nowrap; }
-.mode-tile.active {
-  border-color: var(--accent); color: var(--text);
-  background: linear-gradient(180deg, rgba(224,120,80,.18), rgba(224,120,80,.04));
-}
-.mode-tile.active .mt-emoji { filter: none; }
-
-/* 情绪出口分类：纯 UI 临时选择，不存库不分析 */
-.mood-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 22px; }
-.mood-label { font-size: 13px; color: var(--muted); margin-right: 2px; }
+/* 情绪出口：轻量提示行，放在最上面 */
+.mood-row { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-bottom: 18px; }
+.mood-label { font-size: 12px; color: var(--muted); margin-right: 2px; }
 .mood-chip {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 7px 12px; border: 1px solid var(--line); background: var(--bg-2);
   border-radius: 999px; cursor: pointer; color: var(--muted);
   transition: .15s; font-size: 12.5px;
 }
-.mood-chip:hover { border-color: #4d382d; color: var(--text); }
+.mood-chip:hover { border-color: #5a3d2e; color: var(--text); }
 .mood-chip .m-emoji { font-size: 14px; line-height: 1; }
 .mood-chip.active {
   border-color: var(--accent); color: var(--text);
   background: linear-gradient(180deg, rgba(224,120,80,.2), rgba(224,120,80,.05));
 }
-@media (max-width: 380px) {
-  .mood-chip { padding: 6px 10px; font-size: 11.5px; }
+
+/* 模式网格：LetOut 视觉核心——大 emoji + 粗标签 + 可砸感 */
+.mode-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 6px; margin-bottom: 20px;
 }
+.mode-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 16px 4px 12px;
+  border: 1px solid var(--line); background: var(--bg-2);
+  border-radius: var(--r); cursor: pointer; transition: .15s;
+  color: var(--muted);
+}
+.mode-tile:hover { border-color: #5a3d2e; color: var(--text); transform: translateY(-1px); }
+.mt-emoji { font-size: 22px; line-height: 1; filter: grayscale(.5); }
+.mt-label { font-size: 11.5px; letter-spacing: .02em; white-space: nowrap; font-weight: 500; }
+.mode-tile.active {
+  border-color: var(--accent); color: var(--text);
+  background: linear-gradient(180deg, rgba(224,120,80,.18), rgba(224,120,80,.04));
+  box-shadow: 0 2px 12px rgba(224,120,80,.12);
+}
+.mode-tile.active .mt-emoji { filter: none; }
 
 /* 释放区：全幅、无卡片包裹 */
 .release-zone { text-align: center; padding: 4px 0 2px; position: relative; }
@@ -222,10 +211,6 @@ body {
 }
 .foot-links a:hover { color: var(--accent-hot); }
 .foot-copy { color: #6b574c; font-size: 10px; letter-spacing: .06em; }
-.brand-line {
-  font-size: 11px; color: var(--muted); letter-spacing: .1em;
-  margin: 0 0 12px;
-}
 
 /* Toast */
 .toast {
@@ -238,5 +223,5 @@ body {
 
 @media (max-width: 380px) {
   .mode-grid { grid-template-columns: repeat(3, 1fr); }
-  .home-title { font-size: 26px; }
+  .mood-chip { padding: 6px 10px; font-size: 11.5px; }
 }

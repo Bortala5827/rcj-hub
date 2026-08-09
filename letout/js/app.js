@@ -63,9 +63,10 @@ document.querySelectorAll('.nav-btn').forEach((b) =>
 function renderHome() {
   destroyPlayers();
   view.innerHTML = `
-    <div class="brand-eyebrow">LET OUT · 大声说</div>
-    <h1 class="home-title">今天，把心里那点东西，放出来。</h1>
-    <p class="home-sub">低连接时代的情绪出口。不评价、不留存、不 Therapy。</p>
+    <div class="mood-row">
+      <span class="mood-label">今天想：</span>
+      ${MOODS.map((m) => `<button class="mood-chip" data-mood="${m.id}"><span class="m-emoji">${m.emoji}</span><span class="m-label">${m.label}</span></button>`).join('')}
+    </div>
 
     <div class="mode-grid" id="modeRow">
       ${MODES.map((m) => `<button class="mode-tile" data-mode="${m.id}"><span class="mt-emoji">${m.emoji}</span><span class="mt-label">${m.label}</span></button>`).join('')}
