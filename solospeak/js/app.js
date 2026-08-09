@@ -312,7 +312,6 @@ async function renderAbout() {
 
       <section class="about-foot">
         <p class="about-foot-note">独声是 Speak Series · 开口系列 的一款。</p>
-        <p class="about-quote">开口，本身就是一种力量。</p>
       </section>
     </div>
   `;

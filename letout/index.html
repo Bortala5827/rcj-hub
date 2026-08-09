@@ -12,35 +12,67 @@
     body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
       background: radial-gradient(1200px 600px at 70% -10%, #2a1c12 0%, var(--bg) 55%);
       color: var(--fg); font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
-    .card { width: min(560px, 90vw); padding: 40px 36px; text-align: center; }
-    .badge { display: inline-block; font-size: 12px; letter-spacing: .18em; color: var(--warm);
-      border: 1px solid rgba(224,122,63,.4); border-radius: 999px; padding: 5px 14px; margin-bottom: 22px; }
-    h1 { font-size: 34px; margin: 0 0 6px; letter-spacing: .02em; }
-    .sub { color: var(--warm); font-size: 15px; margin-bottom: 26px; }
-    .desc { color: var(--muted); line-height: 1.8; font-size: 15px; margin: 0 auto 28px; max-width: 420px; }
-    .soon { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted);
-      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 8px 16px; margin-bottom: 32px; }
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warm); animation: pulse 1.6s infinite; }
-    @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
-    .links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    a.btn { color: var(--fg); text-decoration: none; border: 1px solid rgba(255,255,255,.16); border-radius: 10px; padding: 10px 18px; font-size: 14px; transition: .2s; }
+
+    .card { width: min(520px, 88vw); padding: 48px 36px 40px; text-align: center; }
+
+    .badge { display: inline-block; font-size: 11px; letter-spacing: .2em; color: var(--warm);
+      border: 1px solid rgba(224,122,63,.35); border-radius: 999px; padding: 5px 16px; margin-bottom: 28px;
+      text-transform: uppercase; font-weight: 500; }
+
+    h1 { font-size: 32px; margin: 0 0 8px; letter-spacing: .03em; font-weight: 700; }
+    .sub { color: var(--warm); font-size: 15px; margin-bottom: 32px; font-weight: 500; }
+
+    .desc { color: var(--muted); line-height: 1.85; font-size: 14.5px; margin: 0 auto 36px; max-width: 400px; }
+
+    /* 五种模式标签 */
+    .modes { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px; }
+    .mode-tag {
+      font-size: 12px; color: var(--muted); background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08); border-radius: 999px; padding: 5px 14px;
+      transition: border-color .2s;
+    }
+    .mode-tag:hover { border-color: rgba(224,122,63,.35); color: var(--fg); }
+
+    .soon { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted);
+      background: rgba(224,122,63,.06); border: 1px solid rgba(224,122,63,.15); border-radius: 10px; padding: 9px 18px; margin-bottom: 36px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--warm); animation: pulse 1.8s infinite; }
+    @keyframes pulse { 0%,100%{opacity:.25} 50%{opacity:1} }
+
+    .links { display: flex; gap: 10px; justify-content: center; }
+    a.btn {
+      color: var(--fg); text-decoration: none; border: 1px solid rgba(255,255,255,.14);
+      border-radius: 10px; padding: 11px 20px; font-size: 13.5px; transition: .2s; font-weight: 500;
+    }
     a.btn:hover { border-color: var(--warm); color: var(--warm); }
     a.primary { background: var(--warm); border-color: var(--warm); color: #1a120a; font-weight: 600; }
     a.primary:hover { background: var(--warm-2); border-color: var(--warm-2); color: #fff; }
-    .slogan { margin-top: 38px; color: var(--muted); font-size: 13px; letter-spacing: .04em; }
+
+    .slogan { margin-top: 44px; color: var(--muted); font-size: 12px; letter-spacing: .05em; opacity: .7; }
   </style>
 </head>
 <body>
   <div class="card">
-    <span class="badge">SPEAK SERIES · 开口系列</span>
+    <span class="badge">Speak Series · 开口系列</span>
     <h1>LetOut · 大声说</h1>
     <div class="sub">低连接时代里的情绪出口</div>
-    <p class="desc">允许一个人的内在状态，被真实地释放出来。<br />说出来、喊出来、唱出来、哭出来、安静一下——<br />这里不要求你坚强，只是给「表达」留一个地方。</p>
+
+    <p class="desc">允许一个人的内在状态，被真实地释放出来。<br />这里不要求你坚强，只是给「表达」留一个地方。</p>
+
+    <div class="modes">
+      <span class="mode-tag">说出来</span>
+      <span class="mode-tag">喊出来</span>
+      <span class="mode-tag">唱出来</span>
+      <span class="mode-tag">哭出来</span>
+      <span class="mode-tag">安静一下</span>
+    </div>
+
     <div class="soon"><span class="dot"></span> 正在打磨中，敬请期待</div>
+
     <div class="links">
       <a class="btn primary" href="https://955827.xyz/">← 返回 RCJ Hub</a>
       <a class="btn" href="/solospeak/">先试试 SoloSpeak 独声 →</a>
     </div>
+
     <p class="slogan">开口，本身就是一种力量。</p>
   </div>
 </body>
