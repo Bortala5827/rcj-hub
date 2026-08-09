@@ -72,11 +72,6 @@ function renderHome() {
       ${MODES.map((m) => `<button class="mode-tile" data-mode="${m.id}"><span class="mt-emoji">${m.emoji}</span><span class="mt-label">${m.label}</span></button>`).join('')}
     </div>
 
-    <div class="mood-row">
-      <span class="mood-label">今天想：</span>
-      ${MOODS.map((m) => `<button class="mood-chip" data-mood="${m.id}"><span class="m-emoji">${m.emoji}</span><span class="m-label">${m.label}</span></button>`).join('')}
-    </div>
-
     <div class="release-zone" style="--mode-live:${currentMode.live}">
       <canvas class="wave-canvas" id="liveWave"></canvas>
       <div class="rec-timer" id="recTimer">00:00</div>
@@ -148,7 +143,7 @@ function wireRecord() {
     recState = 'recording';
     fitCanvas(liveWave, 72);
     liveStop = mountLiveBars(liveWave, recorder.analyser, {
-      color: '#6f9b8a',
+      color: '#e07850',
       minBarHeight: currentMode.tension ? 4 : 2,
       alpha: currentMode.tension ? 1 : 0.9,
     });
