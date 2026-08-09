@@ -3,7 +3,7 @@ import {
   putRecording, getAllRecordings, deleteRecording, setFavorite, getMeta, putMeta,
 } from './db.js';
 import { Recorder } from './recorder.js';
-import { mountLive, fitCanvas } from './waveform.js';
+import { mountLiveBars, renderWave, fitCanvas } from './waveform.js';
 import { mountPlayer } from './player.js';
 import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN, QUOTE } from './topics.js';
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
@@ -135,7 +135,7 @@ async function renderHome() {
     }
     recState = 'recording';
     fitCanvas(liveWave, 72);
-    liveStop = mountLive(liveWave, recorder.analyser, { color: '#6f7d5a' });
+    liveStop = mountLiveBars(liveWave, recorder.analyser, { color: '#6f9b8a' });
     recBtn.classList.add('recording');
     recBtn.textContent = '■';
     recStartTs = Date.now();
