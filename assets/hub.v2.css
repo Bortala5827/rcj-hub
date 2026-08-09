@@ -192,6 +192,68 @@ section[id] { scroll-margin-top: 84px; }
   .block-eyebrow { margin: 36px 0 14px; }
 }
 
+/* ============== 孤独的美食家 · 理念卡片 ============== */
+.gourmet { margin-top: 56px; }
+.gourmet-inner {
+  background: linear-gradient(135deg, #f5f3ee 0%, #e9e6df 50%, #e7ebdf 100%);
+  border: 1px solid #dcd8ce;
+  border-radius: var(--radius);
+  padding: 44px 36px;
+  position: relative; overflow: hidden;
+}
+.gourmet-inner::before {
+  content: "";
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: linear-gradient(180deg, #6f7d5a 0%, #a8b89d 100%);
+}
+.gourmet-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+  text-transform: uppercase; color: #6f7d5a; margin-bottom: 20px;
+}
+.gourmet-body { max-width: 600px; margin-left: 16px; }
+.gourmet-title {
+  font-size: clamp(22px, 3vw, 28px); font-weight: 700;
+  letter-spacing: -0.01em; color: var(--ink); margin-bottom: 6px;
+}
+.gourmet-sub {
+  font-size: 15px; font-weight: 500; color: #6f7d5a;
+  margin-bottom: 24px; line-height: 1.6;
+}
+.gourmet-quote {
+  border-left: 2px solid #cdd4bf; padding-left: 18px;
+  margin-bottom: 24px; font-style: italic;
+  font-size: 15px; color: var(--ink-2);
+  line-height: 1.85; font-family: Georgia, "Songti SC", "Noto Serif SC", serif;
+}
+.gourmet-quote br { display: block; content: ""; margin-top: 4px; }
+.gourmet-desc {
+  font-size: 14.5px; color: var(--ink-2);
+  line-height: 1.85; margin-bottom: 28px;
+}
+.gourmet-desc br { display: block; content: ""; margin-top: 2px; }
+.gourmet-cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 700; color: #55613f;
+  padding: 12px 24px; border-radius: 999px;
+  background: rgba(111, 125, 90, 0.08);
+  border: 1px solid rgba(111, 125, 90, 0.18);
+  transition: all 0.25s ease;
+}
+.gourmet-cta:hover {
+  background: rgba(111, 125, 90, 0.15);
+  border-color: rgba(111, 125, 90, 0.35);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 720px) {
+  .gourmet { margin-top: 40px; }
+  .gourmet-inner { padding: 32px 24px; }
+  .gourmet-body { margin-left: 8px; }
+  .gourmet-quote { font-size: 14px; padding-left: 14px; }
+  .gourmet-desc { font-size: 14px; }
+}
+
 /* ============== Vibe / 社区友链 ============== */
 .vibe { padding-top: 72px; }
 
