@@ -361,24 +361,27 @@ section[id] { scroll-margin-top: 84px; }
 }
 .pillar b { color: var(--ink); font-weight: 700; }
 
-/* ============== Speak Series 开口地图 ============== */
-.speak-map {
-  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 22px 24px; margin-bottom: 28px;
+/* ============== Speak Series 开口系列（优化） ============== */
+.speak-head { margin: 6px 0 22px; }
+.speak-head h2 {
+  font-size: clamp(22px, 3vw, 28px); font-weight: 700; letter-spacing: -0.015em;
+  color: var(--ink); margin-bottom: 8px;
 }
-.sm-q { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 14px; }
-.sm-row {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-sm);
-  margin-bottom: 10px; transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+.speak-head p { font-size: 15px; color: var(--ink-2); max-width: 560px; }
+
+/* 需求标签：合并自原「我现在需要什么」开口地图 */
+.need-tag {
+  align-self: flex-start;
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.01em;
+  padding: 4px 11px; border-radius: 999px;
+  background: var(--bg-soft); border: 1px solid var(--line); color: var(--ink-3);
 }
-.sm-row:last-child { margin-bottom: 0; }
-.sm-row:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,0.06); }
-.sm-emoji { font-size: 22px; line-height: 1; flex-shrink: 0; }
-.sm-text { display: flex; flex-direction: column; flex: 1; }
-.sm-text b { font-size: 15px; font-weight: 700; color: var(--ink); }
-.sm-text i { font-style: normal; font-size: 13px; color: var(--ink-3); margin-top: 2px; }
-.sm-go { font-size: 13px; font-weight: 600; color: var(--accent); flex-shrink: 0; }
+.dir-solo .need-tag { color: #6f7d5a; background: #eef1e8; border-color: #d8dfcc; }
+.dir-letout .need-tag { color: #b45309; background: #fbf0e6; border-color: #f3cdb4; }
+.dir-talk .need-tag { color: #7c3aed; background: #f4effe; border-color: #ddcff7; }
+
+/* 图标与文字间距微调（开口系列卡片） */
+.dir-card .dir-icon { margin-bottom: 2px; }
 
 /* ============== 生命周期状态 ============== */
 .dir-card .status {
