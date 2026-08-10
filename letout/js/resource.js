@@ -5,7 +5,7 @@
 // ⚠️ 接入方式：把 RESOURCE_REPO_RAW 改成你的仓库 raw 地址（仓库里放 manifest.json
 //    和各个 webm 文件）。manifest 结构见本文件底部 LOCAL_FALLBACK。
 
-const RESOURCE_REPO_RAW = 'https://raw.githubusercontent.com/Bortala5827/rcj-media-shadow/master'; // 情绪影子资源库（影视/人物台词）
+const RESOURCE_REPO_RAW = 'https://raw.githubusercontent.com/Bortala5827/rcj-media-assets/master'; // 情绪影子资源库（影视/人物台词）
 const ROTATE_DAYS = 3;        // 每 3 天轮换一批
 
 const LOCAL_FALLBACK = {
