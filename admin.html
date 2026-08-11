@@ -123,6 +123,9 @@
     .btn-small:hover { background: #f1f5f9; }
     .muted { color: var(--muted); }
     .loading { text-align: center; color: var(--muted); padding: 50px; }
+    /* FaceTalk 管理 Tab（iframe 嵌入，统一收口） */
+    .ft-frame-wrap { margin-top: 4px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #fff; }
+    .ft-frame-wrap iframe { width: 100%; height: 82vh; min-height: 560px; border: 0; display: block; }
   </style>
 </head>
 <body>
@@ -132,6 +135,7 @@
     <div class="tabs">
       <button class="tab active" data-tab="links" onclick="switchTab('links')">友链审核</button>
       <button class="tab" data-tab="data" onclick="switchTab('data')">使用数据</button>
+      <button class="tab" data-tab="ft" onclick="switchTab('ft')">FaceTalk 管理</button>
     </div>
   </div>
 
@@ -139,6 +143,12 @@
 
   <div class="panel" id="panel-data" hidden>
     <div id="dataApp"></div>
+  </div>
+
+  <div class="panel" id="panel-ft" hidden>
+    <div class="ft-frame-wrap">
+      <iframe src="https://ms.955827.xyz/admin" title="FaceTalk 管理后台" loading="lazy"></iframe>
+    </div>
   </div>
 </div>
 
@@ -148,6 +158,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab === tab); });
   document.getElementById('panel-links').hidden = (tab !== 'links');
   document.getElementById('panel-data').hidden = (tab !== 'data');
+  document.getElementById('panel-ft').hidden = (tab !== 'ft');
   if (tab === 'data') loadData();
 }
 
@@ -344,7 +355,7 @@ function switchTab(tab) {
       '<div class="data-head"><h1>📊 Speak Series 使用数据</h1>' +
         '<button class="btn-small" onclick="exportSnapshot()">⬇ 导出数据快照</button></div>' +
       '<div class="data-note">数据来自你<strong>本机浏览器</strong>（本地优先，不上传服务器）。只有在 <code>955827.xyz</code> 下使用 SoloSpeak / LetOut 才会被统计；换浏览器或清缓存则归零。' +
-        'FaceTalk 的数据在服务端（D1），请到 <a href="https://ms.955827.xyz/admin" target="_blank" rel="noopener">ms.955827.xyz/admin</a> 查看。</div>' +
+        'FaceTalk 的数据在服务端（D1），已整合到本页「<strong>FaceTalk 管理</strong>」标签页（也可直接访问 <a href="https://ms.955827.xyz/admin" target="_blank" rel="noopener">ms.955827.xyz/admin</a>）。</div>' +
 
       '<div class="stats">' +
         '<div class="stat solo"><div class="stat-num">' + solo.length + '</div><div class="stat-label">SoloSpeak 录音</div></div>' +
