@@ -241,6 +241,12 @@ body {
 .foot-links a:hover { color: var(--accent-hot); }
 .foot-copy { color: #6b574c; font-size: 10px; letter-spacing: .06em; }
 
+/* 母 slogan（Speak Series 统一骨架） */
+.mother-slogan {
+  text-align: center; font-size: 13px; color: var(--muted);
+  letter-spacing: .06em; margin: 0 0 10px;
+}
+
 /* Toast */
 .toast {
   position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(10px);
