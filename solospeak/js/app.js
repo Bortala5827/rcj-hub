@@ -205,7 +205,7 @@ async function renderHome() {
       ? '状态打开了 🔥 这份劲儿，去 <a href="https://955827.xyz/letout/" target="_blank" rel="noopener">LetOut</a> 把情绪彻底释放一下 →'
       : '想更放得开一点，可以试试 <a href="https://955827.xyz/letout/" target="_blank" rel="noopener">LetOut</a> 释放一下 →';
     const faceTalkBanner = streak >= 3
-      ? `<div class="ft-banner">连续 ${streak} 天，你都放得很开 🔥<br>想试试对着真人练？去 <a href="https://ms.955827.xyz/" target="_blank" rel="noopener">FaceTalk · 面试搭子</a> 真人对练一下 →</div>`
+      ? `<div class="ft-banner">连续 ${streak} 天，你都放得很开 🔥<br>想试试对着真人练？去 <a href="https://facetalk.955827.xyz/" target="_blank" rel="noopener">FaceTalk · 面试搭子</a> 真人对练一下 →</div>`
       : '';
     view.innerHTML = `
       <div class="recap">

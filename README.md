@@ -42,6 +42,6 @@ RCJ 产品生态共三类：
 | --- | --- | --- |
 | SoloSpeak · 独声 | https://955827.xyz/solospeak | solospeak |
 | LetOut · 大声说 | https://955827.xyz/letout | letout |
-| FaceTalk · 面试搭子 | https://ms.955827.xyz | facetalk |
+| FaceTalk · 面试搭子 | https://facetalk.955827.xyz | facetalk |
 
 > ③ 当前统一在 Speak Series 下运营；若某产品（如 FaceTalk）数据跑出独立价值，可后续拆为独立产品——但不是现在。
