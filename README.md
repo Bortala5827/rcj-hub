@@ -9,7 +9,6 @@ RCJ 产品生态的总入口与作者主页。Cloudflare Pages 托管，极简�
 
 - 品牌字标 + 自我介绍 + 全部产品入口
 - Vibe Coding 友链区：GitHub PR 换链 / 页面表单投稿（D1 收件箱，防垃圾）
-- 聚合 RCJ 全部产品（Exam Hub / Speak Series / FaceTalk）
 - 邮箱 + 版权 footer
 
 详细设计规范见 [`RCJ-Hub-总体设计规范.md`](./RCJ-Hub-总体设计规范.md)。
@@ -19,7 +18,7 @@ RCJ 产品生态的总入口与作者主页。Cloudflare Pages 托管，极简�
 改 `index.html` / `assets/hub.v2.css` → commit + push 到 `main` → CF Pages 自动上线。
 **改完线上 `Ctrl+F5` 硬刷**（Mac: `Cmd+Shift+R`）。
 
-## 🌐 RCJ 产品矩阵
+## RCJ 产品矩阵
 
 RCJ 产品生态共三类：
 
@@ -45,4 +44,4 @@ RCJ 产品生态共三类：
 | LetOut · 大声说 | https://955827.xyz/letout | letout |
 | FaceTalk · 面试搭子 | https://ms.955827.xyz | facetalk |
 
-> 备用域名：各站 `*.rcj9527.dpdns.org`（`.xyz` 不可达时回退）。
+> ③ 当前统一在 Speak Series 下运营；若某产品（如 FaceTalk）数据跑出独立价值，可后续拆为独立产品——但不是现在。
