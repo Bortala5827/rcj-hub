@@ -75,46 +75,63 @@ body {
 
 /* ===== 首页：模式网格即主角（无标题块，打开即选） ===== */
 
-/* 情绪出口：轻量提示行，放在最上面 */
-.mood-row { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-bottom: 18px; }
-.mood-label { font-size: 12px; color: var(--muted); margin-right: 2px; }
-.mood-chip {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 7px 12px; border: 1px solid var(--line); background: var(--bg-2);
+/* 情绪类型：4 格大色块，开场即选（LetOut 视觉核心，热烈释放） */
+.emotion-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 10px; margin-bottom: 14px;
+}
+.emotion-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+  padding: 22px 6px 18px;
+  border: 1px solid var(--line); background: var(--bg-2);
+  border-radius: var(--r); cursor: pointer; position: relative; overflow: hidden;
+  color: var(--muted);
+  transition: transform .15s, border-color .15s, box-shadow .2s, background .2s;
+  animation: tile-in .35s ease both;
+}
+.emotion-tile:nth-child(2) { animation-delay: .04s; }
+.emotion-tile:nth-child(3) { animation-delay: .08s; }
+.emotion-tile:nth-child(4) { animation-delay: .12s; }
+.emotion-tile::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 0%, var(--mode-live, #e07850) 0%, transparent 60%);
+  opacity: 0; transition: opacity .25s;
+}
+.emotion-tile:hover { transform: translateY(-2px); border-color: #5a3d2e; color: var(--text); }
+.et-emoji { font-size: 32px; line-height: 1; filter: grayscale(.45); transition: filter .2s, transform .2s; }
+.et-label { font-size: 14px; font-weight: 700; letter-spacing: .06em; }
+.emotion-tile.active {
+  color: var(--text);
+  border-color: var(--mode-live, #e07850);
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--mode-live, #e07850) 22%, transparent);
+}
+.emotion-tile.active::after { opacity: .16; }
+.emotion-tile.active .et-emoji { filter: none; transform: scale(1.08); }
+
+/* 声纹：情绪下的细分变体，轻量胶囊 */
+.voice-block { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.voice-label { font-size: 12px; color: var(--muted); }
+.voice-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.voice-chip {
+  padding: 6px 13px; border: 1px solid var(--line); background: var(--bg-2);
   border-radius: 999px; cursor: pointer; color: var(--muted);
   transition: .15s; font-size: 12.5px;
 }
-.mood-chip:hover { border-color: #5a3d2e; color: var(--text); }
-.mood-chip .m-emoji { font-size: 14px; line-height: 1; }
-.mood-chip.active {
-  border-color: var(--accent); color: var(--text);
-  background: linear-gradient(180deg, rgba(224,120,80,.2), rgba(224,120,80,.05));
+.voice-chip:hover { border-color: #5a3d2e; color: var(--text); }
+.voice-chip.active {
+  border-color: var(--mode-live, #e07850); color: var(--text);
+  background: color-mix(in srgb, var(--mode-live, #e07850) 16%, var(--bg-2));
 }
 
-/* 模式网格：LetOut 视觉核心——大 emoji + 粗标签 + 可砸感 */
-.mode-grid {
-  display: grid; grid-template-columns: repeat(5, 1fr);
-  gap: 6px; margin-bottom: 20px;
-}
-.mode-tile {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 16px 4px 12px;
-  border: 1px solid var(--line); background: var(--bg-2);
-  border-radius: var(--r); cursor: pointer; transition: .15s;
-  color: var(--muted);
-}
-.mode-tile:hover { border-color: #5a3d2e; color: var(--text); transform: translateY(-1px); }
-.mt-emoji { font-size: 22px; line-height: 1; filter: grayscale(.5); }
-.mt-label { font-size: 11.5px; letter-spacing: .02em; white-space: nowrap; font-weight: 500; }
-.mode-tile.active {
-  border-color: var(--accent); color: var(--text);
-  background: linear-gradient(180deg, rgba(224,120,80,.18), rgba(224,120,80,.04));
-  box-shadow: 0 2px 12px rgba(224,120,80,.12);
-}
-.mode-tile.active .mt-emoji { filter: none; }
+@keyframes tile-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* 释放区：全幅、无卡片包裹 */
-.release-zone { text-align: center; padding: 4px 0 2px; position: relative; }
+/* 释放区：全幅、无卡片包裹，背景随情绪微微染上配色 */
+.release-zone {
+  text-align: center; padding: 14px 0 6px; position: relative;
+  border-radius: var(--r); transition: background .3s;
+  background: radial-gradient(140% 80% at 50% 0%,
+    color-mix(in srgb, var(--mode-live, #e07850) 14%, transparent) 0%, transparent 55%);
+}
 .wave-canvas { width: 100%; height: 84px; display: block; margin-bottom: 10px; }
 .rec-timer {
   font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums;
@@ -122,21 +139,21 @@ body {
 }
 .rec-btn {
   width: 84px; height: 84px; border-radius: 50%;
-  border: 2px solid var(--accent); cursor: pointer; margin: 16px auto 14px;
-  background: var(--accent); color: #17120f; font-size: 26px; font-weight: 700;
+  border: 2px solid var(--mode-live, #e07850); cursor: pointer; margin: 16px auto 14px;
+  background: var(--mode-live, #e07850); color: #17120f; font-size: 26px; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 0 6px rgba(224,120,80,.10);
-  transition: transform .12s, box-shadow .2s, background .2s;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--mode-live, #e07850) 10%, transparent);
+  transition: transform .12s, box-shadow .2s, background .2s, border-color .2s;
 }
 .rec-btn:hover { transform: scale(1.03); }
 .rec-btn:active { transform: scale(.96); }
 .rec-btn.recording {
-  background: transparent; color: var(--accent-hot);
-  animation: pulse 1.25s ease-in-out infinite;
+  background: transparent; color: var(--mode-live, #e07850);
+  animation: emo-pulse 1.25s ease-in-out infinite;
 }
-@keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(224,120,80,.45); }
-  50%      { box-shadow: 0 0 0 18px rgba(224,120,80,0); }
+@keyframes emo-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--mode-live, #e07850) 45%, transparent); }
+  50%      { box-shadow: 0 0 0 18px color-mix(in srgb, var(--mode-live, #e07850) 0%, transparent); }
 }
 .rec-hint {
   color: var(--muted); font-size: 13px; line-height: 1.75;

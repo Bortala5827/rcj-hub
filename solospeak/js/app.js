@@ -3,7 +3,7 @@ import {
   putRecording, getAllRecordings, deleteRecording, setFavorite, getMeta, putMeta,
 } from './db.js';
 import { Recorder } from './recorder.js';
-import { mountLiveBars, renderWave, fitCanvas } from './waveform.js';
+import { mountLiveBars, renderWave, fitCanvas, lerpHex } from './waveform.js';
 import { mountPlayer } from './player.js';
 import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN, QUOTE } from './topics.js';
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
@@ -147,14 +147,20 @@ async function renderHome() {
     }
     recState = 'recording';
     fitCanvas(liveWave, 72);
-    liveStop = mountLiveBars(liveWave, recorder.analyser, { color: '#6f9b8a' });
+    // 波形随音量着色：小音量→苔绿，大音量→暖黄
+    liveStop = mountLiveBars(liveWave, recorder.analyser, {
+      colorFn: (v) => lerpHex('#6f9b8a', '#e3a857', Math.min(1, v * 1.5)),
+    });
     recBtn.classList.add('recording');
     recBtn.textContent = '■';
     recStartTs = Date.now();
+    // 计时器：正计时 MM:SS，秒数实时跳动，反馈更明显
+    const fmt = (sec) => String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
+    timer.textContent = fmt(0);
     const tick = () => {
       if (recState !== 'recording') return;
-      const s = Math.floor((Date.now() - recStartTs) / 1000);
-      timer.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+      const elapsed = Math.floor((Date.now() - recStartTs) / 1000);
+      timer.textContent = fmt(elapsed);
       recorder._timer = setTimeout(tick, 500);
     };
     tick();

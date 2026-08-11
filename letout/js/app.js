@@ -6,15 +6,69 @@ import { mountPlayer } from './player.js';
 import { startGhostGuide } from './ghost-guide.js';
 import { getEmotionShadows } from './resource.js';
 
-const MODES = [
-  { id: 'say',   label: '说出来',   emoji: '💬', live: '#ef9e7d', hint: '把堵在胸口的那句话，慢慢说出来。停顿、重复、沉默，都可以。' },
-  { id: 'shout', label: '喊出来',   emoji: '🔥', live: '#e07850', hint: '找个没人的地方，把那股劲儿喊出来。不用管好不好听。', tension: true },
-  { id: 'sing',  label: '唱出来',   emoji: '🎵', live: '#f0b48f', hint: '哼一段、唱一句，哪怕跑调。先让声音流动起来。' },
-  { id: 'cry',   label: '哭出来',   emoji: '💧', live: '#e07850', hint: '想哭就哭。这里没有观众，只有你自己的声音。', tension: true },
-  { id: 'quiet', label: '安静一下', emoji: '🌙', live: '#cbb4a6', hint: '不说话也行。就在这里，安静地待一会儿。' },
+// ─── 情绪类型 + 声纹变体 ───────────────────────────────
+// 每个情绪一种基调配色 + 波形性格（gradient 跨场渐变 / wobble 抖动 / pulse 律动），
+// 每种情绪下 3~5 种「声纹」变体，微调波形强度，让同情绪也有细微差别。
+const EMOTIONS = [
+  {
+    id: 'rant', label: '抱怨', emoji: '😤',
+    hint: '把堵在胸口的那股怨气，一股脑倒出来。停顿、重复、越说越急，都可以。',
+    grad: ['#ef9e7d', '#e07850'],
+    glow: '#e07850',
+    wave: { alpha: 1, minBarHeight: 4, wobble: 0.35, pulse: 0 },
+    voices: [
+      { id: 'rant-1', label: '唠叨', mod: { wobble: 0.25 } },
+      { id: 'rant-2', label: '吐槽', mod: { wobble: 0.35 } },
+      { id: 'rant-3', label: '碎碎念', mod: { wobble: 0.3, pulse: 0.15 } },
+      { id: 'rant-4', label: '埋怨', mod: { wobble: 0.45 } },
+      { id: 'rant-5', label: '咆哮', mod: { wobble: 0.6, pulse: 0.2 } },
+    ],
+  },
+  {
+    id: 'cry', label: '哭', emoji: '💧',
+    hint: '想哭就哭。这里没有观众，只有你自己的声音。',
+    grad: ['#aab6e6', '#7b8fc4'],
+    glow: '#8fa3d8',
+    wave: { alpha: 0.92, minBarHeight: 3, wobble: 0.22, pulse: 0 },
+    voices: [
+      { id: 'cry-1', label: '抽泣', mod: { wobble: 0.5 } },
+      { id: 'cry-2', label: '啜泣', mod: { wobble: 0.3 } },
+      { id: 'cry-3', label: '大哭', mod: { wobble: 0.45, pulse: 0.15 } },
+      { id: 'cry-4', label: '呜咽', mod: { wobble: 0.55 } },
+      { id: 'cry-5', label: '无声流泪', mod: { wobble: 0.08, minBarHeight: 2 } },
+    ],
+  },
+  {
+    id: 'sing', label: '唱', emoji: '🎵',
+    hint: '哼一段、唱一句，哪怕跑调。先让声音流动起来。',
+    grad: ['#f3cf93', '#e3a857'],
+    glow: '#e8b75f',
+    wave: { alpha: 0.92, minBarHeight: 3, wobble: 0.12, pulse: 0.35 },
+    voices: [
+      { id: 'sing-1', label: '哼唱', mod: { pulse: 0.3 } },
+      { id: 'sing-2', label: '清唱', mod: { pulse: 0.4 } },
+      { id: 'sing-3', label: '跑调', mod: { wobble: 0.3, pulse: 0.3 } },
+      { id: 'sing-4', label: '吼歌', mod: { pulse: 0.5, wobble: 0.2 } },
+      { id: 'sing-5', label: '转音', mod: { pulse: 0.45, wobble: 0.15 } },
+    ],
+  },
+  {
+    id: 'quiet', label: '安静', emoji: '🌙',
+    hint: '不说话也行。就在这里，安静地待一会儿。',
+    grad: ['#bcd0bc', '#9bbf9a'],
+    glow: '#a9c6a8',
+    wave: { alpha: 0.7, minBarHeight: 2, wobble: 0.05, pulse: 0.12, smoothing: 0.9 },
+    voices: [
+      { id: 'quiet-1', label: '呼吸', mod: { pulse: 0.3 } },
+      { id: 'quiet-2', label: '呢喃', mod: { wobble: 0.1 } },
+      { id: 'quiet-3', label: '发呆', mod: { pulse: 0.08 } },
+      { id: 'quiet-4', label: '沉默', mod: { wobble: 0.02, minBarHeight: 1 } },
+      { id: 'quiet-5', label: '白噪音', mod: { wobble: 0.6, minBarHeight: 2 } },
+    ],
+  },
 ];
-const MODE_MAP = Object.fromEntries(MODES.map((m) => [m.id, m]));
-const MODE_LABEL = Object.fromEntries(MODES.map((m) => [m.id, m.label]));
+const EMOTION_MAP = Object.fromEntries(EMOTIONS.map((e) => [e.id, e]));
+const EMOTION_LABEL = Object.fromEntries(EMOTIONS.map((e) => [e.id, e.label]));
 
 // 情绪出口分类：纯 UI 临时选择，不存库、不分析（守「不过度收集」原则）
 const MOODS = [
@@ -29,7 +83,8 @@ const view = document.getElementById('view');
 const toastEl = document.getElementById('toast');
 
 let route = 'home';
-let currentMode = MODES[0];
+let currentEmotion = EMOTIONS[0];
+let currentVoice = EMOTIONS[0].voices[0];
 let recorder = null;
 let liveStop = null;
 let recStartTs = 0;
@@ -68,21 +123,25 @@ document.querySelectorAll('.nav-btn').forEach((b) =>
 function renderHome() {
   destroyPlayers();
   view.innerHTML = `
-    <div class="mood-row">
-      <span class="mood-label">今天想：</span>
-      ${MOODS.map((m) => `<button class="mood-chip" data-mood="${m.id}"><span class="m-emoji">${m.emoji}</span><span class="m-label">${m.label}</span></button>`).join('')}
+    <div class="emotion-grid" id="emotionRow">
+      ${EMOTIONS.map((e) => `
+        <button class="emotion-tile" data-emotion="${e.id}">
+          <span class="et-emoji">${e.emoji}</span>
+          <span class="et-label">${e.label}</span>
+        </button>`).join('')}
     </div>
 
-    <div class="mode-grid" id="modeRow">
-      ${MODES.map((m) => `<button class="mode-tile" data-mode="${m.id}"><span class="mt-emoji">${m.emoji}</span><span class="mt-label">${m.label}</span></button>`).join('')}
+    <div class="voice-block">
+      <span class="voice-label">声纹</span>
+      <div class="voice-row" id="voiceRow"></div>
     </div>
 
-    <div class="release-zone" style="--mode-live:${currentMode.live}">
+    <div class="release-zone" id="releaseZone" style="--mode-live:${currentEmotion.glow}">
       <canvas class="wave-canvas" id="liveWave"></canvas>
       <div class="ghost-guide" id="ghostGuide">想到什么就说什么。</div>
       <div class="rec-timer" id="recTimer">00:00</div>
       <button class="rec-btn" id="recBtn" aria-label="开始释放">●</button>
-      <div class="rec-hint" id="recHint">${currentMode.hint}</div>
+      <div class="rec-hint" id="recHint">${currentEmotion.hint}</div>
     </div>
 
     <label class="keep-toggle">
@@ -92,36 +151,54 @@ function renderHome() {
     <div class="shadow-zone" id="shadowZone"></div>
   `;
 
-  view.querySelectorAll('.mode-tile').forEach((b) => {
-    b.classList.toggle('active', b.dataset.mode === currentMode.id);
-    b.onclick = () => { currentMode = MODE_MAP[b.dataset.mode]; syncModeUI(); };
-  });
-
-  // 情绪出口分类：纯临时高亮，不存库、不分析
-  view.querySelectorAll('.mood-chip').forEach((b) => {
-    b.onclick = () => {
-      const on = b.classList.contains('active');
-      view.querySelectorAll('.mood-chip').forEach((x) => x.classList.remove('active'));
-      if (!on) b.classList.add('active');
-    };
+  view.querySelectorAll('.emotion-tile').forEach((b) => {
+    b.classList.toggle('active', b.dataset.emotion === currentEmotion.id);
+    b.onclick = () => selectEmotion(b.dataset.emotion);
   });
 
   const keepChk = document.getElementById('keepChk');
   keepChk.checked = keepAudio;
   keepChk.onchange = () => { keepAudio = keepChk.checked; };
 
-  syncModeUI();
+  renderVoiceChips();
   wireRecord();
   renderShadows();
 }
 
-function syncModeUI() {
-  view.querySelectorAll('.mode-tile').forEach((b) =>
-    b.classList.toggle('active', b.dataset.mode === currentMode.id));
+function selectEmotion(id) {
+  const e = EMOTION_MAP[id];
+  if (!e || e.id === currentEmotion.id) return;
+  currentEmotion = e;
+  currentVoice = e.voices[0];
+  syncEmotionUI();
+}
+
+function selectVoice(id) {
+  const v = currentEmotion.voices.find((x) => x.id === id);
+  if (!v) return;
+  currentVoice = v;
+  syncEmotionUI();
+}
+
+function syncEmotionUI() {
+  view.querySelectorAll('.emotion-tile').forEach((b) =>
+    b.classList.toggle('active', b.dataset.emotion === currentEmotion.id));
   const zone = view.querySelector('.release-zone');
-  if (zone) zone.style.setProperty('--mode-live', currentMode.live);
+  if (zone) zone.style.setProperty('--mode-live', currentEmotion.glow);
   const hint = document.getElementById('recHint');
-  if (hint) hint.textContent = currentMode.hint;
+  if (hint) hint.textContent = currentEmotion.hint;
+  renderVoiceChips();
+}
+
+function renderVoiceChips() {
+  const row = document.getElementById('voiceRow');
+  if (!row) return;
+  row.innerHTML = currentEmotion.voices.map((v) =>
+    `<button class="voice-chip${v.id === currentVoice.id ? ' active' : ''}" data-voice="${v.id}">${v.label}</button>`
+  ).join('');
+  row.querySelectorAll('.voice-chip').forEach((b) => {
+    b.onclick = () => selectVoice(b.dataset.voice);
+  });
 }
 
 function wireRecord() {
@@ -155,10 +232,15 @@ function wireRecord() {
     }
     recState = 'recording';
     fitCanvas(liveWave, 72);
+    // 波形：按情绪配色渐变 + 声纹微调（抖动/律动）
+    const wcfg = Object.assign({}, currentEmotion.wave, currentVoice.mod || {});
     liveStop = mountLiveBars(liveWave, recorder.analyser, {
-      color: '#e07850',
-      minBarHeight: currentMode.tension ? 4 : 2,
-      alpha: currentMode.tension ? 1 : 0.9,
+      gradient: currentEmotion.grad,
+      wobble: wcfg.wobble || 0,
+      pulse: wcfg.pulse || 0,
+      alpha: wcfg.alpha != null ? wcfg.alpha : 0.9,
+      minBarHeight: wcfg.minBarHeight || 2,
+      smoothing: wcfg.smoothing != null ? wcfg.smoothing : 0.7,
     });
     recBtn.classList.add('recording');
     recBtn.textContent = '■';
@@ -190,7 +272,9 @@ function wireRecord() {
 
     const keep = keepAudio;
     await putRelease({
-      mode: currentMode.id,
+      mode: currentEmotion.id,
+      voice: currentVoice.id,
+      voiceLabel: currentVoice.label,
       durationMs: result.durationMs,
       peaks: result.peaks,
       keep,
@@ -247,7 +331,7 @@ async function renderLog() {
   view.innerHTML = `<div class="section-title">释放记录（${rows.length}）</div>` + rows.map((r) => `
     <div class="log-item" data-id="${r.id}">
       <div class="log-head">
-        <span class="log-mode mode-${r.mode}">${MODE_LABEL[r.mode] || r.mode}</span>
+        <span class="log-mode mode-${r.mode}">${EMOTION_LABEL[r.mode] || r.mode}${r.voiceLabel ? ' · ' + esc(r.voiceLabel) : ''}</span>
         <span class="log-meta">${fmtFull(r.createdAt)} · ${Math.round(r.durationMs / 1000)}s ${r.keep ? '· 💾' : '· 🌫'}</span>
       </div>
       <div class="player" data-id="${r.id}"></div>
@@ -294,7 +378,7 @@ function renderAbout() {
 
       <section class="story">
         <p>当连接越来越密、真正能说真话的地方越来越少，人需要一个出口。</p>
-        <p>说出来、喊出来、唱出来、哭出来、或者只是安静一下——都是允许的。这里不评价好坏，不判断对错，不留痕。</p>
+        <p>抱怨、痛哭、唱、或者只是安静地待着——都是允许的。这里不评价好坏，不判断对错，不留痕。</p>
         <p>像巴黎街头那个把耳机音量调大、对着塞纳河哼歌的人。没人认识他，但他自己知道，这一刻他是松的。</p>
       </section>
 
