@@ -1,5 +1,7 @@
 // sw.js — Service Worker：缓存壳 + 离线可用
-const CACHE = 'solospeak-v1';
+// 注意：每次发布新版本请把 CACHE 版本号 +1（如 v2→v3），并同步更新 index.html 里 sw.js 注册带的 ?v=
+// 这样浏览器才会装上新 SW、清掉旧缓存，避免小米/部分安卓自带浏览器一直吐旧版 JS（表现为录音按钮不显示等）。
+const CACHE = 'solospeak-v2';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   './styles/app.css',
@@ -19,15 +21,15 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+// 网络优先：先试网络（保证新部署立即生效），失败再回退缓存/离线壳。
+// 旧版是「缓存优先」，导致部分浏览器永久用旧 JS，录音按钮等不渲染。
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(e.request).then((r) =>
-      r || fetch(e.request).then((resp) => {
-        const copy = resp.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
-        return resp;
-      }).catch(() => caches.match('./index.html'))
-    )
+    fetch(e.request).then((resp) => {
+      const copy = resp.clone();
+      caches.open(CACHE).then((c) => c.put(e.request, copy));
+      return resp;
+    }).catch(() => caches.match(e.request).then((r) => r || caches.match('./index.html')))
   );
 });

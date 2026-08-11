@@ -228,6 +228,31 @@ select { width: 100%; }
   font-weight: 500; margin: 0;
 }
 
+/* 常见问题：低调折叠，不抢视觉重心 */
+.faq {
+  margin: 22px auto 0; max-width: 560px; padding: 0 4px;
+  border-top: 1px solid var(--line);
+}
+.faq summary {
+  list-style: none; cursor: pointer; user-select: none;
+  font-size: 13px; color: var(--muted); padding: 14px 2px;
+  display: flex; align-items: center; gap: 6px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::before {
+  content: "›"; font-size: 16px; line-height: 1; color: var(--muted);
+  transition: transform .15s ease;
+}
+.faq[open] summary::before { transform: rotate(90deg); }
+.faq-a {
+  font-size: 13px; color: var(--muted); line-height: 1.7;
+  padding: 0 2px 16px;
+}
+.faq-a p { margin: 0 0 8px; }
+.faq-a ul { margin: 0; padding-left: 18px; }
+.faq-a li { margin: 4px 0; }
+.faq-a b { color: var(--ink); font-weight: 500; }
+
 .empty { text-align: center; color: var(--muted); font-size: 14px; padding: 40px 0; }
 
 /* 母品牌页脚：安静的归属标注，不抢子品牌 slogan 的视觉重心 */

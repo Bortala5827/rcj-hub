@@ -396,6 +396,18 @@ async function renderAbout() {
       <section class="about-foot">
         <p class="about-foot-note">独声是 Speak Series · 开口系列 的一款。</p>
       </section>
+
+      <details class="faq">
+        <summary class="faq-q">录音按钮不显示 / 无法录音？</summary>
+        <div class="faq-a">
+          <p>多半是浏览器缓存了旧版本，或权限/兼容问题：</p>
+          <ul>
+            <li><b>缓存了旧版</b>：小米、部分安卓自带浏览器会长期缓存旧 JS。清「浏览记录」通常无效，需在浏览器对该站点的设置里<b>清除「所有缓存 / 存储空间」</b>（或卸载重装 PWA）。</li>
+            <li><b>麦克风权限</b>：检查地址栏是否允许麦克风；被禁用的话录音按钮不会出现。</li>
+            <li><b>浏览器不兼容</b>：换 Chrome、夸克等较新内核通常即可。</li>
+          </ul>
+        </div>
+      </details>
     </div>
   `;
 }
@@ -412,7 +424,7 @@ function fmtFull(ts) {
 // ---------------- 启动 ----------------
 async function boot() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js?v=20260811c').catch(() => {});
   }
   await seedIfEmpty();
   await getMeta('onboarded'); // 预留
