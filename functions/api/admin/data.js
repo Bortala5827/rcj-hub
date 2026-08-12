@@ -42,15 +42,20 @@ async function verifyAuth(request, env) {
   return false;
 }
 
-async function d1(env, dbId, sql) {
-  const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/d1/database/${dbId}/query`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${env.CF_API_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sql }),
-  });
-  const j = await r.json();
-  if (!j.success) throw new Error(j.errors?.[0]?.message || 'D1 查询失败');
-  return j.result[0].results;
+async function d1(env, dbId, sql, ms = 8000) {
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), ms);
+  try {
+    const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/d1/database/${dbId}/query`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${env.CF_API_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sql }),
+      signal: ac.signal,
+    });
+    const j = await r.json();
+    if (!j.success) throw new Error(j.errors?.[0]?.message || 'D1 查询失败');
+    return j.result[0].results;
+  } finally { clearTimeout(timer); }
 }
 
 export async function onRequestGet({ request, env }) {
@@ -60,8 +65,7 @@ export async function onRequestGet({ request, env }) {
   }
 
   try {
-    const [hubLinks, ftPairs, ftIntents, ftApps, ftWall, ftReports, ftRatings, ftMessages, ftPairsRecent, ftWallRecent,
-           auxWallCity, auxWallTotal, auxVisits, auxTrend, auxMatch] = await Promise.all([
+    const results = await Promise.allSettled([
       d1(env, DBS.hub, "SELECT status, COUNT(*) c FROM links GROUP BY status"),
       d1(env, DBS.facetalk, "SELECT status, COUNT(*) c FROM pairs GROUP BY status"),
       d1(env, DBS.facetalk, "SELECT COUNT(*) c FROM intents"),
@@ -78,6 +82,14 @@ export async function onRequestGet({ request, env }) {
       d1(env, DBS.aux, "SELECT day, SUM(n) s FROM visit_counts GROUP BY day ORDER BY day DESC LIMIT 14"),
       d1(env, DBS.aux, "SELECT COUNT(*) c FROM signal_match"),
     ]);
+    const v = (i) => results[i].status === 'fulfilled' ? results[i].value : null;
+    const warns = [];
+    results.forEach((r, i) => { if (r.status === 'rejected') warns.push(`查询#${i} 失败: ${r.reason.message}`); });
+
+    const hubLinks = v(0), ftPairs = v(1), ftIntents = v(2), ftApps = v(3), ftWall = v(4),
+          ftReports = v(5), ftRatings = v(6), ftMessages = v(7), ftPairsRecent = v(8),
+          ftWallRecent = v(9), auxWallCity = v(10), auxWallTotal = v(11),
+          auxVisits = v(12), auxTrend = v(13), auxMatch = v(14);
 
     const links = {};
     (hubLinks || []).forEach(r => links[r.status] = r.c);
@@ -113,6 +125,7 @@ export async function onRequestGet({ request, env }) {
         signalMatch: (auxMatch[0] && auxMatch[0].c) || 0,
       },
       note: '数据源：rcj-hub-d1 / mianshi-dazi-d1 / aux-police-exam-d1（均为服务端读取，不含浏览级 CF Analytics）。',
+      warns: warns.length ? warns : undefined,
     });
   } catch (e) {
     return json({ error: '聚合失败：' + e.message }, 500);
