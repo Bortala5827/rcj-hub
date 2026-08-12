@@ -7,12 +7,17 @@
 //   2. mountLiveBars()  — 实时频谱柱状图 ⭐（截图里的声纹波动）
 //   3. mountLiveWave()  — 实时波形线（经典示波器）
 //
-// mountLiveBars 着色/动效（v2 新增，全部可选、向后兼容）：
-//   color     单色（默认 #6f9b8a）
-//   colorFn   (v,i,n)=>cssColor  按每根柱的值/位置着色
-//   gradient  [c1,c2]            跨整片场由 c1→c2 渐变
-//   wobble    0..1               随机高度抖动（急躁/颤抖感）
-//   pulse     0..1               整体呼吸律动（唱歌/呼吸感）
+// mountLiveBars 着色/动效（全部可选、向后兼容）：
+//   v2:  color     单色（默认 #6f9b8a）
+//        colorFn   (v,i,n)=>cssColor  按每根柱的值/位置着色
+//        gradient  [c1,c2]            跨整片场由 c1→c2 渐变
+//        wobble    0..1               随机高度抖动（急躁/颤抖感）
+//        pulse     0..1               整体呼吸律动（唱歌/呼吸感）
+//   v3:  onLevel   (level)=>void      每帧回传平滑后的整体音量 0..1
+//                                     （用于驱动页面环境光 / CSS 变量）
+//        bloom     0..1               柱体廉价外发光（声音越大越烫）
+//        floorGlow cssHex             底部地面光晕，强度随音量
+//        levelFps  number             onLevel 回调频率上限（默认 15）
 
 // ─── 1. 静态波形（回放用） ─────────────────────────────
 // peaks: number[] 振幅 0..1
@@ -60,6 +65,11 @@ export function mountLiveBars(canvas, analyser, opts = {}) {
     borderRadius = 2,         // 柱顶圆角
     wobble = 0,               // 0..1 随机高度抖动（急躁/颤抖）
     pulse = 0,                // 0..1 整体呼吸律动
+    // v3
+    onLevel = null,           // (level 0..1) => void，每帧平滑音量
+    bloom = 0,                // 0..1 柱体外发光强度
+    floorGlow = null,         // cssHex 底部地面光晕色
+    levelFps = 15,            // onLevel 回调频率上限
   } = opts;
 
   const ctx = canvas.getContext('2d');
@@ -70,6 +80,10 @@ export function mountLiveBars(canvas, analyser, opts = {}) {
 
   let raf;
   let caps = new Float32Array(freqCount); // 峰值跟踪
+  let level = 0;                          // 平滑后的整体音量 0..1
+  let lastEmit = 0;
+  let lastSent = -1;
+  const emitGap = 1000 / Math.max(1, levelFps);
 
   const draw = () => {
     analyser.getByteFrequencyData(data);
@@ -83,6 +97,21 @@ export function mountLiveBars(canvas, analyser, opts = {}) {
 
     // 整体呼吸律动
     const beat = pulse ? (1 + pulse * 0.35 * Math.sin(Date.now() / 170)) : 1;
+
+    // 先算本帧原始平均音量（不含 wobble/pulse 修饰，代表真实说话强度）
+    let sum = 0, cnt = 0;
+    for (let i = 0; i < visibleBins; i += step) { sum += data[i]; cnt++; }
+    const raw = cnt ? Math.min(1, (sum / cnt) / 190) : 0;   // 190 而非 255：人声实际很难打满
+    level = level * 0.78 + raw * 0.22;                      // 时间平滑，避免闪烁
+
+    // 底部地面光（先画，柱体压在上面）
+    if (floorGlow && level > 0.02) {
+      const g = ctx.createLinearGradient(0, h, 0, h * 0.45);
+      g.addColorStop(0, hexToRgba(floorGlow, Math.min(0.42, level * 0.55)));
+      g.addColorStop(1, hexToRgba(floorGlow, 0));
+      ctx.fillStyle = g;
+      ctx.fillRect(0, h * 0.45, w, h * 0.55);
+    }
 
     for (let i = 0; i < visibleBins; i += step) {
       let v = data[i] / 255;                       // 0..1
@@ -102,6 +131,16 @@ export function mountLiveBars(canvas, analyser, opts = {}) {
       if (colorFn) col = colorFn(v, i, visibleBins);
       else if (gradient) col = lerpHex(gradient[0], gradient[1], i / visibleBins);
 
+      // 廉价外发光：同色放大一圈低透明再画一次（比 shadowBlur 快得多）
+      if (bloom > 0 && v > 0.1) {
+        ctx.globalAlpha = alpha * bloom * 0.3 * Math.min(1, v * 1.6);
+        ctx.fillStyle = col;
+        const pad = 2 + bloom * 3;
+        roundRect(ctx, x - pad, h - barH - pad, barW + pad * 2, barH + pad,
+          { tl: borderRadius + pad, tr: borderRadius + pad, br: 0, bl: 0 });
+        ctx.fill();
+      }
+
       // 画柱体（带圆角）
       ctx.globalAlpha = alpha;
       ctx.fillStyle = col;
@@ -117,13 +156,27 @@ export function mountLiveBars(canvas, analyser, opts = {}) {
     }
 
     ctx.globalAlpha = 1;
+
+    // 回传音量给页面（限频 + 变化阈值，避免高频触发样式重算）
+    if (onLevel) {
+      const now = Date.now();
+      if (now - lastEmit >= emitGap) {
+        const q = Math.round(level * 100) / 100;
+        if (q !== lastSent) { onLevel(q); lastSent = q; }
+        lastEmit = now;
+      }
+    }
+
     raf = requestAnimationFrame(draw);
   };
 
   raf = requestAnimationFrame(draw);
 
   // 返回停止函数
-  return () => cancelAnimationFrame(raf);
+  return () => {
+    cancelAnimationFrame(raf);
+    if (onLevel) onLevel(0);   // 停录时让环境光归零
+  };
 }
 
 // ─── 3. 实时波形线（经典示波器风格） ────────────────────
@@ -165,6 +218,14 @@ export function lerpHex(a, b, t) {
   const bl = Math.round(pa[2] + (pb[2] - pa[2]) * t);
   return `rgb(${r},${g},${bl})`;
 }
+
+// #rrggbb + alpha → rgba()
+export function hexToRgba(h, a) {
+  const p = hexToRgb(h);
+  if (!p) return h;
+  return `rgba(${p[0]},${p[1]},${p[2]},${Math.max(0, Math.min(1, a))})`;
+}
+
 function hexToRgb(h) {
   h = String(h).replace('#', '');
   if (h.length === 3) h = h.split('').map((c) => c + c).join('');
