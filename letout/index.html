@@ -6,7 +6,7 @@
   <title>LetOut · 大声说</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#17120f" />
-  <link rel="stylesheet" href="styles/app.css?v=20260812b" />
+  <link rel="stylesheet" href="styles/app.css?v=20260812c" />
 </head>
 <body>
   <div id="app">
@@ -37,8 +37,11 @@
     </footer>
   </div>
 
+  <div id="bg-particles"></div>
   <div id="toast" class="toast" hidden></div>
 
-  <script type="module" src="js/app.js?v=20260812b"></script>
+  <script defer src="vendor/tsparticles/tsparticles.slim.bundle.min.js?v=20260812c"></script>
+  <script type="module" src="js/particles.js?v=20260812c"></script>
+  <script type="module" src="js/app.js?v=20260812c"></script>
 </body>
 </html>

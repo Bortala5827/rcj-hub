@@ -197,6 +197,7 @@ function applyEmotionTheme() {
   root.style.setProperty('--mode-from', currentEmotion.grad[0]);
   root.style.setProperty('--mode-to', currentEmotion.grad[1]);
   root.dataset.emotion = currentEmotion.id;
+  if (window.__particles) window.__particles.setEmotion(currentEmotion.glow);
 }
 
 // 实时音量 → CSS 变量，驱动页面环境光呼吸（限频已在 waveform 层做）
@@ -260,6 +261,7 @@ function wireRecord() {
       onLevel: setLiveLevel,
     });
     document.documentElement.dataset.rec = '1';
+    if (window.__particles) window.__particles.pause(); // 录音时暂停粒子，省电/避免小米卡顿
     recBtn.classList.add('recording');
     recBtn.textContent = '■';
     recStartTs = Date.now();
@@ -278,6 +280,7 @@ function wireRecord() {
     recState = 'stopping';
     if (liveStop) { liveStop(); liveStop = null; }
     delete document.documentElement.dataset.rec;
+    if (window.__particles) window.__particles.resume();
     setLiveLevel(0);
     clearTimeout(recorder._timer);
     const dur = Date.now() - recStartTs;

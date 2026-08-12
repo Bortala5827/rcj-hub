@@ -22,6 +22,12 @@
   --live-level: 0;
   /* 弹性回弹缓动：点下去有肉感，不是生硬切换 */
   --ease-back: cubic-bezier(.34, 1.56, .64, 1);
+  /* 玻璃质感（参考 Xinqing-Station / Daily-Mood-Tracker 的 glassmorphism 写法，适配暗色锐角） */
+  --glass-blur: 16px;
+  --glass-bg: color-mix(in srgb, var(--bg-2) 56%, transparent);
+  --glass-brd: color-mix(in srgb, #ffffff 16%, transparent);
+  --glass-shadow: 0 6px 22px color-mix(in srgb, #000 42%, transparent),
+                  inset 0 1px 0 color-mix(in srgb, #ffffff 10%, transparent);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,6 +55,7 @@ body::after {
 }
 
 #app {
+  position: relative; z-index: 1; /* 抬到粒子背景之上，玻璃卡片才能透出底层粒子 */
   max-width: 480px;
   margin: 0 auto;
   min-height: 100%;
@@ -56,6 +63,12 @@ body::after {
   flex-direction: column;
   border-left: 1px solid var(--line);
   border-right: 1px solid var(--line);
+}
+
+/* 全屏粒子背景：情绪色氛围（tsParticles 自托管，录音时暂停省电） */
+#bg-particles {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
 }
 
 /* 系列切换条：回转 Hub + 兄弟站 */
@@ -104,9 +117,12 @@ body::after {
 .emotion-tile {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
   padding: 22px 6px 18px;
-  border: 1px solid var(--line); background: var(--bg-2);
+  border: 1px solid var(--glass-brd); background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
   border-radius: var(--r); cursor: pointer; position: relative; overflow: hidden;
   color: var(--muted);
+  box-shadow: var(--glass-shadow);
   transition: transform .32s var(--ease-back), border-color .25s, box-shadow .3s, background .25s;
   animation: tile-in .42s var(--ease-back) both;
 }
@@ -124,8 +140,9 @@ body::after {
 .et-label { font-size: 14px; font-weight: 700; letter-spacing: .06em; }
 .emotion-tile.active {
   color: var(--text);
-  border-color: var(--mode-live, #e07850);
-  box-shadow: 0 4px 20px color-mix(in srgb, var(--mode-live, #e07850) 26%, transparent);
+  border-color: color-mix(in srgb, var(--mode-live, #e07850) 65%, transparent);
+  box-shadow: 0 10px 32px color-mix(in srgb, var(--mode-live, #e07850) 24%, transparent),
+              inset 0 1px 0 color-mix(in srgb, #ffffff 12%, transparent);
 }
 .emotion-tile.active::after { opacity: .2; }
 .emotion-tile.active .et-emoji {
@@ -139,8 +156,11 @@ body::after {
 .voice-label { font-size: 12px; color: var(--muted); }
 .voice-row { display: flex; flex-wrap: wrap; gap: 7px; }
 .voice-chip {
-  padding: 6px 13px; border: 1px solid var(--line); background: var(--bg-2);
+  padding: 6px 13px; border: 1px solid var(--glass-brd); background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border-radius: 999px; cursor: pointer; color: var(--muted);
+  box-shadow: var(--glass-shadow);
   transition: transform .3s var(--ease-back), border-color .2s, background .25s, color .2s;
   font-size: 12.5px;
 }
@@ -217,8 +237,12 @@ html[data-rec="1"] .rec-timer {
 /* 情绪影子：影视台词卡（文本 + webm 音频） */
 .shadow-zone { margin-top: 22px; }
 .shadow-card {
-  border: 1px solid var(--line); border-radius: var(--r);
-  background: var(--bg-2); padding: 14px 15px;
+  border: 1px solid var(--glass-brd); border-radius: var(--r);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+  padding: 14px 15px;
 }
 .shadow-head {
   display: flex; align-items: baseline; justify-content: space-between;
@@ -255,9 +279,12 @@ html[data-rec="1"] .rec-timer {
   font-size: 14px; line-height: 1.9;
 }
 .log-item {
-  background: var(--bg-2); border: 1px solid var(--line);
+  background: var(--glass-bg); border: 1px solid var(--glass-brd);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border-left: 2px solid var(--accent-deep);
   border-radius: var(--r); padding: 13px 14px; margin-bottom: 10px;
+  box-shadow: var(--glass-shadow);
 }
 .log-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .log-mode {
@@ -332,4 +359,12 @@ html[data-rec="1"] .rec-timer {
   .emotion-tile:active, .voice-chip:active,
   .rec-btn:hover, .rec-btn:active, .rec-btn.recording { transform: none !important; }
   .release-zone::before { transition: opacity .4s ease; }
+}
+
+/* 不支持 backdrop-filter 的浏览器（部分老旧内核）回退实色，避免看穿底层 */
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  .emotion-tile, .voice-chip, .shadow-card, .log-item {
+    background: var(--bg-2) !important;
+    box-shadow: none !important;
+  }
 }
