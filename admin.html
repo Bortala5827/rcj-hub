@@ -68,6 +68,15 @@
     /* 趋势图 */
     .chart-wrap{width:100%}
     svg.chart{width:100%;height:auto;display:block}
+    .site-stats{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+    .ss-item{display:flex;align-items:center;gap:10px;font-size:13px}
+    .ss-dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+    .ss-name{width:120px;color:#334155}
+    .ss-num{font-weight:700;color:#0f172a;font-variant-numeric:tabular-nums}
+    .ss-sub{color:#94a3b8;font-size:12px}
+    .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
+    .lg{display:flex;align-items:center;gap:6px;font-size:12px;color:#475569}
+    .lg-dot{width:10px;height:10px;border-radius:50%}
 
     /* 条形（城市） */
     .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:9px;font-size:13px}
@@ -202,6 +211,8 @@
 
 <script>
 const API = '/api/admin';
+const SITE_COLORS = { aux:'#1e88e5', xf:'#ef6c00', facetalk:'#8e24aa', hub:'#2e7d32', solospeak:'#00897b', letout:'#6d4c41', training:'#c0ca33', exam:'#d81b60' };
+const SITE_LABELS = { aux:'辅警刷题站', xf:'消防刷题站', facetalk:'FaceTalk', hub:'RCJ Hub', solospeak:'SoloSpeak', letout:'LetOut', training:'RCJ Training', exam:'Exam Hub' };
 let DATA = null;
 const PW = localStorage.getItem('rcj_admin_pw') || '';   // 仅用于向后兼容旧链接接口，统一登录后由 cookie 接管
 
@@ -264,25 +275,34 @@ function renderPage(p){
 
 // ---------- 概览 ----------
 function renderOverview(){
-  const d=DATA, L=d.links, F=d.facetalk, A=d.aux;
+  const d=DATA, L=d.links, F=d.facetalk, A=d.aux, AN=d.analytics||{series:[],allVisits:0};
+  const series=AN.series||[];
   const cards=[
     {cls:'hub',num:L.pending,label:'友链待审',sub:'共 '+L.total+' 条'},
     {cls:'ft',num:F.pairsTotal,label:'FaceTalk 匹配',sub:F.intents+' 意图 / '+F.applications+' 申请'},
-    {cls:'aux',num:A.visits.s,label:'辅警浏览量',sub:A.visits.u+' 独立访客'},
+    {cls:'aux',num:AN.allVisits,label:'全站浏览量',sub:series.length+' 个站点 · 辅警 '+A.visits.s},
     {cls:'aux',num:A.wallTotal,label:'辅警留言墙',sub:A.signalMatch+' 次信号匹配'},
   ];
   let html='<div class="stats">';
   cards.forEach(c=>html+='<div class="stat '+c.cls+'"><div class="stat-num">'+c.num+'</div><div class="stat-label">'+c.label+'</div><div class="stat-sub">'+c.sub+'</div></div>');
   html+='</div>';
 
-  // 趋势图 + 快速分布
-  html+='<div class="grid-2">';
-  html+='<div class="panel"><h3>辅警 · 近 14 日浏览趋势 <span class="tag">visit_counts</span></h3><div class="chart-wrap">'+lineChart(A.visitTrend)+'</div></div>';
-  html+='<div class="panel"><h3>各模块速览</h3>'+miniModuleList()+'</div>';
-  html+='</div>';
+  // 全站多站点趋势图
+  html+='<div class="panel"><h3>全站浏览趋势 · 近 14 日 <span class="tag">rcj-analytics-d1</span></h3>'+multiLineChart(series)+'</div>';
+
+  // 各站点累计流量
+  html+='<div class="panel"><h3>各站点流量（累计）</h3><div class="site-stats">';
+  const order=['aux','xf','facetalk','hub','solospeak','letout','training','exam'];
+  let any=false;
+  order.forEach(site=>{
+    const s=series.find(x=>x.site===site); if(!s)return; any=true;
+    html+='<div class="ss-item"><span class="ss-dot" style="background:'+SITE_COLORS[site]+'"></span><span class="ss-name">'+SITE_LABELS[site]+'</span><span class="ss-num">'+s.total+'</span><span class="ss-sub">'+s.u+' 访客 / '+s.d+' 天</span></div>';
+  });
+  if(!any) html+='<div class="empty">暂无浏览数据（埋点已部署，访问各站点后开始累计）</div>';
+  html+='</div></div>';
 
   html+='<div class="panel"><h3>数据源说明</h3><p class="small muted">'+esc(d.note)+'</p>';
-  html+='<p class="small muted" style="margin-top:8px">Speak Series（SoloSpeak / LetOut）为本地优先、数据存用户浏览器，未上传服务端，故不在此聚合。需查看时请在使用该产品的浏览器中打开其原生统计。</p></div>';
+  html+='<p class="small muted" style="margin-top:8px">所有站点浏览量通过统一埋点 <code>/api/track?site=xxx</code> 汇入同一张表，一处聚合、跨站对比，不再分散。</p></div>';
 
   document.getElementById('content').innerHTML=html;
 }
@@ -457,6 +477,31 @@ function lineChart(data){
     '<circle cx="'+X(n-1)+'" cy="'+Y(last.s)+'" r="3.5" fill="#1e88e5"/>'+
     labels+
     '</svg>';
+}
+
+// 多站点折线图（每条线一个 site）
+function multiLineChart(series){
+  if(!series||!series.length) return '<div class="empty">暂无浏览数据</div>';
+  const W=680,H=240,pad=36;
+  const daySet=new Set();
+  series.forEach(s=>(s.points||[]).forEach(p=>daySet.add(p.day)));
+  const days=Array.from(daySet).sort().slice(-14);
+  const n=days.length; if(!n) return '<div class="empty">暂无浏览数据</div>';
+  const max=Math.max(1,...series.flatMap(s=>(s.points||[]).map(p=>p.s)));
+  const X=i=>pad+i*((W-pad*2)/(n-1));
+  const Y=v=>H-pad-(v/max)*(H-pad*2);
+  let grid='',labels='';
+  for(let g=0;g<=3;g++){const yv=Math.round(max*g/3);const y=Y(yv);grid+='<line x1="'+pad+'" y1="'+y+'" x2="'+(W-pad)+'" y2="'+y+'" stroke="#eef2f7"/><text x="4" y="'+(y+4)+'" font-size="10" fill="#94a3b8">'+yv+'</text>';}
+  [0,Math.floor((n-1)/2),n-1].forEach(i=>{labels+='<text x="'+X(i)+'" y="'+(H-10)+'" font-size="10" fill="#94a3b8" text-anchor="middle">'+days[i].slice(5)+'</text>';});
+  const dayIndex={}; days.forEach((d,i)=>dayIndex[d]=i);
+  let polylines='',legend='';
+  series.forEach(s=>{
+    const col=SITE_COLORS[s.site]||'#64748b';
+    const pts=days.map((d,i)=>{const p=(s.points||[]).find(p=>p.day===d);return X(i)+','+Y(p?p.s:0);}).join(' ');
+    polylines+='<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
+    legend+='<span class="lg"><span class="lg-dot" style="background:'+col+'"></span>'+SITE_LABELS[s.site]+'</span>';
+  });
+  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img">'+grid+polylines+labels+'</svg><div class="legend">'+legend+'</div>';
 }
 
 // ---------- 工具 ----------

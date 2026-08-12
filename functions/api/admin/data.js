@@ -1,12 +1,13 @@
 // rcj-hub · 统一后台数据聚合
 // GET /api/admin/data  (需登录：签名 cookie 或 ?password=)
-// 服务端用 CF_API_TOKEN + CF_ACCOUNT_ID 读取三个 D1 库，聚合后返回 JSON。
+// 服务端用 CF_API_TOKEN + CF_ACCOUNT_ID 读取各 D1 库，聚合后返回 JSON。
 // token 仅存于服务端 env，绝不下发浏览器。
 
 const DBS = {
   hub: 'b18ad841-ee76-4454-97f6-4515f32bb5bf',       // rcj-hub-d1 (友链)
   facetalk: 'f93a89d7-ef5f-49c5-863d-5f1611e1a7f4',  // mianshi-dazi-d1 (FaceTalk)
   aux: 'ab639fbe-39b7-4ea8-bd67-18cdaa133599',        // aux-police-exam-d1 (辅警)
+  analytics: 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828',  // rcj-analytics-d1 (统一浏览统计)
 };
 
 function json(data, status = 200) {
@@ -78,8 +79,8 @@ export async function onRequestGet({ request, env }) {
       d1(env, DBS.facetalk, "SELECT name, text, created_at FROM wall ORDER BY created_at DESC LIMIT 6"),
       d1(env, DBS.aux, "SELECT city, COUNT(*) c FROM wall GROUP BY city ORDER BY c DESC"),
       d1(env, DBS.aux, "SELECT COUNT(*) c FROM wall"),
-      d1(env, DBS.aux, "SELECT SUM(n) s, COUNT(DISTINCT ip) u, COUNT(DISTINCT day) d FROM visit_counts"),
-      d1(env, DBS.aux, "SELECT day, SUM(n) s FROM visit_counts GROUP BY day ORDER BY day DESC LIMIT 14"),
+      d1(env, DBS.analytics, "SELECT site, day, SUM(n) s FROM visits GROUP BY site, day ORDER BY day"),
+      d1(env, DBS.analytics, "SELECT site, SUM(n) total, COUNT(DISTINCT ip) u, COUNT(DISTINCT day) d FROM visits GROUP BY site"),
       d1(env, DBS.aux, "SELECT COUNT(*) c FROM signal_match"),
     ]);
     const v = (i) => results[i].status === 'fulfilled' ? results[i].value : null;
@@ -89,12 +90,38 @@ export async function onRequestGet({ request, env }) {
     const hubLinks = v(0), ftPairs = v(1), ftIntents = v(2), ftApps = v(3), ftWall = v(4),
           ftReports = v(5), ftRatings = v(6), ftMessages = v(7), ftPairsRecent = v(8),
           ftWallRecent = v(9), auxWallCity = v(10), auxWallTotal = v(11),
-          auxVisits = v(12), auxTrend = v(13), auxMatch = v(14);
+          uniRaw = v(12), uniTotals = v(13), auxMatch = v(14);
+
+    // —— 统一浏览统计：按 site 聚合 ——
+    const bySite = {};
+    (uniRaw || []).forEach(r => {
+      bySite[r.site] = bySite[r.site] || { points: [] };
+      bySite[r.site].points.push({ day: r.day, s: Number(r.s) || 0 });
+    });
+    (uniTotals || []).forEach(r => {
+      bySite[r.site] = bySite[r.site] || {};
+      bySite[r.site].total = Number(r.total) || 0;
+      bySite[r.site].u = Number(r.u) || 0;
+      bySite[r.site].d = Number(r.d) || 0;
+    });
+    const analyticsSeries = Object.keys(bySite).map(site => ({
+      site,
+      points: (bySite[site].points || []).slice(-14),
+      total: bySite[site].total || 0,
+      u: bySite[site].u || 0,
+      d: bySite[site].d || 0,
+    }));
+    const allVisits = analyticsSeries.reduce((a, s) => a + s.total, 0);
 
     const links = {};
     (hubLinks || []).forEach(r => links[r.status] = r.c);
     const pairs = {};
     (ftPairs || []).forEach(r => pairs[r.status] = r.c);
+
+    // 辅警面板兼容：从统一库取 aux 站点数据
+    const auxUni = bySite['aux'] || {};
+    const auxVisits = { s: auxUni.total || 0, u: auxUni.u || 0, d: auxUni.d || 0 };
+    const auxVisitTrend = (auxUni.points || []).slice().reverse();
 
     return json({
       ok: true,
@@ -120,11 +147,16 @@ export async function onRequestGet({ request, env }) {
       aux: {
         wallTotal: (auxWallTotal[0] && auxWallTotal[0].c) || 0,
         wallByCity: auxWallCity || [],
-        visits: auxVisits[0] || { s: 0, u: 0, d: 0 },
-        visitTrend: (auxTrend || []).reverse(),
+        visits: auxVisits,
+        visitTrend: auxVisitTrend,
         signalMatch: (auxMatch[0] && auxMatch[0].c) || 0,
       },
-      note: '数据源：rcj-hub-d1 / mianshi-dazi-d1 / aux-police-exam-d1（均为服务端读取，不含浏览级 CF Analytics）。',
+      analytics: {
+        allVisits,
+        series: analyticsSeries,
+        bySite,
+      },
+      note: '数据源：rcj-hub-d1 / mianshi-dazi-d1 / aux-police-exam-d1（互动数据）+ rcj-analytics-d1（统一浏览统计，hub/solospeak/letout/training/aux/xf/facetalk/exam 共用）。',
       warns: warns.length ? warns : undefined,
     });
   } catch (e) {
