@@ -1,7 +1,7 @@
 // sw.js — Service Worker：缓存壳 + 离线可用
 // 注意：每次发布新版本请把 CACHE 版本号 +1（如 v2→v3），并同步更新 index.html 里 sw.js 注册带的 ?v=
 // 这样浏览器才会装上新 SW、清掉旧缓存，避免小米/部分安卓自带浏览器一直吐旧版 JS（表现为录音按钮不显示等）。
-const CACHE = 'solospeak-v3';
+const CACHE = 'solospeak-v4';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   './styles/app.css',

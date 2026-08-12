@@ -437,7 +437,7 @@ function fmtFull(ts) {
 // ---------------- 启动 ----------------
 async function boot() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20260812b').catch(() => {});
+    navigator.serviceWorker.register('sw.js?v=20260812c').catch(() => {});
   }
   await seedIfEmpty();
   await getMeta('onboarded'); // 预留
