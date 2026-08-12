@@ -276,11 +276,17 @@ function renderPage(p){
 // ---------- 概览 ----------
 function renderOverview(){
   const d=DATA, L=d.links, F=d.facetalk, A=d.aux, AN=d.analytics||{series:[],allVisits:0};
-  const series=AN.series||[];
+  // 补全已知站点（没数据的也显示 0 平线）
+  const ALL_SITES=['aux','xf','facetalk','hub','solospeak','letout','training','exam'];
+  const seriesMap={};
+  (AN.series||[]).forEach(s=>seriesMap[s.site]=s);
+  ALL_SITES.forEach(s=>{ if(!seriesMap[s]) seriesMap[s]={site,s,points:[],total:0,u:0,d:0}; });
+  const fullSeries=ALL_SITES.map(s=>seriesMap[s]);
+  const allVisits=fullSeries.reduce((a,s)=>a+s.total,0);
   const cards=[
     {cls:'hub',num:L.pending,label:'友链待审',sub:'共 '+L.total+' 条'},
     {cls:'ft',num:F.pairsTotal,label:'FaceTalk 匹配',sub:F.intents+' 意图 / '+F.applications+' 申请'},
-    {cls:'aux',num:AN.allVisits,label:'全站浏览量',sub:series.length+' 个站点 · 辅警 '+A.visits.s},
+    {cls:'aux',num:allVisits,label:'全站浏览量',sub:fullSeries.filter(s=>s.total>0).length+' 个站点有数据 · 辅警 '+A.visits.s},
     {cls:'aux',num:A.wallTotal,label:'辅警留言墙',sub:A.signalMatch+' 次信号匹配'},
   ];
   let html='<div class="stats">';
@@ -288,14 +294,13 @@ function renderOverview(){
   html+='</div>';
 
   // 全站多站点趋势图
-  html+='<div class="panel"><h3>全站浏览趋势 · 近 14 日 <span class="tag">rcj-analytics-d1</span></h3>'+multiLineChart(series)+'</div>';
+  html+='<div class="panel"><h3>全站浏览趋势 · 近 14 日 <span class="tag">rcj-analytics-d1</span></h3>'+multiLineChart(fullSeries)+'</div>';
 
   // 各站点累计流量
   html+='<div class="panel"><h3>各站点流量（累计）</h3><div class="site-stats">';
-  const order=['aux','xf','facetalk','hub','solospeak','letout','training','exam'];
   let any=false;
-  order.forEach(site=>{
-    const s=series.find(x=>x.site===site); if(!s)return; any=true;
+  ALL_SITES.forEach(site=>{
+    const s=fullSeries.find(x=>x.site===site); if(!s)return; any=true;
     html+='<div class="ss-item"><span class="ss-dot" style="background:'+SITE_COLORS[site]+'"></span><span class="ss-name">'+SITE_LABELS[site]+'</span><span class="ss-num">'+s.total+'</span><span class="ss-sub">'+s.u+' 访客 / '+s.d+' 天</span></div>';
   });
   if(!any) html+='<div class="empty">暂无浏览数据（埋点已部署，访问各站点后开始累计）</div>';
