@@ -12,71 +12,81 @@ import { getEmotionShadows } from './resource.js';
 //   grad   [c1,c2] 柱体跨场渐变      glow  该情绪的环境光主色
 //   wobble 0..1 随机抖动（躁/颤）    pulse 0..1 整体呼吸律动（唱/喘）
 //   bloom  0..1 柱体外发光（越大越烫）floor 底部地面光色（随音量亮）
-// 躁动强度梯度（有意拉开、别调成一样）：抱怨 > 唱 > 哭 > 安静
+// 情绪能量梯度（有意拉开、别调成一样）：燃 > 释放 > 沉淀 > 安静
 const EMOTIONS = [
   {
-    id: 'rant', label: '抱怨', emoji: '😤',
-    hint: '把堵在胸口的那股怨气，一股脑倒出来。停顿、重复、越说越急，都可以。',
-    // 最躁：橙 → 血橙红，抖动大、发光最烫
-    grad: ['#ffa06b', '#df3f22'],
-    glow: '#ff6b3d',
-    wave: { alpha: 1, minBarHeight: 4, wobble: 0.46, pulse: 0, bloom: 0.62, smoothing: 0.62 },
+    id: 'burn', label: '燃', emoji: '🔥',
+    hint: '把堵在胸口的那股火，一股脑倒出来。停顿、重复、越说越急，都可以。',
+    // 最躁：橙红，抖动大、发光最烫
+    grad: ['#ffb27a', '#e23b1e'],
+    glow: '#ff6b35',
+    wave: { alpha: 1, minBarHeight: 4, wobble: 0.48, pulse: 0.04, bloom: 0.64, smoothing: 0.6 },
     voices: [
-      { id: 'rant-1', label: '唠叨', mod: { wobble: 0.3, bloom: 0.4 } },
-      { id: 'rant-2', label: '吐槽', mod: { wobble: 0.44 } },
-      { id: 'rant-3', label: '碎碎念', mod: { wobble: 0.36, pulse: 0.18 } },
-      { id: 'rant-4', label: '埋怨', mod: { wobble: 0.55 } },
-      { id: 'rant-5', label: '咆哮', mod: { wobble: 0.72, pulse: 0.24, bloom: 0.85, alpha: 1 } },
+      { id: 'burn-1', label: '闷烧', mod: { wobble: 0.3, bloom: 0.4 } },
+      { id: 'burn-2', label: '发火', mod: { wobble: 0.44 } },
+      { id: 'burn-3', label: '宣泄', mod: { wobble: 0.5, pulse: 0.14 } },
+      { id: 'burn-4', label: '急躁', mod: { wobble: 0.58 } },
+      { id: 'burn-5', label: '咆哮', mod: { wobble: 0.74, pulse: 0.24, bloom: 0.88, alpha: 1 } },
     ],
   },
   {
-    id: 'cry', label: '哭', emoji: '💧',
-    hint: '想哭就哭。这里没有观众，只有你自己的声音。',
-    // 冷蓝紫：颤抖为主，光要弱、要湿，不能烫
-    grad: ['#c3cdf7', '#5f74b8'],
-    glow: '#8fa3d8',
-    wave: { alpha: 0.9, minBarHeight: 3, wobble: 0.26, pulse: 0.06, bloom: 0.3, smoothing: 0.78 },
+    id: 'release', label: '释放', emoji: '💥',
+    hint: '想说什么就说什么。这里没有观众，只有你自己的声音。',
+    // 紫红：表达欲强，抖动+律动兼有的中高能量
+    grad: ['#c97ba0', '#6a2249'],
+    glow: '#b14c7e',
+    wave: { alpha: 0.95, minBarHeight: 3, wobble: 0.34, pulse: 0.22, bloom: 0.5, smoothing: 0.7 },
     voices: [
-      { id: 'cry-1', label: '抽泣', mod: { wobble: 0.52 } },
-      { id: 'cry-2', label: '啜泣', mod: { wobble: 0.32, bloom: 0.22 } },
-      { id: 'cry-3', label: '大哭', mod: { wobble: 0.5, pulse: 0.18, bloom: 0.5 } },
-      { id: 'cry-4', label: '呜咽', mod: { wobble: 0.58 } },
-      { id: 'cry-5', label: '无声流泪', mod: { wobble: 0.06, minBarHeight: 2, bloom: 0.12, alpha: 0.66 } },
+      { id: 'release-1', label: '倾诉', mod: { wobble: 0.28, pulse: 0.18, bloom: 0.4 } },
+      { id: 'release-2', label: '吐槽', mod: { wobble: 0.4 } },
+      { id: 'release-3', label: '呐喊', mod: { wobble: 0.46, pulse: 0.3, bloom: 0.66 } },
+      { id: 'release-4', label: '长叹', mod: { pulse: 0.34, wobble: 0.2 } },
+      { id: 'release-5', label: '痛快', mod: { wobble: 0.5, pulse: 0.4, bloom: 0.78 } },
     ],
   },
   {
-    id: 'sing', label: '唱', emoji: '🎵',
-    hint: '哼一段、唱一句，哪怕跑调。先让声音流动起来。',
-    // 暖金更艳：律动为主，抖动小，光温暖
-    grad: ['#ffe08f', '#f0972b'],
-    glow: '#f5b942',
-    wave: { alpha: 0.95, minBarHeight: 3, wobble: 0.1, pulse: 0.42, bloom: 0.55, smoothing: 0.72 },
+    id: 'settle', label: '沉淀', emoji: '🌊',
+    hint: '慢慢把乱糟糟的念头理顺。不急，一句一句来。',
+    // 蓝灰：冷静、接地，抖动小、光要稳
+    grad: ['#7d9bb5', '#2f4a66'],
+    glow: '#5f82a3',
+    wave: { alpha: 0.82, minBarHeight: 3, wobble: 0.16, pulse: 0.1, bloom: 0.26, smoothing: 0.82 },
     voices: [
-      { id: 'sing-1', label: '哼唱', mod: { pulse: 0.32, bloom: 0.4 } },
-      { id: 'sing-2', label: '清唱', mod: { pulse: 0.44 } },
-      { id: 'sing-3', label: '跑调', mod: { wobble: 0.32, pulse: 0.34 } },
-      { id: 'sing-4', label: '吼歌', mod: { pulse: 0.55, wobble: 0.24, bloom: 0.8 } },
-      { id: 'sing-5', label: '转音', mod: { pulse: 0.5, wobble: 0.14 } },
+      { id: 'settle-1', label: '梳理', mod: { wobble: 0.12, pulse: 0.08 } },
+      { id: 'settle-2', label: '独白', mod: { wobble: 0.2 } },
+      { id: 'settle-3', label: '理清', mod: { wobble: 0.16, pulse: 0.14 } },
+      { id: 'settle-4', label: '喃喃', mod: { wobble: 0.26, bloom: 0.2 } },
+      { id: 'settle-5', label: '沉淀', mod: { wobble: 0.06, pulse: 0.04, bloom: 0.12, alpha: 0.66 } },
     ],
   },
   {
     id: 'quiet', label: '安静', emoji: '🌙',
     hint: '不说话也行。就在这里，安静地待一会儿。',
-    // 最缓：苔绿偏灰，慢呼吸、几乎不抖、光很淡
-    grad: ['#cfe0cd', '#7fa886'],
-    glow: '#a9c6a8',
-    wave: { alpha: 0.66, minBarHeight: 2, wobble: 0.03, pulse: 0.1, bloom: 0.12, smoothing: 0.92 },
+    // 最缓：米白偏暖，慢呼吸、几乎不抖、光很淡
+    grad: ['#ece3d4', '#b3a487'],
+    glow: '#d4c9b8',
+    wave: { alpha: 0.64, minBarHeight: 2, wobble: 0.04, pulse: 0.1, bloom: 0.12, smoothing: 0.92 },
     voices: [
       { id: 'quiet-1', label: '呼吸', mod: { pulse: 0.26 } },
       { id: 'quiet-2', label: '呢喃', mod: { wobble: 0.09 } },
       { id: 'quiet-3', label: '发呆', mod: { pulse: 0.06, alpha: 0.56 } },
       { id: 'quiet-4', label: '沉默', mod: { wobble: 0.01, minBarHeight: 1, bloom: 0, alpha: 0.48 } },
-      { id: 'quiet-5', label: '白噪音', mod: { wobble: 0.55, minBarHeight: 2, bloom: 0.2 } },
+      { id: 'quiet-5', label: '白噪音', mod: { wobble: 0.5, minBarHeight: 2, bloom: 0.18 } },
     ],
   },
 ];
 const EMOTION_MAP = Object.fromEntries(EMOTIONS.map((e) => [e.id, e]));
 const EMOTION_LABEL = Object.fromEntries(EMOTIONS.map((e) => [e.id, e.label]));
+
+// 旧 id 兼容：库房里老录音存的是 rant/cry/sing/quiet，映射到新情绪盘，
+// 否则回放时 EMOTION_MAP/EMOTION_LABEL 取不到，标签会显示成原始 id。
+const LEGACY_EMOTION = { rant: 'burn', cry: 'settle', sing: 'release', quiet: 'quiet' };
+for (const [oldId, newId] of Object.entries(LEGACY_EMOTION)) {
+  if (EMOTION_MAP[newId]) {
+    EMOTION_MAP[oldId] = EMOTION_MAP[newId];
+    EMOTION_LABEL[oldId] = EMOTION_LABEL[newId];
+  }
+}
 
 const view = document.getElementById('view');
 const toastEl = document.getElementById('toast');
