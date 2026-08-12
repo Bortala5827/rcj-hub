@@ -216,17 +216,35 @@ const SITE_LABELS = { aux:'辅警刷题站', xf:'消防刷题站', facetalk:'Fac
 let DATA = null;
 const PW = localStorage.getItem('rcj_admin_pw') || '';   // 仅用于向后兼容旧链接接口，统一登录后由 cookie 接管
 
+// ---------- 统一请求封装（含 8s 超时 + 错误归一）----------
+async function apiReq(path, opts = {}) {
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), opts.timeout || 8000);
+  try {
+    const res = await fetch(API + path, Object.assign({ cache: 'no-store' }, opts, { signal: ac.signal }));
+    let data = null;
+    try { data = await res.json(); } catch (_) {}
+    return { ok: res.ok, status: res.status, data };
+  } catch (e) {
+    return { ok: false, status: 0, data: null, error: (e && e.name === 'AbortError') ? '请求超时' : (e && e.message) || '网络错误' };
+  } finally { clearTimeout(timer); }
+}
+const apiGet = (p, o) => apiReq(p, o);
+const apiPost = (p, body, o) => apiReq(p, Object.assign({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, o));
+
+function showLogin() {
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
 // ---------- 登录 ----------
-function doLogin(){
+async function doLogin(){
   const v = document.getElementById('pwInput').value.trim();
   if(!v) return;
-  fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:v})})
-    .then(r=>r.json().then(d=>({r,d})))
-    .then(({r,d})=>{
-      if(r.ok && d.ok){ enterApp(); loadData(); }
-      else { const e=document.getElementById('loginErr'); e.style.display='block'; e.textContent=d.error||'登录失败'; }
-    })
-    .catch(()=>{ const e=document.getElementById('loginErr'); e.style.display='block'; e.textContent='网络错误'; });
+  const e = document.getElementById('loginErr'); e.style.display = 'none';
+  const r = await apiPost('/login', { password: v });
+  if(r.ok && r.data && r.data.ok){ enterApp(); loadData(); }
+  else { e.style.display = 'block'; e.textContent = (r.data && r.data.error) || r.error || '登录失败'; }
 }
 function doLogout(){
   fetch(API+'/logout',{method:'POST'}).finally(()=>location.reload());
@@ -240,17 +258,18 @@ document.getElementById('pwInput').addEventListener('keydown',e=>{if(e.key==='En
 // ---------- 数据加载 ----------
 async function loadData(){
   const c=document.getElementById('content');
-  if(!DATA || true){ /* 每次刷新都重拉 */ }
-  try{
-    const res=await fetch(API+'/data',{cache:'no-store'});
-    if(res.status===401){ document.getElementById('loginWrap').style.display='flex'; document.getElementById('app').style.display='none'; return; }
-    const d=await res.json();
-    if(!d.ok){ c.innerHTML='<div class="err-box">'+esc(d.error||'加载失败')+'</div>'; return; }
-    DATA=d;
-    document.getElementById('genTime').textContent='更新于 '+fmtTime(d.generatedAt);
-    document.getElementById('genSmall').textContent=fmtTime(d.generatedAt);
-    renderPage(currentPage);
-  }catch(e){ c.innerHTML='<div class="err-box">网络错误：'+esc(e.message)+'</div>'; }
+  c.innerHTML='<div class="loading">读取中…</div>';
+  const r=await apiGet('/data');
+  if(r.status===401){ showLogin(); return; }
+  if(!r.ok || !r.data || !r.data.ok){
+    const msg=(r.data && r.data.error) || r.error || ('HTTP ' + r.status) || '加载失败';
+    c.innerHTML='<div class="err-box">'+esc(msg)+'<div style="margin-top:12px"><button class="btn" onclick="loadData()">↻ 重试</button></div></div>';
+    return;
+  }
+  DATA=r.data;
+  document.getElementById('genTime').textContent='更新于 '+fmtTime(DATA.generatedAt);
+  document.getElementById('genSmall').textContent=fmtTime(DATA.generatedAt);
+  renderPage(currentPage);
 }
 
 // ---------- 导航 ----------
@@ -527,14 +546,18 @@ function multiLineChart(series){
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function fmtTime(ts){ if(!ts)return '—'; let d; if(String(ts).length>12) d=new Date(Number(ts)); else d=new Date(Number(ts)*1000); if(isNaN(d))return '—'; const p=n=>n<10?'0'+n:''+n; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
 
-// ---------- 启动 ----------
+// ---------- 启动（只探测一次，成功直接渲染，不再重复拉取）----------
 (async function(){
-  // 先探测是否已登录（cookie）
-  try{
-    const res=await fetch(API+'/data',{cache:'no-store'});
-    if(res.ok){ enterApp(); loadData(); }
-    else { document.getElementById('loginWrap').style.display='flex'; }
-  }catch(e){ document.getElementById('loginWrap').style.display='flex'; }
+  const r=await apiGet('/data');
+  if(r.ok && r.data && r.data.ok){
+    DATA=r.data;
+    enterApp();
+    document.getElementById('genTime').textContent='更新于 '+fmtTime(DATA.generatedAt);
+    document.getElementById('genSmall').textContent=fmtTime(DATA.generatedAt);
+    renderPage(currentPage);
+  } else {
+    showLogin();
+  }
 })();
 </script>
 </body>
