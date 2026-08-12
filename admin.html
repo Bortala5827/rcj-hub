@@ -4,394 +4,473 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>RCJ 后台 · 统一面板</title>
+  <title>RCJ Admin · 统一后台</title>
   <style>
-    :root {
-      --bg: #f8fafc; --surface: #fff; --text: #0f172a; --muted: #64748b;
-      --accent: #1e88e5; --danger: #dc2626; --line: #e2e8f0; --radius: 12px;
-      --letout: #e07850; --solo: #6f9b8a; --facetalk: #7b8fc4;
+    :root{
+      --bg:#f1f5f9; --surface:#fff; --text:#0f172a; --muted:#64748b; --line:#e2e8f0;
+      --sb:#0f172a; --sb2:#1e293b; --sb-text:#cbd5e1; --sb-muted:#64748b;
+      --accent:#1e88e5; --ok:#16a34a; --warn:#f59e0b; --danger:#dc2626;
+      --ft:#7b8fc4; --aux:#e07850; --hub:#16a34a; --solo:#6f9b8a;
+      --radius:14px; --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: var(--bg); color: var(--text); line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+      background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+    /* ===== 布局 ===== */
+    .layout{display:flex;min-height:100vh}
+    .sidebar{width:230px;flex-shrink:0;background:var(--sb);color:var(--sb-text);
+      display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:30}
+    .sb-brand{padding:20px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.07)}
+    .sb-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#7b8fc4);
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:14px}
+    .sb-brand b{color:#fff;font-size:15px;display:block;line-height:1.2}
+    .sb-brand small{color:var(--sb-muted);font-size:11px}
+    .sb-nav{padding:12px 10px;flex:1;overflow-y:auto}
+    .sb-item{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:10px;color:var(--sb-text);
+      cursor:pointer;font-size:14px;font-weight:500;margin-bottom:3px;transition:background .15s}
+    .sb-item .ico{width:20px;text-align:center;font-size:16px}
+    .sb-item:hover{background:var(--sb2)}
+    .sb-item.active{background:var(--accent);color:#fff}
+    .sb-foot{padding:14px 20px;border-top:1px solid rgba(255,255,255,.07);font-size:12px;color:var(--sb-muted)}
+    .sb-foot button{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:12px;padding:0}
+    .sb-foot button:hover{color:#f87171}
+
+    .main{margin-left:230px;flex:1;min-width:0;display:flex;flex-direction:column}
+    .topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:20}
+    .topbar h1{font-size:17px;font-weight:700}
+    .topbar .acts{display:flex;gap:10px;align-items:center}
+    .topbar .gen{font-size:12px;color:var(--muted)}
+    .btn{padding:8px 15px;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--surface);
+      color:var(--text);border-radius:9px;cursor:pointer;transition:.15s}
+    .btn:hover{background:var(--bg)}
+    .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .btn.primary:hover{background:#1565c0}
+    .content{padding:24px;flex:1}
+    .mobile-bar{display:none}
+
+    /* ===== 卡片 / 指标 ===== */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
+    .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+    .stat.ft::before{background:var(--ft)} .stat.aux::before{background:var(--aux)} .stat.hub::before{background:var(--hub)}
+    .stat-num{font-size:26px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+    .stat-label{font-size:12px;color:var(--muted);margin-top:3px}
+    .stat-sub{font-size:11px;color:#94a3b8;margin-top:2px}
+
+    .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:20px}
+    .panel h3{font-size:15px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .panel h3 .tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--bg);color:var(--muted)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+    /* 趋势图 */
+    .chart-wrap{width:100%}
+    svg.chart{width:100%;height:auto;display:block}
+
+    /* 条形（城市） */
+    .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:9px;font-size:13px}
+    .bar-label{flex:0 0 86px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bar-track{flex:1;background:#f1f5f9;border-radius:999px;height:15px;overflow:hidden}
+    .bar-fill{height:100%;background:var(--aux);border-radius:999px;transition:width .5s}
+    .bar-val{flex:0 0 34px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+
+    /* 表格 */
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;padding:9px 10px;border-bottom:1px solid var(--line)}
+    td{padding:10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+    tr:last-child td{border-bottom:none}
+    .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:7px}
+    .pill.ok{background:#dcfce7;color:#166534} .pill.warn{background:#fef3c7;color:#92400e}
+    .pill.gray{background:#e2e8f0;color:#475569} .pill.blue{background:#dbeafe;color:#1e40af}
+    .pill.ft{background:#eef2fb;color:#4a5a8a} .pill.aux{background:#fdeee7;color:#9a4a26}
+    .mono{font-variant-numeric:tabular-nums}
+    .muted{color:var(--muted)} .small{font-size:12px}
+    .empty{padding:34px;text-align:center;color:var(--muted);font-size:14px}
+
+    /* 登录屏 */
+    .login-wrap{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a,#1e293b);display:flex;align-items:center;justify-content:center;z-index:50}
+    .login-card{background:#fff;border-radius:18px;padding:34px 32px;width:360px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+    .login-card .lc-logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7b8fc4);
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;margin-bottom:14px}
+    .login-card h2{font-size:19px;margin-bottom:4px}
+    .login-card p{color:var(--muted);font-size:13px;margin-bottom:20px}
+    .login-card input{width:100%;padding:12px 14px;font-size:15px;border:1px solid var(--line);border-radius:10px;outline:none}
+    .login-card input:focus{border-color:var(--accent)}
+    .login-card button{width:100%;margin-top:14px;padding:12px;font-size:15px;font-weight:700;background:var(--accent);color:#fff;border:none;border-radius:10px;cursor:pointer}
+    .login-card button:hover{background:#1565c0}
+    .login-card .err{background:#fef2f2;color:#991b1b;font-size:13px;padding:9px 12px;border-radius:9px;margin-bottom:14px}
+
+    /* 链接列表（友链） */
+    .link-list{display:flex;flex-direction:column;gap:11px}
+    .link-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:11px}
+    .link-item.pending{border-left:4px solid var(--warn)}
+    .link-item.approved{border-left:4px solid var(--ok)}
+    .link-body{flex:1;min-width:0}
+    .link-name{font-weight:700;font-size:14px}
+    .link-url{font-size:12px;color:var(--accent);word-break:break-all}
+    .link-desc{font-size:13px;color:var(--muted);margin-top:2px}
+    .link-time{font-size:11px;color:#94a3b8;margin-top:4px}
+    .link-acts{display:flex;gap:7px;flex-shrink:0}
+    .mini{padding:6px 12px;font-size:12px;font-weight:600;border:none;border-radius:8px;cursor:pointer}
+    .mini.ok{background:#dcfce7;color:#166534} .mini.ok:hover{background:#bbf7d0}
+    .mini.rev{background:#e0e7ff;color:#3730a3} .mini.rev:hover{background:#c7d2fe}
+    .mini.del{background:#fee2e2;color:#991b1b} .mini.del:hover{background:#fecaca}
+    .mini:disabled{opacity:.5;cursor:default}
+
+    .tabs2{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--line)}
+    .tab2{padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px}
+    .tab2.active{color:var(--accent);border-bottom-color:var(--accent)}
+    .cnt{display:inline-block;min-width:18px;text-align:center;font-size:11px;background:var(--line);color:var(--muted);padding:1px 6px;border-radius:10px;margin-left:5px}
+    .tab2.active .cnt{background:var(--accent);color:#fff}
+
+    .site-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+    .site-card{display:block;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);transition:.15s}
+    .site-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+    .site-card .sc-ico{font-size:22px;margin-bottom:8px}
+    .site-card .sc-name{font-weight:700;font-size:15px;color:var(--text)}
+    .site-card .sc-url{font-size:12px;color:var(--accent);word-break:break-all;margin-top:2px}
+    .site-card .sc-desc{font-size:12px;color:var(--muted);margin-top:6px}
+
+    .loading{padding:60px;text-align:center;color:var(--muted)}
+    .err-box{background:#fef2f2;color:#991b1b;padding:14px 18px;border-radius:11px;font-size:14px;margin-bottom:18px}
+
+    @media(max-width:820px){
+      .sidebar{transform:translateX(-100%);transition:transform .2s;width:220px}
+      .sidebar.open{transform:none}
+      .main{margin-left:0}
+      .mobile-bar{display:flex;align-items:center;gap:12px;background:var(--sb);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:25}
+      .mobile-bar .mb-brand{font-weight:700;font-size:15px}
+      .mobile-bar .mb-menu{margin-left:auto;font-size:22px;cursor:pointer}
+      .grid-2{grid-template-columns:1fr}
+      .sidebar{box-shadow:4px 0 24px rgba(0,0,0,.3)}
     }
-    .container { max-width: 820px; margin: 0 auto; padding: 40px 20px; }
-    h1 { font-size: 22px; margin-bottom: 8px; }
-    .sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
-
-    /* Topbar + tabs */
-    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-    .topbar h1 { margin: 0; }
-    .tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--line); }
-    .tab {
-      padding: 10px 18px; font-size: 14px; font-weight: 600; cursor: pointer;
-      border: none; background: none; color: var(--muted); border-bottom: 2px solid transparent;
-      margin-bottom: -2px; transition: color .15s, border-color .15s;
-    }
-    .tab:hover { color: var(--text); }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-    /* Login (links) */
-    .login-box {
-      background: var(--surface); border: 1px solid var(--line);
-      border-radius: var(--radius); padding: 28px; max-width: 400px; margin: 60px auto;
-    }
-    .login-box label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-    .login-box input {
-      width: 100%; padding: 11px 14px; font-size: 15px; border: 1px solid var(--line);
-      border-radius: 8px; outline: none; transition: border-color .2s;
-    }
-    .login-box input:focus { border-color: var(--accent); }
-    .login-box button {
-      width: 100%; margin-top: 16px; padding: 11px; font-size: 15px; font-weight: 600;
-      background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: background .2s;
-    }
-    .login-box button:hover { background: #1565c0; }
-
-    .list { display: flex; flex-direction: column; gap: 12px; }
-    .item {
-      background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-      padding: 18px 20px; display: flex; align-items: flex-start; gap: 16px; transition: box-shadow .15s;
-    }
-    .item:hover { box-shadow: 0 2px 8px rgba(15,23,42,.06); }
-    .item.pending { border-left: 4px solid #f59e0b; }
-    .item.approved { border-left: 4px solid #16a34a; }
-    .item-body { flex: 1; min-width: 0; }
-    .item-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-    .item-url { font-size: 13px; color: var(--accent); word-break: break-all; margin-bottom: 4px; }
-    .item-desc { font-size: 13px; color: var(--muted); }
-    .item-time { font-size: 12px; color: #94a3b8; margin-top: 6px; }
-    .item-actions { display: flex; gap: 8px; flex-shrink: 0; padding-top: 2px; }
-    .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-left: 6px; vertical-align: middle; }
-    .badge-pending { background: #fef3c7; color: #92400e; }
-    .badge-approved { background: #dcfce7; color: #166534; }
-    .btn { padding: 7px 16px; font-size: 13px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background .15s; }
-    .btn-approve { background: #dcfce7; color: #166534; }
-    .btn-approve:hover { background: #bbf7d0; }
-    .btn-delete { background: #fee2e2; color: #991b1b; }
-    .btn-delete:hover { background: #fecaca; }
-    .btn-revoke { background: #e0e7ff; color: #3730a3; }
-    .btn-revoke:hover { background: #c7d2fe; }
-    .btn:disabled { opacity: .5; cursor: default; }
-
-    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
-    .topbar2 { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .btn-logout { font-size: 13px; color: var(--muted); cursor: pointer; background: none; border: none; }
-    .btn-logout:hover { color: var(--danger); }
-    .error { background: #fef2f2; color: #991b1b; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
-    .tabs2 { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--line); }
-    .tab2 { padding: 10px 18px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; background: none; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -2px; }
-    .tab2:hover { color: var(--text); }
-    .tab2.active { color: var(--accent); border-bottom-color: var(--accent); }
-    .tab-count { display: inline-block; min-width: 20px; text-align: center; font-size: 11px; background: var(--line); color: var(--muted); padding: 1px 6px; border-radius: 10px; margin-left: 4px; }
-    .tab2.active .tab-count { background: var(--accent); color: #fff; }
-
-    /* Data dashboard */
-    .data-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
-    .data-note { font-size: 12px; color: var(--muted); background: #eef6ff; border: 1px solid #d6e8ff; padding: 10px 14px; border-radius: 10px; margin-bottom: 18px; line-height: 1.6; }
-    .data-note a { color: var(--accent); }
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; }
-    .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; text-align: center; }
-    .stat-num { font-size: 24px; font-weight: 800; }
-    .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-    .stat.solo .stat-num { color: var(--solo); }
-    .stat.letout .stat-num { color: var(--letout); }
-    .stat.min .stat-num { color: var(--text); }
-
-    .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
-    .card h3 { font-size: 15px; margin-bottom: 14px; }
-    .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 13px; }
-    .bar-label { flex: 0 0 76px; color: var(--text); }
-    .bar-track { flex: 1; background: #f1f5f9; border-radius: 999px; height: 16px; overflow: hidden; }
-    .bar-fill { height: 100%; background: var(--letout); border-radius: 999px; transition: width .4s; }
-    .bar-val { flex: 0 0 40px; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
-
-    .recent { display: flex; flex-direction: column; gap: 8px; }
-    .r-item { display: flex; align-items: center; gap: 12px; font-size: 13px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
-    .r-item:last-child { border-bottom: none; }
-    .r-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .r-dot.solo { background: var(--solo); }
-    .r-dot.letout { background: var(--letout); }
-    .r-main { flex: 1; min-width: 0; }
-    .r-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .r-sub { color: var(--muted); font-size: 12px; }
-    .r-time { color: var(--muted); font-size-12; font-size: 12px; flex-shrink: 0; }
-
-    .btn-small { font-size: 13px; padding: 7px 14px; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 8px; cursor: pointer; }
-    .btn-small:hover { background: #f1f5f9; }
-    .muted { color: var(--muted); }
-    .loading { text-align: center; color: var(--muted); padding: 50px; }
-    /* FaceTalk 管理 Tab（iframe 嵌入，统一收口） */
-    .ft-frame-wrap { margin-top: 4px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #fff; }
-    .ft-frame-wrap iframe { width: 100%; height: 82vh; min-height: 560px; border: 0; display: block; }
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="topbar">
-    <h1>RCJ 后台</h1>
-    <div class="tabs">
-      <button class="tab active" data-tab="links" onclick="switchTab('links')">友链审核</button>
-      <button class="tab" data-tab="data" onclick="switchTab('data')">使用数据</button>
-      <button class="tab" data-tab="ft" onclick="switchTab('ft')">FaceTalk 管理</button>
+
+<!-- 登录屏 -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="lc-logo">RCJ</div>
+    <h2>统一后台</h2>
+    <p>管理 RCJ 全站数据 · 一次登录</p>
+    <div class="err" id="loginErr" style="display:none"></div>
+    <input type="password" id="pwInput" placeholder="管理员密码" autofocus />
+    <button onclick="doLogin()">登录</button>
+  </div>
+</div>
+
+<!-- 主框架 -->
+<div class="layout" id="app" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">RCJ</div>
+      <div><b>RCJ Admin</b><small>统一数据后台</small></div>
     </div>
-  </div>
+    <nav class="sb-nav" id="nav">
+      <div class="sb-item active" data-page="overview"><span class="ico">📊</span>概览</div>
+      <div class="sb-item" data-page="links"><span class="ico">🔗</span>友链审核</div>
+      <div class="sb-item" data-page="facetalk"><span class="ico">💬</span>FaceTalk</div>
+      <div class="sb-item" data-page="aux"><span class="ico">🛡️</span>辅警题库</div>
+      <div class="sb-item" data-page="sites"><span class="ico">🌐</span>站点导航</div>
+    </nav>
+    <div class="sb-foot">
+      <div id="genTime">—</div>
+      <button onclick="doLogout()">退出登录</button>
+    </div>
+  </aside>
 
-  <div class="panel" id="panel-links"><div id="app"></div></div>
-
-  <div class="panel" id="panel-data" hidden>
-    <div id="dataApp"></div>
-  </div>
-
-  <div class="panel" id="panel-ft" hidden>
-    <div class="ft-frame-wrap">
-      <iframe src="https://facetalk.955827.xyz/admin" title="FaceTalk 管理后台" loading="lazy"></iframe>
+  <div class="main">
+    <div class="mobile-bar">
+      <span class="mb-brand">RCJ Admin</span>
+      <span class="mb-menu" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</span>
+    </div>
+    <div class="topbar">
+      <h1 id="pageTitle">概览</h1>
+      <div class="acts">
+        <span class="gen" id="genSmall"></span>
+        <button class="btn" onclick="loadData()">↻ 刷新</button>
+      </div>
+    </div>
+    <div class="content" id="content">
+      <div class="loading">读取中…</div>
     </div>
   </div>
 </div>
 
 <script>
-// ============ Tab 切换 ============
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab === tab); });
-  document.getElementById('panel-links').hidden = (tab !== 'links');
-  document.getElementById('panel-data').hidden = (tab !== 'data');
-  document.getElementById('panel-ft').hidden = (tab !== 'ft');
-  if (tab === 'data') loadData();
+const API = '/api/admin';
+let DATA = null;
+const PW = localStorage.getItem('rcj_admin_pw') || '';   // 仅用于向后兼容旧链接接口，统一登录后由 cookie 接管
+
+// ---------- 登录 ----------
+function doLogin(){
+  const v = document.getElementById('pwInput').value.trim();
+  if(!v) return;
+  fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:v})})
+    .then(r=>r.json().then(d=>({r,d})))
+    .then(({r,d})=>{
+      if(r.ok && d.ok){ enterApp(); loadData(); }
+      else { const e=document.getElementById('loginErr'); e.style.display='block'; e.textContent=d.error||'登录失败'; }
+    })
+    .catch(()=>{ const e=document.getElementById('loginErr'); e.style.display='block'; e.textContent='网络错误'; });
+}
+function doLogout(){
+  fetch(API+'/logout',{method:'POST'}).finally(()=>location.reload());
+}
+function enterApp(){
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('app').style.display='flex';
+}
+document.getElementById('pwInput').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ---------- 数据加载 ----------
+async function loadData(){
+  const c=document.getElementById('content');
+  if(!DATA || true){ /* 每次刷新都重拉 */ }
+  try{
+    const res=await fetch(API+'/data',{cache:'no-store'});
+    if(res.status===401){ document.getElementById('loginWrap').style.display='flex'; document.getElementById('app').style.display='none'; return; }
+    const d=await res.json();
+    if(!d.ok){ c.innerHTML='<div class="err-box">'+esc(d.error||'加载失败')+'</div>'; return; }
+    DATA=d;
+    document.getElementById('genTime').textContent='更新于 '+fmtTime(d.generatedAt);
+    document.getElementById('genSmall').textContent=fmtTime(d.generatedAt);
+    renderPage(currentPage);
+  }catch(e){ c.innerHTML='<div class="err-box">网络错误：'+esc(e.message)+'</div>'; }
 }
 
-// ============ 友链审核（D1） ============
-(function(){
-  var el = document.getElementById('app');
-  var pw = localStorage.getItem('admin_pw') || '';
-  var allLinks = [];
-  var currentTab = 'pending';
+// ---------- 导航 ----------
+let currentPage='overview';
+document.getElementById('nav').addEventListener('click',e=>{
+  const it=e.target.closest('.sb-item'); if(!it)return;
+  document.querySelectorAll('.sb-item').forEach(x=>x.classList.toggle('active',x===it));
+  currentPage=it.dataset.page;
+  document.getElementById('pageTitle').textContent=it.textContent.trim();
+  document.getElementById('sidebar').classList.remove('open');
+  renderPage(currentPage);
+});
 
-  function renderLogin(err) {
-    el.innerHTML = '<div class="login-box">' +
-      '<h1>🔐 友链审核</h1>' +
-      '<p class="sub">输入管理员密码</p>' +
-      (err ? '<div class="error">' + esc(err) + '</div>' : '') +
-      '<label>密码</label>' +
-      '<input type="password" id="pw-input" placeholder="输入密码…" autofocus />' +
-      '<button onclick="login()">登录</button>' +
-      '</div>';
-    document.getElementById('pw-input').addEventListener('keydown', function(e){ if(e.key==='Enter') login(); });
-  }
+function renderPage(p){
+  if(!DATA){ document.getElementById('content').innerHTML='<div class="loading">读取中…</div>'; return; }
+  if(p==='overview') renderOverview();
+  else if(p==='links') renderLinks();
+  else if(p==='facetalk') renderFaceTalk();
+  else if(p==='aux') renderAux();
+  else if(p==='sites') renderSites();
+}
 
-  window.login = function() {
-    var v = document.getElementById('pw-input').value.trim();
-    if (!v) return;
-    pw = v;
-    localStorage.setItem('admin_pw', v);
-    loadList();
-  };
+// ---------- 概览 ----------
+function renderOverview(){
+  const d=DATA, L=d.links, F=d.facetalk, A=d.aux;
+  const cards=[
+    {cls:'hub',num:L.pending,label:'友链待审',sub:'共 '+L.total+' 条'},
+    {cls:'ft',num:F.pairsTotal,label:'FaceTalk 匹配',sub:F.intents+' 意图 / '+F.applications+' 申请'},
+    {cls:'aux',num:A.visits.s,label:'辅警浏览量',sub:A.visits.u+' 独立访客'},
+    {cls:'aux',num:A.wallTotal,label:'辅警留言墙',sub:A.signalMatch+' 次信号匹配'},
+  ];
+  let html='<div class="stats">';
+  cards.forEach(c=>html+='<div class="stat '+c.cls+'"><div class="stat-num">'+c.num+'</div><div class="stat-label">'+c.label+'</div><div class="stat-sub">'+c.sub+'</div></div>');
+  html+='</div>';
 
-  function loadList() {
-    el.innerHTML = '<p style="text-align:center;color:var(--muted);padding:60px">加载中…</p>';
-    fetch('/api/admin/links?password=' + encodeURIComponent(pw))
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if (d.error) { pw=''; localStorage.removeItem('admin_pw'); renderLogin(d.error); return; }
-        allLinks = d.links || [];
-        renderList();
-      })
-      .catch(function(){ el.innerHTML = '<p class="error">网络错误，请刷新重试</p>'; });
-  }
+  // 趋势图 + 快速分布
+  html+='<div class="grid-2">';
+  html+='<div class="panel"><h3>辅警 · 近 14 日浏览趋势 <span class="tag">visit_counts</span></h3><div class="chart-wrap">'+lineChart(A.visitTrend)+'</div></div>';
+  html+='<div class="panel"><h3>各模块速览</h3>'+miniModuleList()+'</div>';
+  html+='</div>';
 
-  function renderList() {
-    var pending = allLinks.filter(function(l){ return l.status === 'pending'; });
-    var approved = allLinks.filter(function(l){ return l.status === 'approved'; });
+  html+='<div class="panel"><h3>数据源说明</h3><p class="small muted">'+esc(d.note)+'</p>';
+  html+='<p class="small muted" style="margin-top:8px">Speak Series（SoloSpeak / LetOut）为本地优先、数据存用户浏览器，未上传服务端，故不在此聚合。需查看时请在使用该产品的浏览器中打开其原生统计。</p></div>';
 
-    var top = '<div class="topbar2">' +
-      '<h1>📋 友链管理</h1>' +
-      '<button class="btn-logout" onclick="logout()">退出</button>' +
-      '</div>';
+  document.getElementById('content').innerHTML=html;
+}
 
-    var tabs = '<div class="tabs2">' +
-      '<button class="tab2' + (currentTab==='pending' ? ' active' : '') + '" onclick="switchLinkTab(\'pending\')">待审核<span class="tab-count">' + pending.length + '</span></button>' +
-      '<button class="tab2' + (currentTab==='approved' ? ' active' : '') + '" onclick="switchLinkTab(\'approved\')">已通过<span class="tab-count">' + approved.length + '</span></button>' +
-      '<button class="tab2' + (currentTab==='all' ? ' active' : '') + '" onclick="switchLinkTab(\'all\')">全部<span class="tab-count">' + allLinks.length + '</span></button>' +
-      '</div>';
+function miniModuleList(){
+  const d=DATA, F=d.facetalk, A=d.aux;
+  const rows=[
+    ['💬 FaceTalk','匹配 '+F.pairsTotal+' · 留言墙 '+F.wall+' · 举报 '+F.reports+' · 评分 '+F.ratings],
+    ['🛡️ 辅警题库','留言 '+A.wallTotal+' · 浏览 '+A.visits.s+' · 信号匹配 '+A.signalMatch],
+    ['🔗 友链','待审 '+d.links.pending+' · 已通过 '+d.links.approved],
+  ];
+  let h='<div style="display:flex;flex-direction:column;gap:12px">';
+  rows.forEach(r=>h+='<div style="display:flex;gap:10px;font-size:13px"><span>'+r[0]+'</span><span class="muted">'+r[1]+'</span></div>');
+  return h+'</div>';
+}
 
-    var list = currentTab === 'pending' ? pending : currentTab === 'approved' ? approved : allLinks;
+// ---------- 友链 ----------
+let linkTab='pending', linkData=[];
+async function renderLinks(){
+  const c=document.getElementById('content');
+  c.innerHTML='<div class="loading">读取友链…</div>';
+  try{
+    const res=await fetch(API+'/links',{cache:'no-store'});
+    const d=await res.json();
+    if(!d.ok){ c.innerHTML='<div class="err-box">'+esc(d.error||'加载失败')+'</div>'; return; }
+    linkData=d.links||[];
+  }catch(e){ c.innerHTML='<div class="err-box">网络错误</div>'; return; }
 
-    if (!list.length) {
-      var emptyMsg = currentTab === 'pending' ? '✅ 暂无待审核的友链' :
-                    currentTab === 'approved' ? '📭 还没有已通过的友链' : '📭 暂无友链';
-      el.innerHTML = top + tabs + '<div class="empty-state"><p>' + emptyMsg + '</p></div>';
-      return;
-    }
+  const pending=linkData.filter(l=>l.status==='pending');
+  const approved=linkData.filter(l=>l.status==='approved');
+  const tabs='<div class="tabs2">'+
+    '<div class="tab2'+(linkTab==='pending'?' active':'')+'" onclick="switchLink(\'pending\')">待审核<span class="cnt">'+pending.length+'</span></div>'+
+    '<div class="tab2'+(linkTab==='approved'?' active':'')+'" onclick="switchLink(\'approved\')">已通过<span class="cnt">'+approved.length+'</span></div>'+
+    '<div class="tab2'+(linkTab==='all'?' active':'')+'" onclick="switchLink(\'all\')">全部<span class="cnt">'+linkData.length+'</span></div></div>';
+  const list=linkTab==='pending'?pending:linkTab==='approved'?approved:linkData;
+  let html='<div class="panel"><h3>🔗 友链审核 <span class="tag">rcj-hub-d1</span></h3>'+tabs;
+  if(!list.length){ html+='<div class="empty">✅ 该分类下暂无友链</div></div>'; c.innerHTML=html; return; }
+  html+='<div class="link-list">';
+  list.forEach(l=>{
+    const isP=l.status==='pending';
+    html+='<div class="link-item '+l.status+'"><div class="link-body">'+
+      '<div class="link-name">'+esc(l.name)+'</div>'+
+      '<div class="link-url">'+esc(l.url)+'</div>'+
+      (l.desc?'<div class="link-desc">'+esc(l.desc)+'</div>':'')+
+      '<div class="link-time">'+fmtTime(l.created_at)+'</div></div>'+
+      '<div class="link-acts">'+
+      (isP?'<button class="mini ok" data-id="'+l.id+'" onclick="linkAct(this,\'approve\')">✓ 通过</button>':
+            '<button class="mini rev" data-id="'+l.id+'" onclick="linkAct(this,\'revoke\')">↩ 撤回</button>')+
+      '<button class="mini del" data-id="'+l.id+'" onclick="linkAct(this,\'delete\')">✗ 删除</button></div></div>';
+  });
+  html+='</div></div>';
+  c.innerHTML=html;
+}
+function switchLink(t){ linkTab=t; renderLinks(); }
+function linkAct(btn,action){
+  if(action==='delete' && !confirm('确定删除？不可恢复。')) return;
+  btn.disabled=true;
+  fetch(API+'/links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,id:parseInt(btn.dataset.id)})})
+    .then(r=>r.json()).then(d=>{ if(d.ok) renderLinks(); else alert(d.error||'失败'); });
+}
 
-    var html = top + tabs + '<div class="list">';
-    list.forEach(function(l){
-      var isPending = l.status === 'pending';
-      html += '<div class="item ' + l.status + '">' +
-        '<div class="item-body">' +
-          '<p class="item-name">' + esc(l.name) +
-            '<span class="badge ' + (isPending ? 'badge-pending' : 'badge-approved') + '">' + (isPending ? '待审核' : '已通过') + '</span>' +
-          '</p>' +
-          '<p class="item-url">' + esc(l.url) + '</p>' +
-          (l.desc ? '<p class="item-desc">' + esc(l.desc) + '</p>' : '') +
-          '<p class="item-time">' + fmtTime(l.created_at) + '</p>' +
-        '</div>' +
-        '<div class="item-actions">';
-      if (isPending) {
-        html += '<button class="btn btn-approve" data-id="' + l.id + '" onclick="approve(this)">✓ 通过</button>';
-      } else {
-        html += '<button class="btn btn-revoke" data-id="' + l.id + '" onclick="revoke(this)">↩ 撤回</button>';
-      }
-      html += '<button class="btn btn-delete" data-id="' + l.id + '" onclick="del(this)">✗ 删除</button>' +
-        '</div>' +
-      '</div>';
+// ---------- FaceTalk ----------
+function renderFaceTalk(){
+  const F=DATA.facetalk, bs=F.pairsByStatus||{};
+  let html='<div class="stats">';
+  [['ft',F.pairsTotal,'匹配对总数','closed '+ (bs.closed||0)],
+   ['ft',F.intents,'公开意图',''],
+   ['ft',F.applications,'申请',''],
+   ['ft',F.wall,'留言墙',''],
+   ['ft',F.reports,'举报',''],
+   ['ft',F.ratings,'评分','']].forEach(c=>html+='<div class="stat '+c[0]+'"><div class="stat-num">'+c[1]+'</div><div class="stat-label">'+c[2]+'</div>'+(c[3]?'<div class="stat-sub">'+c[3]+'</div>':'')+'</div>');
+  html+='</div>';
+
+  html+='<div class="grid-2">';
+  // 最近匹配
+  html+='<div class="panel"><h3>最近匹配对 <span class="tag">mianshi-dazi-d1</span></h3>';
+  if(!F.recentPairs.length) html+='<div class="empty">暂无匹配记录</div>';
+  else{
+    html+='<table><thead><tr><th>模式</th><th>状态</th><th>创建时间</th></tr></thead><tbody>';
+    F.recentPairs.forEach(p=>{
+      html+='<tr><td>'+(p.mode||'-')+'</td><td><span class="pill '+(p.status==='closed'?'ok':'blue')+'">'+esc(p.status)+'</span></td><td class="mono small">'+fmtTime(p.created)+'</td></tr>';
     });
-    html += '</div>';
-    el.innerHTML = html;
+    html+='</tbody></table>';
   }
-
-  window.switchLinkTab = function(tab) { currentTab = tab; renderList(); };
-
-  window.approve = function(btn){
-    btn.disabled = true;
-    var id = parseInt(btn.dataset.id);
-    fetch('/api/admin/links', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ password: pw, action: 'approve', id: id }) })
-      .then(function(r){ return r.json(); }).then(function(d){ if (d.ok) loadList(); else alert(d.error || '失败'); });
-  };
-  window.revoke = function(btn){
-    btn.disabled = true;
-    var id = parseInt(btn.dataset.id);
-    fetch('/api/admin/links', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ password: pw, action: 'revoke', id: id }) })
-      .then(function(r){ return r.json(); }).then(function(d){ if (d.ok) loadList(); else alert(d.error || '失败'); });
-  };
-  window.del = function(btn){
-    if (!confirm('确定删除这条提交？此操作不可恢复。')) return;
-    btn.disabled = true;
-    var id = parseInt(btn.dataset.id);
-    fetch('/api/admin/links', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ password: pw, action: 'delete', id: id }) })
-      .then(function(r){ return r.json(); }).then(function(d){ if (d.ok) loadList(); else alert(d.error || '失败'); });
-  };
-  window.logout = function(){ pw=''; localStorage.removeItem('admin_pw'); renderLogin(); };
-
-  function esc(s) {
-    return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
-  }
-  function fmtTime(ts) {
-    if (!ts) return '';
-    var d = new Date(ts);
-    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
-  }
-  function pad(n){ return n<10 ? '0'+n : ''+n; }
-
-  if (pw) loadList(); else renderLogin();
-})();
-
-// ============ 使用数据（本地 IndexedDB，Speak Series） ============
-(function(){
-  var dataEl = document.getElementById('dataApp');
-  var MODE_LABEL = { say:'说出来', shout:'喊出来', sing:'唱出来', cry:'哭出来', quiet:'安静一下' };
-  var dataLoaded = false;
-
-  window.loadData = function() {
-    dataEl.innerHTML = '<div class="loading">读取本机数据…</div>';
-    Promise.all([ readAll('solospeak','recordings'), readAll('letout','releases') ])
-      .then(function(res){
-        renderData(res[0], res[1]);
-      })
-      .catch(function(){ dataEl.innerHTML = '<div class="empty-state"><p>读取失败。请确认你在 955827.xyz 下使用过 SoloSpeak / LetOut。</p></div>'; });
-  };
-
-  function readAll(dbName, store) {
-    return new Promise(function(resolve){
-      var req;
-      try { req = indexedDB.open(dbName); } catch(e){ resolve([]); return; }
-      req.onerror = function(){ resolve([]); };
-      req.onsuccess = function(){
-        var db = req.result;
-        if (!db.objectStoreNames.contains(store)) { db.close(); resolve([]); return; }
-        try {
-          var tx = db.transaction(store, 'readonly');
-          var os = tx.objectStore(store);
-          var g = os.getAll();
-          g.onsuccess = function(){ db.close(); resolve(g.result || []); };
-          g.onerror = function(){ db.close(); resolve([]); };
-        } catch(e){ db.close(); resolve([]); }
-      };
+  html+='</div>';
+  // 最近留言墙
+  html+='<div class="panel"><h3>最近留言墙</h3>';
+  if(!F.recentWall.length) html+='<div class="empty">暂无留言</div>';
+  else{
+    html+='<div style="display:flex;flex-direction:column;gap:10px">';
+    F.recentWall.forEach(w=>{
+      html+='<div style="border-bottom:1px dashed var(--line);padding-bottom:9px"><div class="small"><b>'+esc(w.name)+'</b> <span class="muted">'+fmtTime(w.created_at)+'</span></div><div class="small">'+esc(w.text)+'</div></div>';
     });
+    html+='</div>';
   }
+  html+='</div>';
+  html+='</div>';
 
-  function renderData(solo, leto) {
-    solo = solo || []; leto = leto || [];
-    var soloMin = solo.reduce(function(a,r){ return a + (r.durationMs||0); },0) / 60000;
-    var letoMin = leto.reduce(function(a,r){ return a + (r.durationMs||0); },0) / 60000;
+  html+='<div class="panel"><h3>原生后台（深度操作）</h3><a class="site-card" href="https://facetalk.955827.xyz/admin" target="_blank" rel="noopener"><div class="sc-ico">💬</div><div class="sc-name">FaceTalk 管理后台</div><div class="sc-url">facetalk.955827.xyz/admin</div><div class="sc-desc">匹配详情、信誉、留言墙审核等深度操作（独立密码）。</div></a></div>';
 
-    // LetOut 模式分布
-    var modeCounts = {};
-    leto.forEach(function(r){ var m = r.mode||'say'; modeCounts[m] = (modeCounts[m]||0)+1; });
-    var modeRows = Object.keys(MODE_LABEL).map(function(m){
-      var c = modeCounts[m]||0;
-      var pct = leto.length ? Math.round(c / leto.length * 100) : 0;
-      return '<div class="bar-row"><span class="bar-label">' + MODE_LABEL[m] + '</span>' +
-        '<span class="bar-track"><span class="bar-fill" style="width:' + pct + '%"></span></span>' +
-        '<span class="bar-val">' + c + '</span></div>';
-    }).join('');
-    if (!leto.length) modeRows = '<p class="muted">还没有任何释放记录。</p>';
+  document.getElementById('content').innerHTML=html;
+}
 
-    // 最近活动（合并）
-    var recent = [];
-    solo.forEach(function(r){ recent.push({ type:'solo', ts:r.createdAt, dur:r.durationMs, title: r.topicText || '独声练习', sub: 'SoloSpeak · 独声' }); });
-    leto.forEach(function(r){ recent.push({ type:'letout', ts:r.createdAt, dur:r.durationMs, title: MODE_LABEL[r.mode]||r.mode, sub: 'LetOut · 大声说' }); });
-    recent.sort(function(a,b){ return b.ts - a.ts; });
-    recent = recent.slice(0, 12);
-    var recentHtml = recent.length ? recent.map(function(r){
-      return '<div class="r-item"><span class="r-dot ' + r.type + '"></span>' +
-        '<div class="r-main"><div class="r-title">' + esc(r.title) + '</div>' +
-        '<div class="r-sub">' + r.sub + ' · ' + Math.round(r.dur/1000) + 's</div></div>' +
-        '<span class="r-time">' + fmtDate(r.ts) + '</span></div>';
-    }).join('') : '<p class="muted">暂无活动。</p>';
+// ---------- 辅警 ----------
+function renderAux(){
+  const A=DATA.aux;
+  let html='<div class="stats">';
+  [['aux',A.wallTotal,'留言墙总数',''],
+   ['aux',A.visits.s,'浏览量','近 '+A.visits.d+' 天'],
+   ['aux',A.visits.u,'独立访客',''],
+   ['aux',A.signalMatch,'信号匹配','']].forEach(c=>html+='<div class="stat '+c[0]+'"><div class="stat-num">'+c[1]+'</div><div class="stat-label">'+c[2]+'</div>'+(c[3]?'<div class="stat-sub">'+c[3]+'</div>':'')+'</div>');
+  html+='</div>';
 
-    dataEl.innerHTML =
-      '<div class="data-head"><h1>📊 Speak Series 使用数据</h1>' +
-        '<button class="btn-small" onclick="exportSnapshot()">⬇ 导出数据快照</button></div>' +
-      '<div class="data-note">数据来自你<strong>本机浏览器</strong>（本地优先，不上传服务器）。只有在 <code>955827.xyz</code> 下使用 SoloSpeak / LetOut 才会被统计；换浏览器或清缓存则归零。' +
-        'FaceTalk 的数据在服务端（D1），已整合到本页「<strong>FaceTalk 管理</strong>」标签页（也可直接访问 <a href="https://facetalk.955827.xyz/admin" target="_blank" rel="noopener">facetalk.955827.xyz/admin</a>）。</div>' +
+  html+='<div class="panel"><h3>近 14 日浏览趋势 <span class="tag">visit_counts</span></h3><div class="chart-wrap">'+lineChart(A.visitTrend)+'</div></div>';
 
-      '<div class="stats">' +
-        '<div class="stat solo"><div class="stat-num">' + solo.length + '</div><div class="stat-label">SoloSpeak 录音</div></div>' +
-        '<div class="stat min"><div class="stat-num">' + soloMin.toFixed(0) + '</div><div class="stat-label">独声时长(分)</div></div>' +
-        '<div class="stat letout"><div class="stat-num">' + leto.length + '</div><div class="stat-label">LetOut 释放</div></div>' +
-        '<div class="stat min"><div class="stat-num">' + letoMin.toFixed(0) + '</div><div class="stat-label">释放时长(分)</div></div>' +
-      '</div>' +
-
-      '<div class="card"><h3>LetOut · 释放模式分布</h3>' + modeRows + '</div>' +
-      '<div class="card"><h3>最近活动</h3><div class="recent">' + recentHtml + '</div></div>';
-
-    window.__snapshot = {
-      exportedAt: new Date().toISOString(),
-      solospeak: { count: solo.length, minutes: +soloMin.toFixed(1) },
-      letout: { count: leto.length, minutes: +letoMin.toFixed(1), modeCounts: modeCounts },
-      recent: recent,
-    };
+  html+='<div class="panel"><h3>留言墙 · 按城市 <span class="tag">wall</span></h3>';
+  if(!A.wallByCity.length) html+='<div class="empty">暂无留言</div>';
+  else{
+    const max=Math.max(...A.wallByCity.map(x=>x.c),1);
+    html+='<div style="margin-top:6px">';
+    A.wallByCity.slice(0,10).forEach(x=>{
+      html+='<div class="bar-row"><span class="bar-label">'+esc(x.city||'未标注')+'</span><span class="bar-track"><span class="bar-fill" style="width:'+(x.c/max*100).toFixed(1)+'%"></span></span><span class="bar-val">'+x.c+'</span></div>';
+    });
+    html+='</div>';
   }
+  html+='</div>';
 
-  window.exportSnapshot = function() {
-    if (!window.__snapshot) return;
-    var blob = new Blob([JSON.stringify(window.__snapshot, null, 2)], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a'); a.href = url; a.download = 'rcj-speak-data-' + new Date().toISOString().slice(0,10) + '.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-  };
+  document.getElementById('content').innerHTML=html;
+}
 
-  function esc(s) {
-    return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
-  }
-  function fmtDate(ts) {
-    var d = new Date(ts);
-    return (d.getMonth()+1) + '/' + d.getDate() + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
-  }
-  function pad(n){ return n<10 ? '0'+n : ''+n; }
+// ---------- 站点导航 ----------
+function renderSites(){
+  const sites=[
+    {ico:'💬',name:'FaceTalk',url:'facetalk.955827.xyz/admin',desc:'面试搭子 · 匹配/留言/信誉'},
+    {ico:'🛡️',name:'辅警刷题站',url:'fj.955827.xyz',desc:'笔试·面试·体测题库'},
+    {ico:'🔥',name:'消防刷题站',url:'xf.955827.xyz',desc:'消防员结构化面试'},
+    {ico:'📚',name:'RCJ Exam Hub',url:'exam.955827.xyz',desc:'题库与内容中枢'},
+    {ico:'🎯',name:'RCJ Training',url:'exam.955827.xyz/train',desc:'职业能力训练系统'},
+    {ico:'🎤',name:'SoloSpeak',url:'955827.xyz/solospeak',desc:'开口系列 · 独声练习'},
+    {ico:'🌿',name:'LetOut',url:'955827.xyz/letout',desc:'开口系列 · 大声说'},
+  ];
+  let html='<div class="panel"><h3>🌐 站点导航</h3><div class="site-grid">';
+  sites.forEach(s=>{
+    const full=s.url.startsWith('http')?s.url:('https://'+s.url);
+    html+='<a class="site-card" href="'+full+'" target="_blank" rel="noopener"><div class="sc-ico">'+s.ico+'</div><div class="sc-name">'+s.name+'</div><div class="sc-url">'+s.url+'</div><div class="sc-desc">'+s.desc+'</div></a>';
+  });
+  html+='</div></div>';
+  document.getElementById('content').innerHTML=html;
+}
+
+// ---------- SVG 折线图 ----------
+function lineChart(data){
+  if(!data||!data.length) return '<div class="empty">暂无浏览数据</div>';
+  const W=680,H=220,pad=34;
+  const max=Math.max(...data.map(d=>d.s),1);
+  const n=data.length;
+  const X=i=>pad+i*((W-pad*2)/(n-1));
+  const Y=v=>H-pad-(v/max)*(H-pad*2);
+  const pts=data.map((d,i)=>X(i).toFixed(1)+','+Y(d.s).toFixed(1)).join(' ');
+  const area=pad+','+(H-pad)+' '+pts+' '+(W-pad)+','+(H-pad);
+  let grid='',labels='';
+  for(let g=0;g<=3;g++){ const yv=Math.round(max*g/3); const y=Y(yv); grid+='<line x1="'+pad+'" y1="'+y+'" x2="'+(W-pad)+'" y2="'+y+'" stroke="#eef2f7" stroke-width="1"/><text x="4" y="'+(y+4)+'" font-size="10" fill="#94a3b8">'+yv+'</text>'; }
+  // x 标签：首、中、尾
+  const idxs=[0,Math.floor((n-1)/2),n-1];
+  idxs.forEach(i=>{ const d=data[i]; labels+='<text x="'+X(i)+'" y="'+(H-10)+'" font-size="10" fill="#94a3b8" text-anchor="middle">'+String(d.day).slice(5)+'</text>'; });
+  const last=data[n-1];
+  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img">'+
+    '<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e88e5" stop-opacity=".22"/><stop offset="100%" stop-color="#1e88e5" stop-opacity="0"/></linearGradient></defs>'+
+    grid+
+    '<polygon points="'+area+'" fill="url(#cg)"/>'+
+    '<polyline points="'+pts+'" fill="none" stroke="#1e88e5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+
+    '<circle cx="'+X(n-1)+'" cy="'+Y(last.s)+'" r="3.5" fill="#1e88e5"/>'+
+    labels+
+    '</svg>';
+}
+
+// ---------- 工具 ----------
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtTime(ts){ if(!ts)return '—'; let d; if(String(ts).length>12) d=new Date(Number(ts)); else d=new Date(Number(ts)*1000); if(isNaN(d))return '—'; const p=n=>n<10?'0'+n:''+n; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+
+// ---------- 启动 ----------
+(async function(){
+  // 先探测是否已登录（cookie）
+  try{
+    const res=await fetch(API+'/data',{cache:'no-store'});
+    if(res.ok){ enterApp(); loadData(); }
+    else { document.getElementById('loginWrap').style.display='flex'; }
+  }catch(e){ document.getElementById('loginWrap').style.display='flex'; }
 })();
 </script>
 </body>
