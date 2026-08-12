@@ -21,6 +21,13 @@ let liveStop = null;
 let recStartTs = 0;
 const players = new Set(); // 活跃 player，切页时销毁
 
+function fmtMMSS(sec) {
+  sec = Math.floor(sec || 0);
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
 function toast(msg) {
   toastEl.textContent = msg;
   toastEl.hidden = false;
@@ -71,7 +78,7 @@ async function renderHome() {
       </div>
       <div class="goal-bar"><div class="goal-bar-fill" style="width:${pct}%"></div></div>
       <div class="goal-stats">
-        <span>已说 <b>${doneMin}</b> / ${targetMin} 分钟</span>
+        <span><b>${fmtMMSS(goal.doneSec || 0)}</b> / ${fmtMMSS(targetMin * 60)}</span>
         <span class="goal-streak">连续 ${goal.streak} 天</span>
       </div>
       ${makeupNote ? `<div class="goal-makeup">${makeupNote}</div>` : ''}
@@ -430,7 +437,7 @@ function fmtFull(ts) {
 // ---------------- 启动 ----------------
 async function boot() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20260811c').catch(() => {});
+    navigator.serviceWorker.register('sw.js?v=20260812b').catch(() => {});
   }
   await seedIfEmpty();
   await getMeta('onboarded'); // 预留
