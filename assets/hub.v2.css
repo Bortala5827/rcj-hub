@@ -9,9 +9,28 @@
   --bg-soft: #f7f8fa;
   --accent: #1e88e5;
   --accent-weak: #e8f1fc;
+  --signal: #f5a524;        /* Hub 实验信号色（暖） */
+  --signal-weak: #fef3e2;
+  --grid: rgba(15, 23, 42, 0.028);
   --radius: 16px;
   --radius-sm: 10px;
   --max: 1080px;
+}
+
+/* ============== RCJ Hub 专属签名：蓝图网格 + 颗粒噪点 ============== */
+body.hub {
+  background-color: #fbfcfd;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 30px 30px;
+  background-position: -1px -1px;
+}
+/* 颗粒噪点（与 Speak Series 家族共有质感，Hub 同样采用） */
+body.hub::after {
+  content: ""; position: fixed; inset: 0; z-index: 3; pointer-events: none;
+  opacity: 0.04; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,12 +75,22 @@ section[id] { scroll-margin-top: 84px; }
 
 /* ============== HERO ============== */
 .hero { position: relative; overflow: hidden; padding: 88px 0 72px; }
+.hero-grid {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 136, 229, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(circle at 50% 28%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(circle at 50% 28%, #000 0%, transparent 72%);
+}
 .hero-glow {
   position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
   width: 900px; height: 500px; pointer-events: none; z-index: 0;
   background:
-    radial-gradient(circle at 30% 40%, rgba(30, 136, 229, 0.12), transparent 60%),
-    radial-gradient(circle at 70% 60%, rgba(124, 58, 237, 0.08), transparent 60%);
+    radial-gradient(circle at 28% 36%, rgba(30, 136, 229, 0.14), transparent 60%),
+    radial-gradient(circle at 72% 64%, rgba(124, 58, 237, 0.08), transparent 60%),
+    radial-gradient(circle at 50% 82%, rgba(245, 165, 36, 0.06), transparent 55%);
   filter: blur(8px);
 }
 .hero-inner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; text-align: center; animation: fadeUp 0.6s ease both; }
@@ -97,8 +126,8 @@ section[id] { scroll-margin-top: 84px; }
   transition: all 0.2s ease; cursor: pointer;
   border: 1px solid transparent;
 }
-.btn-primary { background: var(--ink); color: #fff; }
-.btn-primary:hover { background: #1f2937; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(15,23,42,0.18); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #1565c0; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(30,136,229,0.28); }
 .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn-ghost:hover { background: var(--bg-soft); border-color: var(--ink-4); transform: translateY(-1px); }
 
@@ -112,7 +141,7 @@ section[id] { scroll-margin-top: 84px; }
 .sh-sub { font-size: 15px; color: var(--ink-2); max-width: 560px; }
 
 /* ============== 核心产品区 ============== */
-.directions { padding: 72px 0 24px; background: var(--bg-soft); border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); }
+.directions { padding: 72px 0 24px; background: transparent; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); }
 .dir-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 .dir-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .dir-card {
@@ -143,6 +172,23 @@ section[id] { scroll-margin-top: 84px; }
   font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
   text-transform: uppercase; color: var(--ink-3);
   margin: 48px 0 16px;
+}
+
+/* 精选大卡：Exam Hub 单独成行、放大强调 */
+.dir-feature { margin-bottom: 6px; }
+.dir-feature .dir-card { padding: 32px 30px; }
+.dir-feature .dir-icon { width: 58px; height: 58px; font-size: 30px; }
+.dir-feature h3 { font-size: 20px; }
+
+/* 蓝图标签：开口系列的 lab 风格小标题 */
+.block-eyebrow.blueprint-label {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  color: var(--ink-2);
+  display: inline-flex; align-items: center; gap: 10px;
+  border-top: 1px dashed var(--line); padding-top: 20px;
+}
+.block-eyebrow.blueprint-label::before {
+  content: "+"; color: var(--signal); font-weight: 700; font-size: 15px; line-height: 1;
 }
 
 /* 实验清单 */
