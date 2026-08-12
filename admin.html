@@ -416,7 +416,9 @@ function renderAux(){
    ['aux',A.signalMatch,'信号匹配','']].forEach(c=>html+='<div class="stat '+c[0]+'"><div class="stat-num">'+c[1]+'</div><div class="stat-label">'+c[2]+'</div>'+(c[3]?'<div class="stat-sub">'+c[3]+'</div>':'')+'</div>');
   html+='</div>';
 
-  html+='<div class="panel"><h3>近 14 日浏览趋势 <span class="tag">visit_counts</span></h3><div class="chart-wrap">'+lineChart(A.visitTrend)+'</div></div>';
+  html+='<div class="panel"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><button class="btn" onclick="runMigrate()">↻ 迁移辅警历史浏览数据</button><span id="migrateMsg" class="muted small"></span></div><p class="small muted" style="margin-top:6px">把辅警库旧 visit_counts 并入统一库（幂等，可重复点）。迁移后概览与本面板即显示完整历史。</p></div>';
+
+  html+='<div class="panel"><h3>近 14 日浏览趋势 <span class="tag">rcj-analytics-d1</span></h3><div class="chart-wrap">'+lineChart(A.visitTrend)+'</div></div>';
 
   html+='<div class="panel"><h3>留言墙 · 按城市 <span class="tag">wall</span></h3>';
   if(!A.wallByCity.length) html+='<div class="empty">暂无留言</div>';
@@ -431,6 +433,18 @@ function renderAux(){
   html+='</div>';
 
   document.getElementById('content').innerHTML=html;
+}
+
+async function runMigrate(){
+  const m=document.getElementById('migrateMsg'); if(!m)return;
+  m.textContent='迁移中…';
+  try{
+    const res=await fetch(API+'/migrate',{cache:'no-store'});
+    const d=await res.json();
+    if(!d.ok){ m.textContent='失败：'+(d.error||''); return; }
+    m.textContent='已完成，并入 '+d.migrated+' 条（aux 累计 '+(d.unifiedAux?d.unifiedAux.s:0)+' 浏览）';
+    loadData();
+  }catch(e){ m.textContent='网络错误'; }
 }
 
 // ---------- 站点导航 ----------
