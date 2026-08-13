@@ -298,6 +298,8 @@ html[data-rec="1"] .rec-timer {
 }
 .log-meta { font-size: 11px; color: var(--muted); }
 .player { margin: 2px 0 8px; }
+/* P0-1 擦除定位：录完的声波可拖拽定位（Tide/Audiom 灵魂交互） */
+.player .wave-canvas { cursor: pointer; touch-action: none; }
 .player-note { font-size: 11px; color: var(--muted); padding: 5px 0; }
 .player-bar { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
 .play-btn {
@@ -356,6 +358,24 @@ html[data-rec="1"] .rec-timer {
   letter-spacing: .04em;
 }
 .mini-btn:hover { border-color: var(--accent-deep); color: var(--accent-hot); }
+
+/* P1-4 情绪声波卡模态：移动端长按 <img> 存相册，桌面端「保存图片」下载 */
+.share-modal {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(10, 8, 7, .82);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; padding: 22px;
+}
+.share-card-wrap {
+  max-height: 70vh; overflow: hidden; border-radius: var(--r);
+  box-shadow: 0 18px 60px color-mix(in srgb, #000 60%, transparent);
+}
+.share-img { display: block; max-height: 70vh; max-width: 92vw; height: auto; border-radius: var(--r); }
+.share-actions { display: flex; gap: 10px; }
+.share-actions .mini-btn { font-size: 13px; padding: 9px 18px; }
+.share-save { border-color: var(--accent); color: var(--accent-hot); }
+.share-tip { color: var(--muted); font-size: 11px; margin: 0; text-align: center; }
 
 /* 关于 */
 .about-hero { padding: 6px 0 4px; }

@@ -1,10 +1,11 @@
 // app.js — LetOut 主逻辑（释放 / 库房 / 关于）
-import { putRelease, getAllReleases, deleteRelease } from './db.js?v=20260812h';
-import { Recorder } from './recorder.js?v=20260812h';
-import { mountLiveBars, fitCanvas } from './waveform.js?v=20260812h';
-import { mountPlayer, mountAudioPlayer } from './player.js?v=20260812h';
-import { startGhostGuide } from './ghost-guide.js?v=20260812h';
-import { getEmotionShadows } from './resource.js?v=20260812h';
+import { putRelease, getAllReleases, deleteRelease } from './db.js?v=20260813a';
+import { Recorder } from './recorder.js?v=20260813a';
+import { mountLiveBars, fitCanvas } from './waveform.js?v=20260813a';
+import { mountPlayer, mountAudioPlayer } from './player.js?v=20260813a';
+import { openShareCard } from './sharecard.js?v=20260813a';
+import { startGhostGuide } from './ghost-guide.js?v=20260813a';
+import { getEmotionShadows } from './resource.js?v=20260813a';
 
 // ─── 情绪类型 + 声纹变体 ───────────────────────────────
 // 每个情绪一种基调配色 + 波形性格，每种情绪下 3~5 种「声纹」变体微调强度。
@@ -20,7 +21,7 @@ const EMOTIONS = [
     // 最躁：橙红，抖动大、发光最烫
     grad: ['#ffb27a', '#e23b1e'],
     glow: '#ff6b35',
-    wave: { alpha: 1, minBarHeight: 4, wobble: 0.48, pulse: 0.04, bloom: 0.64, smoothing: 0.6 },
+    wave: { alpha: 1, minBarHeight: 4, wobble: 0.48, pulse: 0.04, bloom: 0.64, smoothing: 0.6, barWidthRatio: 1.3, capStyle: 'hard', wobbleKind: 'random', mirror: true, mirrorAsym: 0.2 },
     voices: [
       { id: 'burn-1', label: '闷烧', mod: { wobble: 0.3, bloom: 0.4 } },
       { id: 'burn-2', label: '发火', mod: { wobble: 0.44 } },
@@ -35,7 +36,7 @@ const EMOTIONS = [
     // 紫红：表达欲强，抖动+律动兼有的中高能量
     grad: ['#c97ba0', '#6a2249'],
     glow: '#b14c7e',
-    wave: { alpha: 0.95, minBarHeight: 3, wobble: 0.34, pulse: 0.22, bloom: 0.5, smoothing: 0.7 },
+    wave: { alpha: 0.95, minBarHeight: 3, wobble: 0.34, pulse: 0.22, bloom: 0.5, smoothing: 0.7, barWidthRatio: 1.0, capStyle: 'soft', wobbleKind: 'random', mirror: true, mirrorAsym: 0 },
     voices: [
       { id: 'release-1', label: '倾诉', mod: { wobble: 0.28, pulse: 0.18, bloom: 0.4 } },
       { id: 'release-2', label: '吐槽', mod: { wobble: 0.4 } },
@@ -50,7 +51,7 @@ const EMOTIONS = [
     // 蓝灰：冷静、接地，抖动小、光要稳
     grad: ['#7d9bb5', '#2f4a66'],
     glow: '#5f82a3',
-    wave: { alpha: 0.82, minBarHeight: 3, wobble: 0.16, pulse: 0.1, bloom: 0.26, smoothing: 0.82 },
+    wave: { alpha: 0.82, minBarHeight: 3, wobble: 0.16, pulse: 0.1, bloom: 0.26, smoothing: 0.82, barWidthRatio: 0.95, capStyle: 'soft', wobbleKind: 'sine', mirror: true, mirrorAsym: 0 },
     voices: [
       { id: 'settle-1', label: '梳理', mod: { wobble: 0.12, pulse: 0.08 } },
       { id: 'settle-2', label: '独白', mod: { wobble: 0.2 } },
@@ -65,7 +66,7 @@ const EMOTIONS = [
     // 最缓：米白偏暖，慢呼吸、几乎不抖、光很淡
     grad: ['#ece3d4', '#b3a487'],
     glow: '#d4c9b8',
-    wave: { alpha: 0.64, minBarHeight: 2, wobble: 0.04, pulse: 0.1, bloom: 0.12, smoothing: 0.92 },
+    wave: { alpha: 0.64, minBarHeight: 2, wobble: 0.04, pulse: 0.1, bloom: 0.12, smoothing: 0.92, barWidthRatio: 0.6, capStyle: 'soft', wobbleKind: 'sine', mirror: true, mirrorAsym: 0 },
     voices: [
       { id: 'quiet-1', label: '呼吸', mod: { pulse: 0.26 } },
       { id: 'quiet-2', label: '呢喃', mod: { wobble: 0.09 } },
@@ -269,6 +270,11 @@ function wireRecord() {
       smoothing: wcfg.smoothing != null ? wcfg.smoothing : 0.7,
       bloom: wcfg.bloom != null ? wcfg.bloom : 0,
       floorGlow: currentEmotion.glow,
+      mirror: wcfg.mirror !== false,
+      mirrorAsym: wcfg.mirrorAsym || 0,
+      barWidthRatio: wcfg.barWidthRatio || 1,
+      capStyle: wcfg.capStyle || 'soft',
+      wobbleKind: wcfg.wobbleKind || 'random',
       onLevel: setLiveLevel,
     });
     document.documentElement.dataset.rec = '1';
@@ -382,6 +388,7 @@ async function renderLog() {
       </div>
       <div class="player" data-id="${r.id}"></div>
       <div class="log-controls">
+        <button class="mini-btn" data-act="card" data-id="${r.id}">声波卡</button>
         <button class="mini-btn" data-act="del" data-id="${r.id}">焚毁记录</button>
       </div>
     </div>
@@ -396,7 +403,10 @@ async function renderLog() {
     btn.onclick = async () => {
       const id = btn.dataset.id;
       const act = btn.dataset.act;
-      if (act === 'del') {
+      if (act === 'card') {
+        const rel = rows.find((x) => x.id === id);
+        if (rel) openShareCard(rel, EMOTION_MAP[rel.mode] || EMOTIONS[0]);
+      } else if (act === 'del') {
         if (confirm('焚毁这条释放记录？此操作不可恢复。')) {
           await deleteRelease(id);
           renderLog();

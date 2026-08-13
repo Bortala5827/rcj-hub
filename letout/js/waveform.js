@@ -41,6 +41,8 @@ export function renderWave(canvas, peaks, opts = {}) {
     bg = 'transparent',
     mirror = true,
     minBar = 0.02,
+    headColor = null,        // 播放头颜色（拖动定位 / 进度同步），null 不画
+    headWidth = 2,
   } = opts;
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
@@ -58,6 +60,17 @@ export function renderWave(canvas, peaks, opts = {}) {
     ctx.fillStyle = i < split ? playedColor : restColor;
     if (mirror) ctx.fillRect(x, mid - bh, Math.max(1, bw - 0.4), bh * 2);
     else ctx.fillRect(x, h - bh, Math.max(1, bw - 0.4), bh);
+  }
+
+  // 播放头：竖直亮线 + 顶部小圆点（拖动定位 / 播放进度同步）
+  if (headColor) {
+    const hx = Math.max(0, Math.min(w, (split / n) * w));
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = headColor;
+    ctx.fillRect(hx - headWidth / 2, 0, headWidth, h);
+    ctx.beginPath();
+    ctx.arc(hx, headWidth + 2, headWidth + 1, 0, Math.PI * 2);
+    ctx.fill();
   }
 }
 
@@ -92,6 +105,11 @@ export function mountLiveBars(canvas, analyser, opts = {}) {
     mirror = false,            // 镜像反射：柱子从中心轴向上下对称展开
     centerGlow = null,         // 中心轴辉光线（随音量呼吸，仅 mirror）
     radialBg = null,           // 径向背景渐变 [centerHex, edgeHex]
+    // v6 — 情绪性格化（P0-3）：用「形状」区分情绪，不只靠颜色
+    barWidthRatio = 1,       // 柱宽倍率（>1 粗壮有冲击，<1 纤细精致）
+    capStyle = 'soft',       // 'soft' 圆润帽 | 'hard' 实心尖顶（锯齿/爆发感）
+    wobbleKind = 'random',   // 'random' 抖动 | 'sine' 缓慢正弦摇摆（呼吸感）
+    mirrorAsym = 0,          // 0..1 镜像上下不对称（>0 上半更高=更躁动）
   } = opts;
 
   const ctx = canvas.getContext('2d');
@@ -209,7 +227,8 @@ export function mountLiveBars(canvas, analyser, opts = {}) {
       ctx.fillRect(0, h * 0.45, w, h * 0.55);
     }
 
-    const barW = Math.max(1.5, (w / N) - barGap);
+    const slot = w / N;
+    const barW = Math.max(1.5, Math.min(slot * 1.06, slot * barWidthRatio - barGap));
     // mirror 模式：每根柱可用高度 = 半屏（从中心到边缘）
     const maxH = mirror ? h * 0.46 : h * 0.9;
     const baseY = mirror ? h / 2 : h;   // 柱子起点：mirror=中心线，非mirror=底部
@@ -217,11 +236,14 @@ export function mountLiveBars(canvas, analyser, opts = {}) {
     for (let k = 0; k < N; k++) {
       let v = vals[k];
       if (pulse) v = v * beat;
-      if (wobble) v = v * (1 + wobble * (Math.random() - 0.5));
+      if (wobble) {
+        if (wobbleKind === 'sine') v = v * (1 + wobble * 0.5 * Math.sin(Date.now() / 620 + k * 0.35));
+        else v = v * (1 + wobble * (Math.random() - 0.5));
+      }
       v = Math.max(0, Math.min(1, v));
 
       const barH = Math.max(minBarHeight, v * maxH);
-      const x = k * (w / N) + barGap / 2;
+      const x = k * slot + barGap / 2;
 
       // 更新峰值帽
       if (v * maxH > caps[k]) caps[k] = v * maxH;
@@ -249,17 +271,28 @@ export function mountLiveBars(canvas, analyser, opts = {}) {
       };
 
       if (mirror) {
-        drawBar(baseY - barH, barH, borderRadius, 0);       // 上半
-        drawBar(baseY, barH * 0.92, 0, borderRadius);       // 下半（略短营造透视）
+        const asym = mirrorAsym || 0;
+        const topH = barH * (1 + asym * 0.5);
+        const botH = barH * (1 - asym * 0.5);
+        drawBar(baseY - topH, topH, borderRadius, 0);       // 上半（asym>0 更高）
+        drawBar(baseY, botH * 0.92, 0, borderRadius);       // 下半（略短营造透视）
       } else {
         drawBar(baseY - barH, barH, borderRadius, 0);        // 原始：从底向上
       }
 
-      // 峰值帽
+      // 峰值帽：'hard' 实心尖顶（情绪爆发/锯齿感），'soft' 细线帽（圆润）
       if (caps[k] > minBarHeight + 1) {
         ctx.globalAlpha = capAlpha;
         ctx.fillStyle = col;
-        if (mirror) {
+        if (capStyle === 'hard') {
+          const ch = Math.max(2, minBarHeight + 1.5);
+          if (mirror) {
+            ctx.fillRect(x, baseY - caps[k] - ch, barW, ch);
+            ctx.fillRect(x, baseY + caps[k], barW, ch);
+          } else {
+            ctx.fillRect(x, baseY - caps[k] - ch, barW, ch);
+          }
+        } else if (mirror) {
           ctx.fillRect(x, baseY - caps[k], barW, 1.2);     // 上半顶端
         } else {
           ctx.fillRect(x, baseY - caps[k], barW, 1.5);

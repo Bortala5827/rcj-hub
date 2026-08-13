@@ -1,5 +1,5 @@
 // player.js — 回放（仅 keep=true 的音频；无音频则只画静默波形）
-import { renderWave, fitCanvas, mountLiveBars } from './waveform.js?v=20260812h';
+import { renderWave, fitCanvas, mountLiveBars } from './waveform.js?v=20260813a';
 
 function fmt(ms) {
   const s = Math.round(ms / 1000);
@@ -15,9 +15,11 @@ export function mountPlayer(container, release, opts = {}) {
 
   const canvas = document.createElement('canvas');
   canvas.className = 'wave-canvas';
+  canvas.style.cursor = 'pointer';
+  canvas.title = '拖动定位播放';
   container.append(canvas);
   fitCanvas(canvas, 56);
-  renderWave(canvas, release.peaks || [], { progress: 0, playedColor: played, restColor: rest });
+  renderWave(canvas, release.peaks || [], { progress: 0, playedColor: played, restColor: rest, headColor: played });
 
   if (!release.hasAudio || !release.audioBlob) {
     const note = document.createElement('div');
@@ -40,17 +42,49 @@ export function mountPlayer(container, release, opts = {}) {
 
   const audio = new Audio(URL.createObjectURL(release.audioBlob));
   let playing = false;
-  const redraw = (p) => renderWave(canvas, release.peaks || [], { progress: p, playedColor: played, restColor: rest });
+  const redraw = (p) => renderWave(canvas, release.peaks || [], { progress: p, playedColor: played, restColor: rest, headColor: played });
 
   playBtn.onclick = () => { playing ? audio.pause() : audio.play(); };
   audio.onplay = () => { playing = true; playBtn.textContent = '⏸'; };
   audio.onpause = () => { playing = false; playBtn.textContent = '▶'; };
   audio.onended = () => { playing = false; playBtn.textContent = '▶'; redraw(1); };
   audio.ontimeupdate = () => {
+    if (scrubbing) return;
     const p = audio.duration ? audio.currentTime / audio.duration : 0;
     time.textContent = fmt(audio.currentTime * 1000) + ' / ' + fmt(release.durationMs);
     redraw(p);
   };
+
+  // ── P0-1 擦除定位 scrubbing：录完的声波变成可拖拽的「带」──
+  // 指针按下/拖动 → 直接定位到对应时间（Tide/Audiom 的灵魂交互）；
+  // 播放中拖动则先暂停、拖动完若原本在播则继续播放。
+  let scrubbing = false, wasPlaying = false;
+  const seekFromEvent = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    if (audio.duration) audio.currentTime = x * audio.duration;
+    redraw(x);
+    time.textContent = fmt((x * (audio.duration || 0)) * 1000) + ' / ' + fmt(release.durationMs);
+    return x;
+  };
+  canvas.style.touchAction = 'none';
+  canvas.addEventListener('pointerdown', (e) => {
+    if (!audio.duration) return;
+    wasPlaying = !audio.paused;
+    scrubbing = true;
+    try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+    if (wasPlaying) audio.pause();
+    seekFromEvent(e);
+  });
+  canvas.addEventListener('pointermove', (e) => { if (scrubbing) seekFromEvent(e); });
+  const endScrub = (e) => {
+    if (!scrubbing) return;
+    scrubbing = false;
+    try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+    if (wasPlaying) audio.play().catch(() => {});
+  };
+  canvas.addEventListener('pointerup', endScrub);
+  canvas.addEventListener('pointercancel', endScrub);
 
   return {
     destroy() {
