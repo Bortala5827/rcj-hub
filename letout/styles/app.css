@@ -436,3 +436,16 @@ html[data-rec="1"] .rec-timer {
     box-shadow: none !important;
   }
 }
+
+/* 桌面端适配：不再是一条手机窄条，核心区两栏（左：情绪/声纹，右：释放台） */
+@media (min-width: 820px) {
+  #app { max-width: 920px; }
+  .view { display: grid; grid-template-columns: 1fr 1.12fr; gap: 24px; align-items: start; }
+  .emotion-grid { grid-column: 1 / -1; grid-template-columns: repeat(4, 1fr); }
+  .voice-block, .keep-toggle { grid-column: 1; }
+  .release-zone {
+    grid-column: 2; grid-row: 2 / span 4;
+    position: sticky; top: 96px; margin: 0; padding: 26px 18px;
+  }
+  .shadow-zone { grid-column: 1 / -1; }
+}

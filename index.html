@@ -37,25 +37,25 @@
     .marquee-track span { font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace; font-size: 13px; font-weight: 500; letter-spacing: .14em; color: var(--ink-3); padding: 0 26px; }
     @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-    /* 角色漂浮区（Speak Series）——散落浮动 + 身份标签 + 指针邻近放大 */
-    .float-scene { position: relative; height: 400px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-    .float-item { position: absolute; display: block; will-change: transform; text-decoration: none; }
-    .float-inner { display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center; }
-    .float-item img { display: block; width: 100%; height: auto; aspect-ratio: 1/1; object-fit: contain; transition: filter .3s ease; }
-    .float-item:hover img { filter: brightness(1.06) drop-shadow(0 10px 18px rgba(15,23,42,.16)); }
-    .float-name { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
-    .float-desc { font-size: 12px; line-height: 1.4; color: var(--ink-2); max-width: 150px; opacity: 0; transform: translateY(6px); transition: opacity .3s ease, transform .3s ease; }
-    .float-item:hover .float-desc { opacity: 1; transform: translateY(0); }
-    .float-1 { width: 148px; top: 14%; left: 4%; }
-    .float-2 { width: 124px; top: 56%; left: 20%; }
-    .float-3 { width: 138px; top: 20%; right: 6%; }
-    .float-1 .float-inner { animation: float 6s ease-in-out infinite; }
-    .float-2 .float-inner { animation: float 7s ease-in-out -2s infinite; }
-    .float-3 .float-inner { animation: float 6.5s ease-in-out -1.2s infinite; }
-    .float-quote { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; pointer-events: none; max-width: 220px; }
-    .float-quote::first-line { font-size: clamp(18px, 2.4vw, 24px); font-weight: 700; color: var(--ink); letter-spacing: -0.01em; line-height: 1.3; }
-    .float-quote small { display: block; font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace; font-size: 11px; font-weight: 500; color: var(--ink-3); letter-spacing: .14em; margin-top: 10px; text-transform: uppercase; }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+    /* 角色横滑区（Speak Series）——可来回滚动 + 身份常驻 + 指针邻近放大 */
+    .float-scene { position: relative; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 18px 18px; }
+    .float-caption { text-align: center; margin-bottom: 16px; }
+    .float-caption b { display: block; font-size: clamp(18px, 2.4vw, 24px); font-weight: 700; color: var(--ink); letter-spacing: -0.01em; line-height: 1.3; }
+    .float-caption small { display: block; font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace; font-size: 11px; font-weight: 500; color: var(--ink-3); letter-spacing: .14em; margin-top: 8px; text-transform: uppercase; }
+    .float-viewport { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; -webkit-overflow-scrolling: touch; cursor: grab; scroll-behavior: smooth; }
+    .float-viewport.dragging { cursor: grabbing; scroll-behavior: auto; }
+    .float-viewport::-webkit-scrollbar { height: 7px; }
+    .float-viewport::-webkit-scrollbar-thumb { background: var(--ink-4); border-radius: 4px; }
+    .float-viewport::-webkit-scrollbar-track { background: transparent; }
+    .float-track { display: flex; gap: 18px; padding: 4px 2px 8px; width: max-content; }
+    .float-item { flex: 0 0 auto; width: clamp(190px, 24vw, 250px); will-change: transform; text-decoration: none; }
+    .float-inner { display: flex; flex-direction: column; align-items: center; gap: 9px; text-align: center; padding: 18px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 18px; transition: box-shadow .25s ease, border-color .25s ease; }
+    .float-item:hover .float-inner { box-shadow: 0 16px 34px rgba(15,23,42,.13); border-color: var(--ink-4); }
+    .float-item img { display: block; width: 116px; height: 116px; object-fit: contain; transition: filter .3s ease; }
+    .float-item:hover img { filter: brightness(1.05) drop-shadow(0 8px 16px rgba(15,23,42,.16)); }
+    .float-name { font-size: 15px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+    .float-desc { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+    .float-hint { text-align: center; margin-top: 12px; font-size: 12px; color: var(--ink-3); letter-spacing: .04em; }
 
     /* hero 光斑：随指针游走的柔光（视觉亮点） */
     .hero-spot { position: absolute; left: 0; top: 0; width: 460px; height: 460px; margin: -230px 0 0 -230px; border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(circle, rgba(56,150,240,.20), rgba(56,150,240,0) 70%); z-index: 1; }
@@ -64,17 +64,11 @@
       .series-head { flex-direction: column; align-items: flex-start; gap: 4px; }
       .exam-entry { flex-direction: column; align-items: flex-start; gap: 16px; }
       .exam-img { width: 80px; height: 80px; }
-      .float-scene { height: 480px; }
-      .float-1 { width: 110px; }
-      .float-2 { width: 96px; }
-      .float-3 { width: 104px; }
-      .float-desc { opacity: 1; transform: none; }
+      .float-item { width: 72vw; }
     }
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; }
       .marquee-track { animation: none; }
-      .float-1 .float-inner, .float-2 .float-inner, .float-3 .float-inner { animation: none; }
-      .float-desc { opacity: 1; transform: none; }
       .hero-spot { display: none; }
     }
   </style>
@@ -132,28 +126,33 @@
             <span class="series-sub">训练人与世界连接的表达工具</span>
           </div>
           <div class="float-scene">
-            <a class="float-item float-1" href="/solospeak/">
-              <span class="float-inner">
-                <img src="/assets/roles/solospeak.png" alt="SoloSpeak" loading="lazy" />
-                <span class="float-name">SoloSpeak</span>
-                <span class="float-desc">一个人也敢开口，录完自己听</span>
-              </span>
-            </a>
-            <a class="float-item float-2" href="/letout/">
-              <span class="float-inner">
-                <img src="/assets/roles/letout.png" alt="LetOut" loading="lazy" />
-                <span class="float-name">LetOut</span>
-                <span class="float-desc">把情绪说出来，而不是憋着</span>
-              </span>
-            </a>
-            <a class="float-item float-3" href="https://facetalk.955827.xyz" target="_blank" rel="noopener">
-              <span class="float-inner">
-                <img src="/assets/roles/facetalk.png" alt="FaceTalk" loading="lazy" />
-                <span class="float-name">FaceTalk</span>
-                <span class="float-desc">面试搭子匹配筛选助手</span>
-              </span>
-            </a>
-            <div class="float-quote">说话，是一种练习。<small>EXPRESS · 三个角色，在世界各处漂浮</small></div>
+            <div class="float-caption">说话，是一种练习。<small>EXPRESS · 三个角色，在世界各处漂浮</small></div>
+            <div class="float-viewport">
+              <div class="float-track">
+                <a class="float-item" href="/solospeak/">
+                  <span class="float-inner">
+                    <img src="/assets/roles/solospeak.png" alt="SoloSpeak" loading="lazy" />
+                    <span class="float-name">SoloSpeak</span>
+                    <span class="float-desc">一个人也敢开口，录完自己听</span>
+                  </span>
+                </a>
+                <a class="float-item" href="/letout/">
+                  <span class="float-inner">
+                    <img src="/assets/roles/letout.png" alt="LetOut" loading="lazy" />
+                    <span class="float-name">LetOut</span>
+                    <span class="float-desc">把情绪说出来，而不是憋着</span>
+                  </span>
+                </a>
+                <a class="float-item" href="https://facetalk.955827.xyz" target="_blank" rel="noopener">
+                  <span class="float-inner">
+                    <img src="/assets/roles/facetalk.png" alt="FaceTalk" loading="lazy" />
+                    <span class="float-name">FaceTalk</span>
+                    <span class="float-desc">面试搭子匹配筛选助手</span>
+                  </span>
+                </a>
+              </div>
+            </div>
+            <div class="float-hint">← 拖动 / 滚轮横向浏览 →</div>
           </div>
         </div>
 
@@ -240,13 +239,13 @@
     el.addEventListener('pointerup', function(){ gsap.to(el, { scale: 1, duration: 0.28, ease: 'power2.out' }); });
   });
 
-  // 漂浮区：指针邻近的角色被放大（macOS dock 般的灵动）
-  var scene = document.querySelector('.float-scene');
-  if (scene) {
-    var items = [].slice.call(scene.querySelectorAll('.float-item'));
+  // 漂浮区：横滑轨道 + 指针邻近放大（macOS dock 般的灵动）
+  var vp = document.querySelector('.float-viewport');
+  if (vp) {
+    var items = [].slice.call(vp.querySelectorAll('.float-item'));
     var scaleTo = items.map(function(it){ return gsap.quickTo(it, 'scale', { duration: 0.45, ease: 'power3' }); });
-    scene.addEventListener('pointermove', function(e){
-      var sr = scene.getBoundingClientRect();
+    vp.addEventListener('pointermove', function(e){
+      var sr = vp.getBoundingClientRect();
       var cx = e.clientX - sr.left, cy = e.clientY - sr.top;
       items.forEach(function(it, i){
         var r = it.getBoundingClientRect();
@@ -255,17 +254,19 @@
         scaleTo[i](d < 170 ? 1 + (170 - d) / 170 * 0.22 : 1);
       });
     });
-    scene.addEventListener('pointerleave', function(){ scaleTo.forEach(function(q){ q(1); }); });
+    vp.addEventListener('pointerleave', function(){ scaleTo.forEach(function(q){ q(1); }); });
 
-    // 滚动视差：三图错位漂移 + 微旋转（GSAP 精髓）
-    [
-      { el: '.float-1', yPercent: -16, rotation: 3 },
-      { el: '.float-2', yPercent: 20, rotation: -4 },
-      { el: '.float-3', yPercent: -12, rotation: 4 }
-    ].forEach(function(o){
-      gsap.to(o.el, { yPercent: o.yPercent, rotation: o.rotation, ease: 'none',
-        scrollTrigger: { trigger: '.float-scene', start: 'top bottom', end: 'bottom top', scrub: true } });
-    });
+    // 桌面端：纵向滚轮 → 横向滚动
+    vp.addEventListener('wheel', function(e){
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { vp.scrollLeft += e.deltaY; e.preventDefault(); }
+    }, { passive: false });
+
+    // 拖拽滚动（并阻止拖拽误触链接）
+    var down = false, sx = 0, sl = 0, moved = false;
+    vp.addEventListener('pointerdown', function(e){ down = true; moved = false; sx = e.clientX; sl = vp.scrollLeft; vp.classList.add('dragging'); });
+    window.addEventListener('pointermove', function(e){ if (!down) return; var dx = e.clientX - sx; if (Math.abs(dx) > 4) moved = true; vp.scrollLeft = sl - dx; });
+    window.addEventListener('pointerup', function(){ down = false; vp.classList.remove('dragging'); });
+    vp.addEventListener('click', function(e){ if (moved) e.preventDefault(); }, true);
   }
 
   /* ============ Layer 3 · 视觉亮点 ============ */

@@ -391,3 +391,17 @@ select { width: 100%; }
 }
 .recap-actions { display: flex; }
 .recap-actions .big-btn { flex: 1; }
+
+/* 桌面端适配：不再是一条手机窄条，核心区两栏（左：目标/话题，右：录音台） */
+@media (min-width: 820px) {
+  #app { max-width: 940px; padding-left: 30px; padding-right: 30px; }
+  .view { display: grid; grid-template-columns: 1fr 1.02fr; gap: 24px; align-items: start; }
+  .greeting-jp, .greeting-cn, .quote, .goal, .topic-card { grid-column: 1; }
+  .record-zone {
+    grid-column: 2; grid-row: 1 / span 6;
+    position: sticky; top: 96px; margin: 0;
+    padding: 30px 20px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+}
