@@ -1,9 +1,11 @@
-// recorder.js — 录音引擎（MediaRecorder 生命周期）
+// recorder.js — Speak Series 统一复用 · 录音引擎（MediaRecorder 生命周期）
 // 产出：{ blob, durationMs, peaks, level }
 // 不自动上传、不留存服务器；本地优先。
+// 这是 rcj-audio-core 的 canonical 版本：fftSize=2048（频谱更细腻）
+// + 实时 onLevel 回调 + 结束回传 level（峰值/高音量占比/是否触发高音量）。
 
-const TARGET_POINTS = 320; // 峰值数组长度（见 SPEC §4）
-const HIGH_THRESHOLD = 0.58; // 橙色高音量阈值（0..1，时域最大振幅）
+const TARGET_POINTS = 320;           // 峰值数组长度（见各项目 SPEC §4）
+const HIGH_THRESHOLD = 0.58;         // 橙色高音量阈值（0..1，时域最大振幅）
 
 export class Recorder {
   constructor() {
@@ -31,7 +33,7 @@ export class Recorder {
     this.audioCtx = new AC();
     const source = this.audioCtx.createMediaStreamSource(this.stream);
     this.analyser = this.audioCtx.createAnalyser();
-    this.analyser.fftSize = 1024;
+    this.analyser.fftSize = 2048;
     source.connect(this.analyser);
 
     this._frames = [];
