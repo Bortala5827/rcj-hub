@@ -1,6 +1,6 @@
 // app.js — LetOut 主逻辑（释放 / 库房 / 关于）
 import { putRelease, getAllReleases, deleteRelease } from './db.js?v=20260813a';
-import { Recorder } from './recorder.js?v=20260813a';
+import { Recorder } from './recorder.js?v=20260813b';
 import { mountLiveBars, fitCanvas } from './waveform.js?v=20260813a';
 import { mountPlayer, mountAudioPlayer } from './player.js?v=20260813a';
 import { openShareCard } from './sharecard.js?v=20260813a';

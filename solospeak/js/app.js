@@ -2,9 +2,9 @@
 import {
   putRecording, getAllRecordings, deleteRecording, setFavorite, getMeta, putMeta,
 } from './db.js';
-import { Recorder } from './recorder.js';
-import { mountLiveBars, renderWave, fitCanvas, lerpHex } from './waveform.js';
-import { mountPlayer } from './player.js';
+import { Recorder } from './recorder.js?v=20260813b';
+import { mountLiveBars, renderWave, fitCanvas, lerpHex } from './waveform.js?v=20260813a';
+import { mountPlayer } from './player.js?v=20260813a';
 import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN, QUOTE } from './topics.js';
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
 import { exportData, exportAudio } from './export.js';
@@ -437,7 +437,7 @@ function fmtFull(ts) {
 // ---------------- 启动 ----------------
 async function boot() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20260812c').catch(() => {});
+    navigator.serviceWorker.register('sw.js?v=20260813a').catch(() => {});
   }
   await seedIfEmpty();
   await getMeta('onboarded'); // 预留
