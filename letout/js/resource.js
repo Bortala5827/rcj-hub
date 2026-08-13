@@ -12,7 +12,7 @@ const LOCAL_FALLBACK = {
   batches: [
     {
       id: 'local-default',
-      label: '本地占位 · 未接入资源库',
+      label: '精选影视台词 · 本地预览',
       items: [
         { id: 'p1', title: '功夫熊猫 · 阿宝', text: '你患得患失，太在意从前，又担心未来。昨天是段历史，明天是个谜，而今天，是上天的礼物。', audio: null },
         { id: 'p2', title: '海上钢琴师', text: '我们笑着说再见，却深知再见遥遥无期。', audio: null },
