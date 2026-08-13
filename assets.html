@@ -5,20 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0f172a" />
   <title>RCJ 资产库 · Asset Hub</title>
-  <meta name="description" content="RCJ 资产总目录 —— Skills / Media / Interaction 三合一统一仓库。被 Speak Series / Exam Hub / RCJ Hub 复用。" />
+  <meta name="description" content="RCJ Lab 资产总目录 —— 记录创造，沉淀能力，让每一次探索成为下一次复用的基础。核心引擎 / 互动资产 / 媒体资产 / AI 工作流 / 设计资产 / 产品映射 / 能力地图。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260812a" />
+  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260813b" />
   <style>
-    .asset-hero { padding: 72px 0 40px; }
-    .asset-hero h1 { font-size: clamp(28px, 5vw, 44px); font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px; }
-    .asset-hero p { font-size: 16px; color: var(--ink-2); max-width: 640px; margin: 0; }
+    .asset-hero { padding: 72px 0 36px; }
+    .asset-hero h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -0.02em; margin: 0 0 14px; }
+    .asset-hero .sub { font-size: 17px; color: var(--ink-2); max-width: 680px; margin: 0 0 18px; line-height: 1.6; }
+    .roles { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 18px; }
+    .role { font-size: 12.5px; font-weight: 600; color: var(--accent); background: var(--accent-weak); padding: 5px 12px; border-radius: 999px; }
+    .principle { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 14px; color: var(--ink-3); }
+    .principle .chip { background: var(--bg-soft); border: 1px solid var(--line); padding: 4px 11px; border-radius: 8px; font-weight: 600; color: var(--ink-2); }
+    .principle .arrow { color: var(--ink-4); }
+    .principle .no { text-decoration: line-through; color: var(--ink-4); opacity: .7; }
+
     .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 22px 0 4px; font-size: 13px; color: var(--ink-3); }
     .legend span { display: inline-flex; align-items: center; gap: 6px; }
 
-    .layer { margin: 40px 0; }
+    .layer { margin: 46px 0; }
     .layer-head { display: flex; align-items: baseline; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
     .layer-ico { font-size: 20px; }
-    .layer-title { font-size: 18px; font-weight: 700; color: var(--ink); }
+    .layer-title { font-size: 19px; font-weight: 800; color: var(--ink); }
+    .layer-kicker { font-size: 12px; color: var(--ink-4); letter-spacing: .14em; text-transform: uppercase; margin-right: 4px; }
     .layer-repo { font-size: 12.5px; color: var(--ink-4); margin-left: auto; }
     .layer-repo a { color: var(--accent); }
 
@@ -37,6 +45,35 @@
     .card-links { display: flex; gap: 12px; margin-top: 6px; }
     .card-links a { font-size: 12.5px; font-weight: 600; color: var(--accent); }
     .card-links a:hover { text-decoration: underline; }
+
+    /* ===== 核心引擎面板 ===== */
+    .engines { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 6px; }
+    .engine { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 20px 18px; position: relative; overflow: hidden; }
+    .engine::before { content: ''; position: absolute; left: 0; top: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), #7c3aed); }
+    .engine-ico { font-size: 26px; }
+    .engine-name { font-size: 18px; font-weight: 800; color: var(--ink); margin: 8px 0 2px; }
+    .engine-tag { font-size: 13px; color: var(--ink-3); margin-bottom: 12px; }
+    .engine-caps { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .engine-caps span { font-size: 12px; color: var(--ink-2); background: var(--bg-soft); border: 1px solid var(--line); padding: 3px 9px; border-radius: 7px; }
+    .engine-apps { font-size: 12.5px; color: var(--ink-4); }
+    .engine-apps b { color: var(--ink-3); font-weight: 600; }
+
+    /* ===== 产品映射图 ===== */
+    .pmap { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 26px 16px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius); }
+    .pm-node { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 18px; font-weight: 700; color: var(--ink); font-size: 15px; box-shadow: 0 4px 14px rgba(15,23,42,.05); }
+    .pm-root { background: var(--accent); color: #fff; border-color: transparent; }
+    .pm-mid { font-size: 16px; }
+    .pm-row, .pm-row2 { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .pm-arrow { color: var(--ink-4); font-size: 18px; line-height: 1; }
+    .pm-sub { font-size: 13px; color: var(--ink-3); margin-bottom: 2px; }
+
+    /* ===== 能力地图 ===== */
+    .caps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .cap { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 18px 16px; }
+    .cap-ico { font-size: 22px; }
+    .cap-name { font-size: 16px; font-weight: 800; color: var(--ink); margin: 8px 0 10px; }
+    .cap ul { margin: 0; padding-left: 18px; }
+    .cap li { font-size: 13px; color: var(--ink-2); line-height: 1.7; }
 
     .foot { margin: 56px 0 20px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-3); }
     .foot code { background: var(--bg-soft); padding: 1px 6px; border-radius: 6px; font-size: 12px; }
@@ -65,7 +102,20 @@
   <main class="container">
     <section class="asset-hero">
       <h1>RCJ 资产库 · Asset Hub</h1>
-      <p>统一资产仓库 <b>rcj-assets</b>：Skills + Media + Interaction 三合一。被 Speak Series / Exam Hub / RCJ Hub 复用。做功能 → 沉淀资产 → 下一次调用。</p>
+      <p class="sub">记录创造，沉淀能力，让每一次探索成为下一次复用的基础。<br>这里记录 RCJ Lab 在 AI、代码、设计、内容生产中的可复用能力。</p>
+      <div class="roles">
+        <span class="role">对外展示创造能力</span>
+        <span class="role">对内知识管理系统</span>
+        <span class="role">未来方法论 / 服务能力</span>
+      </div>
+      <div class="principle">
+        <span class="chip">做功能</span><span class="arrow">→</span>
+        <span class="chip">沉淀资产</span><span class="arrow">→</span>
+        <span class="chip">建立方法</span><span class="arrow">→</span>
+        <span class="chip">下一次调用</span>
+        <span class="arrow">·</span>
+        <span class="no">做网页 → 发布 → 丢弃</span>
+      </div>
       <div class="legend">
         <span>✅ 已实现</span>
         <span>📋 规划中</span>
@@ -73,130 +123,234 @@
       </div>
     </section>
 
-    <div id="catalog"></div>
+    <!-- 一、核心引擎 -->
+    <section class="layer">
+      <div class="layer-head">
+        <span class="layer-ico">⚙️</span>
+        <span class="layer-kicker">Core Engine</span>
+        <span class="layer-title">核心引擎</span>
+        <span class="layer-repo">整个资产库最重要的一层</span>
+      </div>
+      <div class="engines" id="engines"></div>
+    </section>
+
+    <!-- 二、互动资产 -->
+    <section class="layer">
+      <div class="layer-head">
+        <span class="layer-ico">🧩</span>
+        <span class="layer-kicker">Interaction</span>
+        <span class="layer-title">互动资产</span>
+        <span class="layer-repo"><a href="https://github.com/Bortala5827/rcj-assets/tree/main/interaction" target="_blank" rel="noopener">rcj-assets/interaction</a></span>
+      </div>
+      <div class="grid" data-layer="interaction"></div>
+    </section>
+
+    <!-- 三、媒体资产 -->
+    <section class="layer">
+      <div class="layer-head">
+        <span class="layer-ico">🎙️</span>
+        <span class="layer-kicker">Media</span>
+        <span class="layer-title">媒体资产</span>
+        <span class="layer-repo"><a href="https://github.com/Bortala5827/rcj-assets/tree/main/media" target="_blank" rel="noopener">rcj-assets/media</a></span>
+      </div>
+      <div class="grid" data-layer="media"></div>
+    </section>
+
+    <!-- 四、AI 工作流资产 -->
+    <section class="layer">
+      <div class="layer-head">
+        <span class="layer-ico">🛠️</span>
+        <span class="layer-kicker">AI Workflow</span>
+        <span class="layer-title">AI 工作流资产</span>
+        <span class="layer-repo"><a href="https://github.com/Bortala5827/rcj-assets/tree/main/skills" target="_blank" rel="noopener">rcj-assets/skills</a></span>
+      </div>
+      <div class="grid" data-layer="workflow"></div>
+    </section>
+
+    <!-- 五、设计资产 -->
+    <section class="layer">
+      <div class="layer-head">
+        <span class="layer-ico">🎨</span>
+        <span class="layer-kicker">UI Library</span>
+        <span class="layer-title">设计资产</span>
+        <span class="layer-repo">rcj-ui-library（规划中）</span>
+      </div>
+      <div class="grid" data-layer="ui"></div>
+    </section>
+
+    <!-- 六、产品映射 -->
+    <section class="layer">
+      <div class="layer-head">
+        <span class="layer-ico">🧭</span>
+        <span class="layer-kicker">Product Map</span>
+        <span class="layer-title">产品映射</span>
+        <span class="layer-repo">资产不是孤立的</span>
+      </div>
+      <div class="pmap">
+        <div class="pm-node pm-root">RCJ Assets</div>
+        <div class="pm-arrow">↓</div>
+        <div class="pm-row">
+          <div class="pm-node">🎙 Voice</div>
+          <div class="pm-node">✨ Motion</div>
+          <div class="pm-node">🌀 Particle</div>
+        </div>
+        <div class="pm-arrow">↓</div>
+        <div class="pm-node pm-mid">Speak Series</div>
+        <div class="pm-sub">SoloSpeak · LetOut · FaceTalk</div>
+        <div class="pm-arrow">↓</div>
+        <div class="pm-row2">
+          <div class="pm-node">Exam Hub</div>
+          <div class="pm-node">RCJ Hub</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 七、能力地图 -->
+    <section class="layer">
+      <div class="layer-head">
+        <span class="layer-ico">🧠</span>
+        <span class="layer-kicker">Capability Map</span>
+        <span class="layer-title">个人能力沉淀</span>
+        <span class="layer-repo">未来可成为个人简历</span>
+      </div>
+      <div class="caps" id="caps"></div>
+    </section>
 
     <div class="foot">
-      <p>新增 / 升级资产后，需同步两处索引：① <code>rcj-assets</code> 各子目录 README + manifest；② 本页目录。规则见 <code>rcj-assets/interaction/REUSE.md</code>。旧仓（skills / rcj-media-assets / rcj-interaction-assets）已归档。</p>
+      <p>新增 / 升级资产后，需同步两处索引：① <code>rcj-assets</code> 各子目录 README + manifest；② 本页目录。规则见 <code>rcj-assets/interaction/REUSE.md</code>。旧仓（skills / rcj-media-assets / rcj-interaction-assets）已归档，内容并入 <code>rcj-assets</code>。</p>
       <a class="back" href="/">← 返回 RCJ Lab 主页</a>
     </div>
   </main>
 
   <script>
-    // 资产总目录（索引层）。新增资产 → 在此加一条即可。
-    const ASSETS = [
-      {
-        ico: '🧩', title: '互动资产', repo: 'rcj-assets/interaction',
-        repoUrl: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction',
-        items: [
-          { name: 'voice/waveform', status: 'done', tech: 'Web Audio + Canvas',
-            desc: '实时频谱柱状 + 波形线 + 静态回放。对数频率 + A 计权，人声更突出。',
-            usedBy: 'SoloSpeak · FaceTalk',
-            url: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction/voice/waveform' },
-          { name: 'voice/voice-particles', status: 'done', tech: 'Web Audio · RMS',
-            desc: '声纹驱动表情实时跳动，面试前暖场用（替换原拖拽解压）。',
-            usedBy: 'FaceTalk',
-            url: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction/voice/voice-particles' },
-          { name: 'voice/spectrum', status: 'done', tech: '复用 waveform.js',
-            desc: '频谱视图形态，与 waveform 同源引擎。',
-            usedBy: 'SoloSpeak · FaceTalk',
-            url: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction/voice/spectrum' },
-          { name: 'relax/bubble-pop', status: 'planned', tech: 'Canvas + Web Audio',
-            desc: '压力泡泡爆破：粒子 + 音效 + 数字反馈。LetOut「点击释放」核心。',
-            usedBy: 'LetOut', url: '#' },
-          { name: 'relax/shake', status: 'planned', tech: 'Canvas · 物理',
-            desc: '甩一甩升级版：重力 / 碰撞 / 弹性压力球。',
-            usedBy: 'LetOut', url: '#' },
-          { name: 'relax/particle-burst', status: 'planned', tech: 'canvas-confetti',
-            desc: '文字/庆祝粒子爆炸，「我要上岸！」式情绪释放。',
-            usedBy: 'LetOut · SoloSpeak · FaceTalk', url: '#' },
-          { name: 'relax/breathe', status: 'planned', tech: 'CSS / Canvas',
-            desc: '呼吸圆圈：吸气扩大 / 呼气缩小，引导平复。',
-            usedBy: 'SoloSpeak', url: '#' },
-          { name: 'motion/floating-text', status: 'planned', tech: 'CSS / Canvas',
-            desc: '情绪词漂浮 / 碎裂重组。', usedBy: 'LetOut', url: '#' },
-          { name: 'motion/gsap-effects', status: 'planned', tech: 'GSAP · ScrollTrigger',
-            desc: '统一入场 / 滚动联动 / 时间线 / stagger 动效原子。',
-            usedBy: '全产品', url: '#' },
-          { name: 'motion/page-transition', status: 'planned', tech: 'GSAP / CSS',
-            desc: '产品矩阵内统一转场，保持品牌连贯。', usedBy: 'RCJ Hub', url: '#' },
-          { name: 'particles/confetti', status: 'planned', tech: 'canvas-confetti',
-            desc: '轻量庆祝纸屑，打卡 / 匹配成功反馈。', usedBy: 'SoloSpeak · FaceTalk · Hub', url: '#' },
-          { name: 'particles/stars', status: 'planned', tech: 'Canvas',
-            desc: '鼠标星尘轨迹，「声音留下痕迹」。', usedBy: 'SoloSpeak · Hub', url: '#' },
-          { name: 'particles/firework', status: 'planned', tech: 'Canvas',
-            desc: '里程碑庆祝烟花。', usedBy: 'RCJ Hub', url: '#' },
-        ],
-      },
-      {
-        ico: '🎙️', title: '媒体资产', repo: 'rcj-assets/media',
-        repoUrl: 'https://github.com/Bortala5827/rcj-assets/tree/main/media',
-        items: [
-          { name: '音频素材库', status: 'done', tech: 'MP3 / manifest.json',
-            desc: '可轮换的语音 / 原声片段（11 MP3 + 效果音），远程拉取无需改代码。',
-            usedBy: 'SoloSpeak · LetOut',
-            url: 'https://github.com/Bortala5827/rcj-assets/tree/main/media/audio' },
-        ],
-      },
-      {
-        ico: '🛠️', title: '技能资产', repo: 'rcj-assets/skills',
-        repoUrl: 'https://github.com/Bortala5827/rcj-assets/tree/main/skills',
-        items: [
-          { name: 'rcj-audio-core', status: 'done', tech: 'Web Audio · 录音/播放/波形',
-            desc: 'Speak Series 共享音频核心（录音引擎 + 声波可视化 + 拖拽回放 + 分享卡）。',
-            usedBy: 'SoloSpeak · LetOut · FaceTalk',
-            url: 'https://github.com/Bortala5827/rcj-assets/tree/main/skills/rcj-audio-core' },
-          { name: 'rcj-exam-builder', status: 'done', tech: '静态刷题站生成器',
-            desc: '任意考试题库 → Cloudflare Pages / 离线 HTML 刷题系统。',
-            usedBy: 'Exam Hub · 辅警/消防', url: '#' },
-          { name: 'rcj-written-exam-standard', status: 'done', tech: '笔试刷题标准',
-            desc: '定向刷题 + 套题模考统一实现规范。', usedBy: 'Exam Hub', url: '#' },
-          { name: 'wechat-cover / wechat-draft', status: 'done', tech: '公众号工作流',
-            desc: '公众号封面设计（爆款数据驱动）+ 草稿批量生成（build.js 渲染）。',
-            usedBy: '内容运营', url: '#' },
-          { name: 'github-dns-bypass', status: 'done', tech: 'DoH 代理',
-            desc: 'GitHub DNS 污染绕过（127.0.0.1:10809 DoH 代理），推送/克隆稳定通道。',
-            usedBy: '全仓库', url: '#' },
-        ],
-      },
-      {
-        ico: '🎨', title: 'UI 资产', repo: 'rcj-ui-library（规划中）',
-        repoUrl: '#',
-        items: [
-          { name: '卡片 / 页面模板 / 组件', status: 'planned', tech: 'HTML / CSS',
-            desc: '统一 RCJ 视觉语言（角色图风格 / 配色 / 卡片 / 动效），被各产品引用。',
-            usedBy: '全产品', url: '#' },
-        ],
-      },
-      {
-        ico: '🏠', title: '总入口', repo: 'rcj-hub',
-        repoUrl: 'https://github.com/Bortala5827/rcj-hub',
-        items: [
-          { name: 'RCJ Hub · 品牌枢纽', status: 'done', tech: 'Cloudflare Pages',
-            desc: '955827.xyz 总入口，挂载 Speak Series / Exam Series 子路径。',
-            usedBy: '全产品', url: 'https://github.com/Bortala5827/rcj-hub' },
-          { name: 'Exam Hub · 资产目录', status: 'done', tech: '静态目录页',
-            desc: '公职真题刷题站的索引层（同类思路的题库版）。',
-            usedBy: 'Exam Series', url: 'https://exam.955827.xyz' },
-        ],
-      },
+    // ===== 核心引擎（最重要的一层）=====
+    const ENGINES = [
+      { ico: '🎙️', name: 'Voice Engine', tag: '声音输入与理解能力',
+        caps: ['录音', '声纹分析', '波形', '频谱', '回放', '声音反馈'],
+        apps: 'SoloSpeak · LetOut · FaceTalk' },
+      { ico: '✨', name: 'Motion Engine', tag: '视觉运动能力',
+        caps: ['页面动画', '文字动态', '转场', 'GSAP 效果', '微交互'],
+        apps: 'RCJ Hub · Speak Series · Exam Hub' },
+      { ico: '🌀', name: 'Particle Engine', tag: '情绪反馈能力',
+        caps: ['粒子爆炸', '星尘', '烟花', '能量反馈'],
+        apps: 'LetOut · FaceTalk · RCJ Hub' },
+    ];
+
+    // ===== 资产层（二~五）=====
+    const ASSETS = {
+      interaction: [
+        { name: 'voice/waveform', status: 'done', tech: 'Web Audio + Canvas',
+          desc: '实时频谱柱状 + 波形线 + 静态回放。对数频率 + A 计权，人声更突出。',
+          usedBy: 'SoloSpeak · FaceTalk',
+          url: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction/voice/waveform' },
+        { name: 'voice/voice-particles', status: 'done', tech: 'Web Audio · RMS',
+          desc: '声音驱动视觉反馈：用户讲话 → 表情 / 粒子随之变化。面试前暖场用。',
+          usedBy: 'FaceTalk',
+          url: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction/voice/voice-particles' },
+        { name: 'voice/spectrum', status: 'done', tech: '复用 waveform.js',
+          desc: '频谱可视化模块，与 waveform 同源引擎。',
+          usedBy: 'SoloSpeak · FaceTalk',
+          url: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction/voice/spectrum' },
+        { name: 'relax/bubble-pop', status: 'planned', tech: 'Canvas + Web Audio',
+          desc: '压力泡泡：用户点击 → 释放压力（粒子 + 音效 + 数字反馈）。',
+          usedBy: 'LetOut', url: '#' },
+        { name: 'relax/shake', status: 'planned', tech: 'Canvas · 物理',
+          desc: '甩一甩升级版：加入重力 / 碰撞 / 弹性。',
+          usedBy: 'LetOut', url: '#' },
+        { name: 'relax/particle-burst', status: 'planned', tech: 'canvas-confetti',
+          desc: '文字 / 庆祝粒子爆炸，「我要上岸！」式情绪释放。',
+          usedBy: 'LetOut · SoloSpeak · FaceTalk', url: '#' },
+        { name: 'relax/breathe', status: 'planned', tech: 'CSS / Canvas',
+          desc: '呼吸圆圈：吸气扩大 / 呼气缩小，引导平复。',
+          usedBy: 'SoloSpeak', url: '#' },
+        { name: 'motion/floating-text', status: 'planned', tech: 'CSS / Canvas',
+          desc: '情绪词漂浮 / 碎裂重组。', usedBy: 'LetOut', url: '#' },
+        { name: 'motion/gsap-effects', status: 'planned', tech: 'GSAP · ScrollTrigger',
+          desc: '统一入场 / 滚动联动 / 时间线 / stagger 动效原子。',
+          usedBy: '全产品', url: '#' },
+        { name: 'motion/page-transition', status: 'planned', tech: 'GSAP / CSS',
+          desc: '产品矩阵内统一转场，保持品牌连贯。', usedBy: 'RCJ Hub', url: '#' },
+        { name: 'particles/confetti', status: 'planned', tech: 'canvas-confetti',
+          desc: '轻量庆祝纸屑，打卡 / 匹配成功反馈。', usedBy: 'SoloSpeak · FaceTalk · Hub', url: '#' },
+        { name: 'particles/stars', status: 'planned', tech: 'Canvas',
+          desc: '鼠标星尘轨迹，「声音留下痕迹」。', usedBy: 'SoloSpeak · Hub', url: '#' },
+        { name: 'particles/firework', status: 'planned', tech: 'Canvas',
+          desc: '里程碑庆祝烟花。', usedBy: 'RCJ Hub', url: '#' },
+      ],
+      media: [
+        { name: '情绪影子台词库', status: 'done', tech: 'manifest.json 轮换',
+          desc: '用于治愈 / 陪伴 / 情绪释放；SoloSpeak / LetOut 的台词 + 影视原声素材，每 3 天自动轮换。',
+          usedBy: 'SoloSpeak · LetOut',
+          url: 'https://github.com/Bortala5827/rcj-assets/tree/main/media' },
+        { name: '音频素材库', status: 'done', tech: 'MP3 / manifest',
+          desc: '语音 / 环境音 / 原声片段；远程拉取，无需修改代码。',
+          usedBy: 'SoloSpeak · LetOut',
+          url: 'https://github.com/Bortala5827/rcj-assets/tree/main/media' },
+      ],
+      workflow: [
+        { name: 'rcj-audio-core', status: 'done', tech: 'Web Audio · 录音/播放/波形',
+          desc: 'Speak Series 共享音频核心：录音引擎 + 声波可视化 + 拖拽回放 + 分享卡。',
+          usedBy: 'SoloSpeak · LetOut · FaceTalk',
+          url: 'https://github.com/Bortala5827/rcj-assets/tree/main/skills/rcj-audio-core' },
+        { name: 'rcj-exam-builder', status: 'done', tech: '静态刷题站生成器',
+          desc: '输入考试资料 → 输出 HTML 刷题站 / Cloudflare 版 / 离线版。',
+          usedBy: 'Exam Hub · 辅警/消防',
+          url: 'https://github.com/Bortala5827/rcj-assets/tree/main/skills/rcj-exam-builder' },
+        { name: 'rcj-written-exam-standard', status: 'done', tech: '笔试刷题标准',
+          desc: '沉淀数据结构 / 页面规范 / 训练模式，统一笔试产品实现。',
+          usedBy: 'Exam Hub',
+          url: 'https://github.com/Bortala5827/rcj-assets/tree/main/skills/rcj-written-exam-standard' },
+        { name: 'rcj-push-local-edits', status: 'done', tech: 'Git 推送工作流',
+          desc: '解决本地修改安全同步 GitHub（防覆盖、强删守卫）。',
+          usedBy: '全仓库',
+          url: 'https://github.com/Bortala5827/rcj-assets/tree/main/skills/rcj-push-local-edits' },
+        { name: 'wechat-cover / wechat-draft', status: 'done', tech: '公众号工作流',
+          desc: '爆款数据驱动的封面设计 + 草稿批量生成（build.js 渲染）。',
+          usedBy: '内容运营', url: '#' },
+        { name: 'github-dns-bypass', status: 'done', tech: 'DoH 代理',
+          desc: 'GitHub DNS 污染绕过（127.0.0.1:10809 DoH 代理），推送 / 克隆稳定通道。',
+          usedBy: '全仓库', url: '#' },
+      ],
+      ui: [
+        { name: '卡片 / 页面模板 / 组件', status: 'planned', tech: 'HTML / CSS',
+          desc: '统一 RCJ 视觉语言（角色图风格 / 配色 / 卡片 / 动效规范），被各产品引用。',
+          usedBy: '全产品', url: '#' },
+      ],
+    };
+
+    // ===== 能力地图 =====
+    const CAPS = [
+      { ico: '🤖', name: 'AI 产品开发',
+        items: ['从 0-1 搭建网站 / PWA / 静态应用', 'AI 辅助开发流程', '产品矩阵规划'] },
+      { ico: '📚', name: '内容工程',
+        items: ['资料 → 结构化 → 数据库 → 题库 → 产品', '长文 / 笔记 / 公众号矩阵'] },
+      { ico: '🚀', name: '独立部署',
+        items: ['GitHub', 'Cloudflare Pages', '自定义域名', '自动部署 / CI'] },
+      { ico: '🎨', name: '互动开发',
+        items: ['Web Audio', 'Canvas', 'GSAP', '动画系统设计'] },
     ];
 
     const pillText = { done: '✅ 已实现', planned: '📋 规划中', wip: '🚧 进行中' };
-    const wrap = document.getElementById('catalog');
-    ASSETS.forEach(layer => {
-      const sec = document.createElement('section');
-      sec.className = 'layer';
-      const repoHtml = layer.repoUrl && layer.repoUrl !== '#'
-        ? `<a href="${layer.repoUrl}" target="_blank" rel="noopener">${layer.repo}</a>`
-        : layer.repo;
-      sec.innerHTML = `<div class="layer-head">
-          <span class="layer-ico">${layer.ico}</span>
-          <span class="layer-title">${layer.title}</span>
-          <span class="layer-repo">${repoHtml}</span>
-        </div>`;
-      const grid = document.createElement('div');
-      grid.className = 'grid';
-      layer.items.forEach(it => {
+
+    // 渲染核心引擎
+    const engWrap = document.getElementById('engines');
+    ENGINES.forEach(e => {
+      const el = document.createElement('div');
+      el.className = 'engine';
+      el.innerHTML = `
+        <div class="engine-ico">${e.ico}</div>
+        <div class="engine-name">${e.name}</div>
+        <div class="engine-tag">${e.tag}</div>
+        <div class="engine-caps">${e.caps.map(c => `<span>${c}</span>`).join('')}</div>
+        <div class="engine-apps"><b>应用</b> ${e.apps}</div>`;
+      engWrap.appendChild(el);
+    });
+
+    // 渲染资产层
+    Object.keys(ASSETS).forEach(layer => {
+      const grid = document.querySelector(`[data-layer="${layer}"]`);
+      if (!grid) return;
+      ASSETS[layer].forEach(it => {
         const card = document.createElement('div');
         card.className = 'card';
         const links = it.url && it.url !== '#'
@@ -212,8 +366,18 @@
           ${links}`;
         grid.appendChild(card);
       });
-      sec.appendChild(grid);
-      wrap.appendChild(sec);
+    });
+
+    // 渲染能力地图
+    const capWrap = document.getElementById('caps');
+    CAPS.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'cap';
+      el.innerHTML = `
+        <div class="cap-ico">${c.ico}</div>
+        <div class="cap-name">${c.name}</div>
+        <ul>${c.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+      capWrap.appendChild(el);
     });
   </script>
 </body>
