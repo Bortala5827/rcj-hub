@@ -74,6 +74,11 @@
     .cap-name { font-size: 16px; font-weight: 800; color: var(--ink); margin: 8px 0 10px; }
     .cap ul { margin: 0; padding-left: 18px; }
     .cap li { font-size: 13px; color: var(--ink-2); line-height: 1.7; }
+    .cap-projects { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+    .cap-projects .lab { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 8px; }
+    .cap-projects a { display: block; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; padding: 3px 0; }
+    .cap-projects a:hover { text-decoration: underline; }
+    .cap-projects a::before { content: '→ '; color: var(--ink-4); }
 
     .foot { margin: 56px 0 20px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-3); }
     .foot code { background: var(--bg-soft); padding: 1px 6px; border-radius: 6px; font-size: 12px; }
@@ -321,13 +326,30 @@
     // ===== 能力地图 =====
     const CAPS = [
       { ico: '🤖', name: 'AI 产品开发',
-        items: ['从 0-1 搭建网站 / PWA / 静态应用', 'AI 辅助开发流程', '产品矩阵规划'] },
+        items: ['从 0-1 搭建网站 / PWA / 静态应用', 'AI 辅助开发流程', '产品矩阵规划'],
+        projects: [
+          { label: 'Speak Series · 表达训练产品线', url: '/solospeak' },
+          { label: 'Exam Hub · 职业考试训练系统', url: 'https://exam.955827.xyz' },
+          { label: 'RCJ Hub · 品牌枢纽 / 个人主页', url: '/' },
+        ] },
       { ico: '📚', name: '内容工程',
-        items: ['资料 → 结构化 → 数据库 → 题库 → 产品', '长文 / 笔记 / 公众号矩阵'] },
+        items: ['资料 → 结构化 → 数据库 → 题库 → 产品', '长文 / 笔记 / 公众号矩阵'],
+        projects: [
+          { label: '辅警 / 消防员题库（结构化 → 刷题站）', url: 'https://fj.955827.xyz' },
+          { label: '情绪影子台词库 & 音频素材库', url: 'https://github.com/Bortala5827/rcj-assets/tree/main/media' },
+        ] },
       { ico: '🚀', name: '独立部署',
-        items: ['GitHub', 'Cloudflare Pages', '自定义域名', '自动部署 / CI'] },
+        items: ['GitHub', 'Cloudflare Pages', '自定义域名', '自动部署 / CI'],
+        projects: [
+          { label: 'Cloudflare Pages 全自动化部署', url: '/' },
+          { label: 'GitHub 工作流（rcj-push-local-edits）', url: 'https://github.com/Bortala5827/rcj-assets/tree/main/skills/rcj-push-local-edits' },
+        ] },
       { ico: '🎨', name: '互动开发',
-        items: ['Web Audio', 'Canvas', 'GSAP', '动画系统设计'] },
+        items: ['Web Audio', 'Canvas', 'GSAP', '动画系统设计'],
+        projects: [
+          { label: '声波引擎 rcj-audio-core', url: 'https://github.com/Bortala5827/rcj-assets/tree/main/skills/rcj-audio-core' },
+          { label: 'Voice / Motion / Particle 引擎', url: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction' },
+        ] },
     ];
 
     const pillText = { done: '✅ 已实现', planned: '📋 规划中', wip: '🚧 进行中' };
@@ -373,10 +395,12 @@
     CAPS.forEach(c => {
       const el = document.createElement('div');
       el.className = 'cap';
+      const projects = (c.projects || []).map(p => `<a href="${p.url}" target="_blank" rel="noopener">${p.label}</a>`).join('');
       el.innerHTML = `
         <div class="cap-ico">${c.ico}</div>
         <div class="cap-name">${c.name}</div>
-        <ul>${c.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+        <ul>${c.items.map(i => `<li>${i}</li>`).join('')}</ul>
+        <div class="cap-projects"><div class="lab">代表项目</div>${projects}</div>`;
       capWrap.appendChild(el);
     });
   </script>
