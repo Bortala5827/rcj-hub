@@ -6,7 +6,6 @@
 // v3: 加 60s 内存缓存(避免每次 15 并发 D1 查询) + 合并 SQL(15→10) + 整体超时
 
 const DBS = {
-  hub: 'b18ad841-ee76-4454-97f6-4515f32bb5bf',       // rcj-hub-d1 (友链)
   facetalk: 'f93a89d7-ef5f-49c5-863d-5f1611e1a7f4',  // mianshi-dazi-d1 (FaceTalk)
   aux: 'ab639fbe-39b7-4ea8-bd67-18cdaa133599',        // aux-police-exam-d1 (辅警)
   analytics: 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828',  // rcj-analytics-d1 (统一浏览统计)
@@ -88,23 +87,21 @@ export async function onRequestGet({ request, env }) {
   }
 
   try {
-    // ── 合并后 10 个并发查询（原 15 个）──
+    // ── 合并后 9 个并发查询 ──
     const results = await Promise.allSettled([
-      // [0] hub: 友链状态分布
-      d1(env, DBS.hub, "SELECT status, COUNT(*) c FROM links GROUP BY status"),
-      // [1] facetalk: pairs 状态 + 近 6 条（合并为一次，前端再分）
+      // [0] facetalk: pairs 状态 + 近 6 条（合并为一次，前端再分）
       d1(env, DBS.facetalk, "SELECT status, COUNT(*) c FROM pairs GROUP BY status"),
-      // [2] facetank: 全部计数合并（intents / applications / wall / reports / ratings / messages）
+      // [1] facetank: 全部计数合并（intents / applications / wall / reports / ratings / messages）
       d1(env, DBS.facetalk, "SELECT 'intents' AS k, COUNT(*) c FROM intents UNION ALL SELECT 'applications', COUNT(*) FROM applications UNION ALL SELECT 'wall', COUNT(*) FROM wall UNION ALL SELECT 'reports', COUNT(*) FROM reports UNION ALL SELECT 'ratings', COUNT(*) FROM ratings UNION ALL SELECT 'messages', COUNT(*) FROM messages"),
-      // [3] facetalk: 近期 pairs
+      // [2] facetalk: 近期 pairs
       d1(env, DBS.facetalk, "SELECT a, b, mode, status, created FROM pairs ORDER BY created DESC LIMIT 6"),
-      // [4] facetalk: 近期 wall
+      // [3] facetalk: 近期 wall
       d1(env, DBS.facetalk, "SELECT name, text, created_at FROM wall ORDER BY created_at DESC LIMIT 6"),
-      // [5] aux: wall 城市 + 总数（合并）
+      // [4] aux: wall 城市 + 总数（合并）
       d1(env, DBS.aux, "SELECT city, COUNT(*) c FROM wall GROUP BY city ORDER BY c DESC"),
-      // [6] aux: wall 总数 + signal_match（合并）
+      // [5] aux: wall 总数 + signal_match（合并）
       d1(env, DBS.aux, "SELECT 'wall' AS k, COUNT(*) c FROM wall UNION ALL SELECT 'signal_match', COUNT(*) FROM signal_match"),
-      // [7] analytics: 趋势 + 汇总（合并为一次——按 site 聚合 day + total/u/d 一起算）
+      // [6] analytics: 趋势 + 汇总（合并为一次——按 site 聚合 day + total/u/d 一起算）
       d1(env, DBS.analytics, "SELECT site, day, SUM(n) s, 0 as total, 0 as u, 0 as d FROM visits GROUP BY site, day UNION ALL SELECT site, '' as day, SUM(n) as s, SUM(n) as total, COUNT(DISTINCT ip) as u, COUNT(DISTINCT day) as d FROM visits GROUP BY site ORDER BY site, day"),
     ]);
 
@@ -112,14 +109,13 @@ export async function onRequestGet({ request, env }) {
     const warns = [];
     results.forEach((r, i) => { if (r.status === 'rejected') warns.push(`查询#${i} 失败: ${r.reason.message}`); });
 
-    const hubLinks     = v(0);
-    const ftPairs      = v(1);
-    const ftCountsRaw  = v(2); // [{k,c}, ...]
-    const ftPairsRecent= v(3);
-    const ftWallRecent = v(4);
-    const auxWallCity  = v(5);
-    const auxMerged    = v(6); // [{k,c}, ...]
-    const uniAll       = v(7); // 合并的趋势+汇总
+    const ftPairs      = v(0);
+    const ftCountsRaw  = v(1); // [{k,c}, ...]
+    const ftPairsRecent= v(2);
+    const ftWallRecent = v(3);
+    const auxWallCity  = v(4);
+    const auxMerged    = v(5); // [{k,c}, ...]
+    const uniAll       = v(6); // 合并的趋势+汇总
 
     // ── 解析 facetalk 计数 ──
     const ftCounts = {};
@@ -152,8 +148,6 @@ export async function onRequestGet({ request, env }) {
     }));
     const allVisits = analyticsSeries.reduce((a, s) => a + s.total, 0);
 
-    const links = {};
-    (hubLinks || []).forEach(r => links[r.status] = r.c);
     const pairs = {};
     (ftPairs || []).forEach(r => pairs[r.status] = r.c);
 
@@ -165,12 +159,6 @@ export async function onRequestGet({ request, env }) {
     const payload = {
       ok: true,
       generatedAt: new Date().toISOString(),
-      links: {
-        total: Object.values(links).reduce((a, b) => a + b, 0),
-        pending: links.pending || 0,
-        approved: links.approved || 0,
-        rejected: links.rejected || 0,
-      },
       facetalk: {
         pairsTotal: Object.values(pairs).reduce((a, b) => a + b, 0),
         pairsByStatus: pairs,
@@ -191,7 +179,7 @@ export async function onRequestGet({ request, env }) {
         signalMatch: auxMap.signal_match || 0,
       },
       analytics: { allVisits, series: analyticsSeries, bySite },
-      note: '数据源：rcj-hub-d1 / mianshi-dazi-d1 / aux-police-exam-d1（互动数据）+ rcj-analytics-d1（统一浏览统计）。',
+      note: '数据源：mianshi-dazi-d1 / aux-police-exam-d1（互动数据）+ rcj-analytics-d1（统一浏览统计）。',
       warns: warns.length ? warns : undefined,
     };
 

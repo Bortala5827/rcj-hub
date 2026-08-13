@@ -111,28 +111,6 @@
     .login-card button:hover{background:#1565c0}
     .login-card .err{background:#fef2f2;color:#991b1b;font-size:13px;padding:9px 12px;border-radius:9px;margin-bottom:14px}
 
-    /* 链接列表（友链） */
-    .link-list{display:flex;flex-direction:column;gap:11px}
-    .link-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:11px}
-    .link-item.pending{border-left:4px solid var(--warn)}
-    .link-item.approved{border-left:4px solid var(--ok)}
-    .link-body{flex:1;min-width:0}
-    .link-name{font-weight:700;font-size:14px}
-    .link-url{font-size:12px;color:var(--accent);word-break:break-all}
-    .link-desc{font-size:13px;color:var(--muted);margin-top:2px}
-    .link-time{font-size:11px;color:#94a3b8;margin-top:4px}
-    .link-acts{display:flex;gap:7px;flex-shrink:0}
-    .mini{padding:6px 12px;font-size:12px;font-weight:600;border:none;border-radius:8px;cursor:pointer}
-    .mini.ok{background:#dcfce7;color:#166534} .mini.ok:hover{background:#bbf7d0}
-    .mini.rev{background:#e0e7ff;color:#3730a3} .mini.rev:hover{background:#c7d2fe}
-    .mini.del{background:#fee2e2;color:#991b1b} .mini.del:hover{background:#fecaca}
-    .mini:disabled{opacity:.5;cursor:default}
-
-    .tabs2{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--line)}
-    .tab2{padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px}
-    .tab2.active{color:var(--accent);border-bottom-color:var(--accent)}
-    .cnt{display:inline-block;min-width:18px;text-align:center;font-size:11px;background:var(--line);color:var(--muted);padding:1px 6px;border-radius:10px;margin-left:5px}
-    .tab2.active .cnt{background:var(--accent);color:#fff}
 
     .site-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
     .site-card{display:block;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);transition:.15s}
@@ -180,7 +158,6 @@
     </div>
     <nav class="sb-nav" id="nav">
       <div class="sb-item active" data-page="overview"><span class="ico">📊</span>概览</div>
-      <div class="sb-item" data-page="links"><span class="ico">🔗</span>友链审核</div>
       <div class="sb-item" data-page="facetalk"><span class="ico">💬</span>FaceTalk</div>
       <div class="sb-item" data-page="aux"><span class="ico">🛡️</span>辅警题库</div>
       <div class="sb-item" data-page="sites"><span class="ico">🌐</span>站点导航</div>
@@ -286,7 +263,6 @@ document.getElementById('nav').addEventListener('click',e=>{
 function renderPage(p){
   if(!DATA){ document.getElementById('content').innerHTML='<div class="loading">读取中…</div>'; return; }
   if(p==='overview') renderOverview();
-  else if(p==='links') renderLinks();
   else if(p==='facetalk') renderFaceTalk();
   else if(p==='aux') renderAux();
   else if(p==='sites') renderSites();
@@ -294,7 +270,7 @@ function renderPage(p){
 
 // ---------- 概览 ----------
 function renderOverview(){
-  const d=DATA, L=d.links, F=d.facetalk, A=d.aux, AN=d.analytics||{series:[],allVisits:0};
+  const d=DATA, F=d.facetalk, A=d.aux, AN=d.analytics||{series:[],allVisits:0};
   // 补全已知站点（没数据的也显示 0 平线）
   const ALL_SITES=['aux','xf','facetalk','hub','solospeak','letout','training','exam'];
   const seriesMap={};
@@ -303,7 +279,6 @@ function renderOverview(){
   const fullSeries=ALL_SITES.map(s=>seriesMap[s]);
   const allVisits=fullSeries.reduce((a,s)=>a+s.total,0);
   const cards=[
-    {cls:'hub',num:L.pending,label:'友链待审',sub:'共 '+L.total+' 条'},
     {cls:'ft',num:F.pairsTotal,label:'FaceTalk 匹配',sub:F.intents+' 意图 / '+F.applications+' 申请'},
     {cls:'aux',num:allVisits,label:'全站浏览量',sub:fullSeries.filter(s=>s.total>0).length+' 个站点有数据 · 辅警 '+A.visits.s},
     {cls:'aux',num:A.wallTotal,label:'辅警留言墙',sub:A.signalMatch+' 次信号匹配'},
@@ -336,56 +311,10 @@ function miniModuleList(){
   const rows=[
     ['💬 FaceTalk','匹配 '+F.pairsTotal+' · 留言墙 '+F.wall+' · 举报 '+F.reports+' · 评分 '+F.ratings],
     ['🛡️ 辅警题库','留言 '+A.wallTotal+' · 浏览 '+A.visits.s+' · 信号匹配 '+A.signalMatch],
-    ['🔗 友链','待审 '+d.links.pending+' · 已通过 '+d.links.approved],
   ];
   let h='<div style="display:flex;flex-direction:column;gap:12px">';
   rows.forEach(r=>h+='<div style="display:flex;gap:10px;font-size:13px"><span>'+r[0]+'</span><span class="muted">'+r[1]+'</span></div>');
   return h+'</div>';
-}
-
-// ---------- 友链 ----------
-let linkTab='pending', linkData=[];
-async function renderLinks(){
-  const c=document.getElementById('content');
-  c.innerHTML='<div class="loading">读取友链…</div>';
-  try{
-    const res=await fetch(API+'/links',{cache:'no-store'});
-    const d=await res.json();
-    if(!d.ok){ c.innerHTML='<div class="err-box">'+esc(d.error||'加载失败')+'</div>'; return; }
-    linkData=d.links||[];
-  }catch(e){ c.innerHTML='<div class="err-box">网络错误</div>'; return; }
-
-  const pending=linkData.filter(l=>l.status==='pending');
-  const approved=linkData.filter(l=>l.status==='approved');
-  const tabs='<div class="tabs2">'+
-    '<div class="tab2'+(linkTab==='pending'?' active':'')+'" onclick="switchLink(\'pending\')">待审核<span class="cnt">'+pending.length+'</span></div>'+
-    '<div class="tab2'+(linkTab==='approved'?' active':'')+'" onclick="switchLink(\'approved\')">已通过<span class="cnt">'+approved.length+'</span></div>'+
-    '<div class="tab2'+(linkTab==='all'?' active':'')+'" onclick="switchLink(\'all\')">全部<span class="cnt">'+linkData.length+'</span></div></div>';
-  const list=linkTab==='pending'?pending:linkTab==='approved'?approved:linkData;
-  let html='<div class="panel"><h3>🔗 友链审核 <span class="tag">rcj-hub-d1</span></h3>'+tabs;
-  if(!list.length){ html+='<div class="empty">✅ 该分类下暂无友链</div></div>'; c.innerHTML=html; return; }
-  html+='<div class="link-list">';
-  list.forEach(l=>{
-    const isP=l.status==='pending';
-    html+='<div class="link-item '+l.status+'"><div class="link-body">'+
-      '<div class="link-name">'+esc(l.name)+'</div>'+
-      '<div class="link-url">'+esc(l.url)+'</div>'+
-      (l.desc?'<div class="link-desc">'+esc(l.desc)+'</div>':'')+
-      '<div class="link-time">'+fmtTime(l.created_at)+'</div></div>'+
-      '<div class="link-acts">'+
-      (isP?'<button class="mini ok" data-id="'+l.id+'" onclick="linkAct(this,\'approve\')">✓ 通过</button>':
-            '<button class="mini rev" data-id="'+l.id+'" onclick="linkAct(this,\'revoke\')">↩ 撤回</button>')+
-      '<button class="mini del" data-id="'+l.id+'" onclick="linkAct(this,\'delete\')">✗ 删除</button></div></div>';
-  });
-  html+='</div></div>';
-  c.innerHTML=html;
-}
-function switchLink(t){ linkTab=t; renderLinks(); }
-function linkAct(btn,action){
-  if(action==='delete' && !confirm('确定删除？不可恢复。')) return;
-  btn.disabled=true;
-  fetch(API+'/links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,id:parseInt(btn.dataset.id)})})
-    .then(r=>r.json()).then(d=>{ if(d.ok) renderLinks(); else alert(d.error||'失败'); });
 }
 
 // ---------- FaceTalk ----------
