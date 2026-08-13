@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0f172a" />
   <title>RCJ 资产库 · Asset Hub</title>
-  <meta name="description" content="RCJ 资产总目录 —— 我有什么资产，一页看全。Voice / Motion / Particle 三大引擎，被 Speak Series 各产品复用。" />
+  <meta name="description" content="RCJ 资产总目录 —— Skills / Media / Interaction 三合一统一仓库。被 Speak Series / Exam Hub / RCJ Hub 复用。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="/assets/hub.v2.css?v=20260812a" />
   <style>
@@ -65,7 +65,7 @@
   <main class="container">
     <section class="asset-hero">
       <h1>RCJ 资产库 · Asset Hub</h1>
-      <p>我有什么资产，一页看全。底层三引擎 <b>Voice / Motion / Particle</b>，被 Speak Series 各产品（SoloSpeak / LetOut / FaceTalk）与 RCJ Hub 复用。做功能 → 沉淀资产 → 下一次调用，而不是做网页 → 丢掉。</p>
+      <p>统一资产仓库 <b>rcj-assets</b>：Skills + Media + Interaction 三合一。被 Speak Series / Exam Hub / RCJ Hub 复用。做功能 → 沉淀资产 → 下一次调用。</p>
       <div class="legend">
         <span>✅ 已实现</span>
         <span>📋 规划中</span>
@@ -76,7 +76,7 @@
     <div id="catalog"></div>
 
     <div class="foot">
-      <p>新增 / 升级资产后，需同步两处索引：① 各仓库 README + <code>assets-manifest.json</code>；② 本页目录。规则见 <code>rcj-interaction-assets/REUSE.md</code>。</p>
+      <p>新增 / 升级资产后，需同步两处索引：① <code>rcj-assets</code> 各子目录 README + manifest；② 本页目录。规则见 <code>rcj-assets/interaction/REUSE.md</code>。旧仓（skills / rcj-media-assets / rcj-interaction-assets）已归档。</p>
       <a class="back" href="/">← 返回 RCJ Lab 主页</a>
     </div>
   </main>
@@ -85,21 +85,21 @@
     // 资产总目录（索引层）。新增资产 → 在此加一条即可。
     const ASSETS = [
       {
-        ico: '🧩', title: '互动资产', repo: 'rcj-interaction-assets',
-        repoUrl: 'https://github.com/Bortala5827/rcj-interaction-assets',
+        ico: '🧩', title: '互动资产', repo: 'rcj-assets/interaction',
+        repoUrl: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction',
         items: [
           { name: 'voice/waveform', status: 'done', tech: 'Web Audio + Canvas',
             desc: '实时频谱柱状 + 波形线 + 静态回放。对数频率 + A 计权，人声更突出。',
             usedBy: 'SoloSpeak · FaceTalk',
-            url: 'https://github.com/Bortala5827/rcj-interaction-assets/tree/main/voice/waveform' },
+            url: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction/voice/waveform' },
           { name: 'voice/voice-particles', status: 'done', tech: 'Web Audio · RMS',
             desc: '声纹驱动表情实时跳动，面试前暖场用（替换原拖拽解压）。',
             usedBy: 'FaceTalk',
-            url: 'https://github.com/Bortala5827/rcj-interaction-assets/tree/main/voice/voice-particles' },
+            url: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction/voice/voice-particles' },
           { name: 'voice/spectrum', status: 'done', tech: '复用 waveform.js',
             desc: '频谱视图形态，与 waveform 同源引擎。',
             usedBy: 'SoloSpeak · FaceTalk',
-            url: 'https://github.com/Bortala5827/rcj-interaction-assets/tree/main/voice/spectrum' },
+            url: 'https://github.com/Bortala5827/rcj-assets/tree/main/interaction/voice/spectrum' },
           { name: 'relax/bubble-pop', status: 'planned', tech: 'Canvas + Web Audio',
             desc: '压力泡泡爆破：粒子 + 音效 + 数字反馈。LetOut「点击释放」核心。',
             usedBy: 'LetOut', url: '#' },
@@ -128,33 +128,33 @@
         ],
       },
       {
-        ico: '🎙️', title: '媒体资产', repo: 'rcj-media-assets',
-        repoUrl: 'https://github.com/Bortala5827/rcj-media-assets',
+        ico: '🎙️', title: '媒体资产', repo: 'rcj-assets/media',
+        repoUrl: 'https://github.com/Bortala5827/rcj-assets/tree/main/media',
         items: [
-          { name: '情绪影子台词库', status: 'done', tech: 'manifest.json 轮换',
-            desc: 'SoloSpeak / LetOut 的治愈台词 + 影视原声素材，每 3 天自动轮换。',
+          { name: '音频素材库', status: 'done', tech: 'MP3 / manifest.json',
+            desc: '可轮换的语音 / 原声片段（11 MP3 + 效果音），远程拉取无需改代码。',
             usedBy: 'SoloSpeak · LetOut',
-            url: 'https://github.com/Bortala5827/rcj-media-assets' },
-          { name: '音频素材库', status: 'done', tech: 'webm / mp3',
-            desc: '可轮换的语音 / 原声片段，远程拉取无需改代码。',
-            usedBy: 'SoloSpeak · LetOut', url: '#' },
+            url: 'https://github.com/Bortala5827/rcj-assets/tree/main/media/audio' },
         ],
       },
       {
-        ico: '🛠️', title: '技能资产', repo: 'skills / rcj-audio-core',
-        repoUrl: 'https://github.com/Bortala5827/skills',
+        ico: '🛠️', title: '技能资产', repo: 'rcj-assets/skills',
+        repoUrl: 'https://github.com/Bortala5827/rcj-assets/tree/main/skills',
         items: [
           { name: 'rcj-audio-core', status: 'done', tech: 'Web Audio · 录音/播放/波形',
             desc: 'Speak Series 共享音频核心（录音引擎 + 声波可视化 + 拖拽回放 + 分享卡）。',
             usedBy: 'SoloSpeak · LetOut · FaceTalk',
-            url: 'https://github.com/Bortala5827/skills/tree/main/rcj-audio-core' },
+            url: 'https://github.com/Bortala5827/rcj-assets/tree/main/skills/rcj-audio-core' },
           { name: 'rcj-exam-builder', status: 'done', tech: '静态刷题站生成器',
             desc: '任意考试题库 → Cloudflare Pages / 离线 HTML 刷题系统。',
             usedBy: 'Exam Hub · 辅警/消防', url: '#' },
           { name: 'rcj-written-exam-standard', status: 'done', tech: '笔试刷题标准',
             desc: '定向刷题 + 套题模考统一实现规范。', usedBy: 'Exam Hub', url: '#' },
-          { name: 'rcj-push-local-edits', status: 'done', tech: 'Git 推送工作流',
-            desc: '无 .git 的 _repos 改动 → 安全推 GitHub（防覆盖、强删守卫）。',
+          { name: 'wechat-cover / wechat-draft', status: 'done', tech: '公众号工作流',
+            desc: '公众号封面设计（爆款数据驱动）+ 草稿批量生成（build.js 渲染）。',
+            usedBy: '内容运营', url: '#' },
+          { name: 'github-dns-bypass', status: 'done', tech: 'DoH 代理',
+            desc: 'GitHub DNS 污染绕过（127.0.0.1:10809 DoH 代理），推送/克隆稳定通道。',
             usedBy: '全仓库', url: '#' },
         ],
       },

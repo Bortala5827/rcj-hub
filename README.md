@@ -67,14 +67,18 @@ RCJ 产品生态共三类：
 
 > ③ 当前统一在 Speak Series 下运营；若某产品（如 FaceTalk）数据跑出独立价值，可后续拆为独立产品——但不是现在。
 
-## 资产层（按类型分仓库，供上层产品复用）
+## 资产层（统一仓库，供上层产品复用）
 
 产品层做完就丢是浪费；能复用的一律沉淀到资产仓库，上层只「调用模块」。
 
-| 仓库 | 存什么 | 被谁调用 |
+> **2026-08-13 合并**：原 `skills` + `rcj-media-assets` + `rcj-interaction-assets` 三仓合一为 **`rcj-assets`**（旧仓已归档不删除）。
+
+| 目录 | 存什么 | 被谁调用 |
 | --- | --- | --- |
-| rcj-interaction-assets | 声纹动画 / 解压互动 / GSAP 动效 / 粒子 | Speak Series、RCJ Hub 首页 |
-| rcj-media-assets | 音频素材与媒体组件 | Speak Series |
-| skills | AI 提示词 / 工作流 / Skill 沉淀 | 全部项目 |
+| `skills/` | AI 技能（SKILL.md）/ 音频引擎 / 题库生成器 / 工作流 | 全部项目 |
+| `media/` | 音频 MP3 素材 / 媒体处理脚本 | Speak Series |
+| `interaction/` | 声纹动画 / 解压互动 / GSAP 动效 / 粒子效果 | Speak Series、RCJ Hub |
+
+**仓库**：[`Bortala5827/rcj-assets`](https://github.com/Bortala5827/rcj-assets)
 
 资产总目录（我有什么资产，一页看全）：**[955827.xyz/assets](https://955827.xyz/assets)**
