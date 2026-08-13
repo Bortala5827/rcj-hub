@@ -27,7 +27,7 @@ export class Recorder {
     this.audioCtx = new AC();
     const source = this.audioCtx.createMediaStreamSource(this.stream);
     this.analyser = this.audioCtx.createAnalyser();
-    this.analyser.fftSize = 1024;
+    this.analyser.fftSize = 2048;
     source.connect(this.analyser);
 
     this._frames = [];

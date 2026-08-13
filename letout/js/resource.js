@@ -24,6 +24,22 @@ const LOCAL_FALLBACK = {
   ],
 };
 
+// 测试模式强制有声资源（即使远程 manifest 拉取失败也用这组，保证 ?testaudio=1 必出声波）
+const LOCAL_TEST_AUDIO = [
+  { id: 'a01', title: '《爱拼才会赢》', text: '爱拼才会赢。', audio: 'audio/a01.mp3' },
+  { id: 'a02', title: '影视原声', text: '中国人向来以成败论英雄。', audio: 'audio/a02.mp3' },
+  { id: 'a03', title: '影视原声', text: '人生能有几个机会呢。', audio: 'audio/a03.mp3' },
+  { id: 'a04', title: '影视原声', text: '你看这些年我这么辛苦这么。', audio: 'audio/a04.mp3' },
+  { id: 'a05', title: '影视原声', text: '同学们。', audio: 'audio/a05.mp3' },
+  { id: 'a06', title: '影视原声', text: '我就是抱着办不成的决心。', audio: 'audio/a06.mp3' },
+  { id: 'a07', title: '《水浒传》', text: '我等梁山好汉。', audio: 'audio/a07.mp3' },
+  { id: 'a08', title: '影视原声', text: '掌声已经响起来了。', audio: 'audio/a08.mp3' },
+  { id: 'a09', title: '影视原声', text: '日月蹉跎。', audio: 'audio/a09.mp3' },
+  { id: 'a10', title: '中东战歌', text: '中东战歌。', audio: 'audio/a10.mp3' },
+  { id: 'a11', title: '《繁花》', text: '繁花 · 十年。', audio: 'audio/a11.mp3' },
+  { id: 'f01', title: '《功夫熊猫》', text: '昨天是段历史，明天是个谜，而今天，是上天的礼物。', audio: 'audio/f01.mp3' },
+];
+
 function pickBatch(batches) {
   const day = Math.floor(Date.now() / 864e5);
   const idx = Math.floor(day / ROTATE_DAYS) % batches.length;
@@ -38,6 +54,14 @@ function resolveAudio(p) {
 
 // 返回 { batch, items:[{id,title,text,audio}], remote:boolean }
 export async function getEmotionShadows() {
+  // 预览开关：?testaudio=1 → 直接用本地有声资源集（完全不依赖远程，保证必出声波）
+  // 生产无参时完全不变；不影响正常轮换。放在最顶部，即使网络挂了也能验证声波。
+  if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('testaudio')) {
+    const items = LOCAL_TEST_AUDIO.map((it) => ({
+      id: it.id, title: it.title || '', text: it.text || '', audio: resolveAudio(it.audio),
+    }));
+    return { batch: { label: '测试 · 声波频动' }, items, remote: true };
+  }
   try {
     if (!RESOURCE_REPO_RAW) throw new Error('no repo configured');
     const res = await fetch(`${RESOURCE_REPO_RAW}/manifest.json`, { cache: 'no-cache' });

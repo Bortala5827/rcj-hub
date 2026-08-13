@@ -192,6 +192,8 @@ body::after {
 }
 .release-zone > * { position: relative; z-index: 1; }
 .wave-canvas { width: 100%; height: 84px; display: block; margin-bottom: 10px; }
+/* 情绪影子的声波播放器：紧凑模式，辅条级 */
+.shadow-card .wave-canvas { height: 56px; border-radius: 6px; }
 .rec-timer {
   font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums;
   letter-spacing: .04em; color: var(--text);
@@ -234,26 +236,28 @@ html[data-rec="1"] .rec-timer {
   letter-spacing: .02em; font-style: italic; transition: opacity .3s;
 }
 
-/* 情绪影子：影视台词卡（文本 + webm 音频） */
-.shadow-zone { margin-top: 22px; }
+/* 情绪影子：影视台词卡（文本 + webm 音频）—— 辅助层级，不抢录音区焦点 */
+.shadow-zone { margin-top: 14px; }
 .shadow-card {
-  border: 1px solid var(--glass-brd); border-radius: var(--r);
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  backdrop-filter: blur(var(--glass-blur));
-  box-shadow: var(--glass-shadow);
-  padding: 14px 15px;
+  border: 1px solid color-mix(in srgb, var(--glass-brd) 50%, transparent);
+  border-radius: calc(var(--r) - 2px);
+  background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.6));
+  backdrop-filter: blur(calc(var(--glass-blur) * 0.6));
+  box-shadow: none;
+  padding: 10px 12px;
+  opacity: .82;
 }
 .shadow-head {
   display: flex; align-items: baseline; justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
 }
 .shadow-label {
-  font-size: 11px; font-weight: 700; letter-spacing: .28em;
-  text-transform: uppercase; color: var(--accent);
+  font-size: 10px; font-weight: 700; letter-spacing: .24em;
+  text-transform: uppercase; color: color-mix(in srgb, var(--accent) 65%, var(--muted));
 }
-.shadow-batch { font-size: 10px; color: #6b574c; letter-spacing: .04em; }
-.shadow-item { padding: 12px 0; border-top: 1px dashed var(--line); }
+.shadow-batch { font-size: 9px; color: #5a4a42; letter-spacing: .03em; }
+.shadow-item { padding: 6px 0; border-top: 1px dashed color-mix(in srgb, var(--line) 50%, transparent); }
 .shadow-item:first-of-type { border-top: none; padding-top: 0; }
 .shadow-title { font-size: 11px; color: var(--accent); letter-spacing: .06em; margin-bottom: 5px; }
 .shadow-text { font-size: 14px; line-height: 1.8; color: var(--text); }
@@ -299,8 +303,52 @@ html[data-rec="1"] .rec-timer {
 .play-btn {
   width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
   background: var(--accent); color: #17120f; font-size: 13px; flex-shrink: 0;
+  transition: transform .2s var(--ease-back), box-shadow .2s;
+}
+.play-btn:hover { transform: scale(1.08); }
+.play-btn:active { transform: scale(.92); }
+/* 播放中：播放键发光呼吸 */
+.shadow-card .play-btn[data-playing="1"] {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent),
+              0 0 14px 2px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 .player-time { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* 资源音频：紧凑音符 + 声波条（辅件级，不抢焦点） */
+.shadow-player--audio {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 2px 0 0;
+}
+.shadow-note {
+  width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
+  border: 1.5px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  background: radial-gradient(circle at 50% 36%,
+    color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%);
+  color: color-mix(in srgb, var(--accent) 70%, var(--muted));
+  font-size: 20px; line-height: 1; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: none;
+  transition: transform .2s var(--ease-back), box-shadow .2s, background .2s;
+}
+.shadow-note:hover { transform: scale(1.1); }
+.shadow-note:active { transform: scale(.93); }
+.shadow-note[data-playing="1"] {
+  background: radial-gradient(circle at 50% 50%,
+    color-mix(in srgb, var(--accent) 36%, transparent), transparent 72%);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent),
+              0 0 10px 1px color-mix(in srgb, var(--accent) 20%, transparent);
+  animation: notePulse 1.5s ease-in-out infinite;
+}
+@keyframes notePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+.shadow-player--audio .wave-canvas { width: 100%; }
+.shadow-player--audio .player-time { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .log-controls { display: flex; gap: 8px; }
 .mini-btn {
   border: 1px solid var(--line); background: transparent; color: var(--muted);

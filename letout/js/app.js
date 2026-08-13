@@ -1,10 +1,10 @@
 // app.js — LetOut 主逻辑（释放 / 库房 / 关于）
-import { putRelease, getAllReleases, deleteRelease } from './db.js';
-import { Recorder } from './recorder.js';
-import { mountLiveBars, fitCanvas } from './waveform.js';
-import { mountPlayer } from './player.js';
-import { startGhostGuide } from './ghost-guide.js';
-import { getEmotionShadows } from './resource.js';
+import { putRelease, getAllReleases, deleteRelease } from './db.js?v=20260812h';
+import { Recorder } from './recorder.js?v=20260812h';
+import { mountLiveBars, fitCanvas } from './waveform.js?v=20260812h';
+import { mountPlayer, mountAudioPlayer } from './player.js?v=20260812h';
+import { startGhostGuide } from './ghost-guide.js?v=20260812h';
+import { getEmotionShadows } from './resource.js?v=20260812h';
 
 // ─── 情绪类型 + 声纹变体 ───────────────────────────────
 // 每个情绪一种基调配色 + 波形性格，每种情绪下 3~5 种「声纹」变体微调强度。
@@ -101,6 +101,7 @@ let keepAudio = false;
 let ghostStop = null;       // 轮换引导语计时器清除函数
 let shadowCache = null;     // 情绪影子按天缓存，避免每次重渲染都拉取
 const players = new Set(); // 活跃 player，切页时销毁
+let shadowPlayer = null;    // 情绪影子音频播放器（声波频动），重渲染时销毁重建
 
 function toast(msg) {
   toastEl.textContent = msg;
@@ -338,6 +339,7 @@ function renderShadowInner(zone, data) {
   const items = data.items || [];
   // 单次只出一条（随机），不列清单
   const it = items.length ? items[Math.floor(Math.random() * items.length)] : null;
+  if (shadowPlayer) { shadowPlayer.destroy(); shadowPlayer = null; }
   if (!it) { zone.innerHTML = ''; return; }
   zone.innerHTML = `
     <div class="shadow-card">
@@ -346,11 +348,22 @@ function renderShadowInner(zone, data) {
         <span class="shadow-batch">${esc(data.batch && data.batch.label ? data.batch.label : '')}</span>
       </div>
       <div class="shadow-item">
-        ${it.title ? `<div class="shadow-title">${esc(it.title)}</div>` : ''}
-        <div class="shadow-text">${esc(it.text)}</div>
-        ${it.audio ? `<audio class="shadow-audio" src="${esc(it.audio)}" controls preload="none"></audio>` : ''}
+        ${it.audio
+          ? `<div class="shadow-player shadow-player--audio"></div>`
+          : `<div class="shadow-title">${esc(it.title || '')}</div><div class="shadow-text">${esc(it.text)}</div>`}
       </div>
     </div>`;
+  // 接入「声波频动」：实时频谱柱 + 颜色变化 + 音量驱动环境光呼吸
+  if (it.audio) {
+    const holder = zone.querySelector('.shadow-player');
+    if (holder) {
+      shadowPlayer = mountAudioPlayer(holder, it.audio, {
+        gradient: ['#e07850', '#f3b089'],
+        glow: '#e07850',
+        onLevel: setLiveLevel,
+      });
+    }
+  }
 }
 
 // ---------------- 库房（释放记录） ----------------
