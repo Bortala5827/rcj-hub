@@ -55,6 +55,13 @@ function setRoute(r) {
 document.querySelectorAll('.nav-btn').forEach((b) =>
   b.addEventListener('click', () => setRoute(b.dataset.route)));
 
+// 面板内导航按钮点击后自动关闭设置面板
+document.querySelectorAll('.ai-nav-btn').forEach((b) =>
+  b.addEventListener('click', () => {
+    var ov = document.getElementById('aiSettingsOverlay');
+    if (ov) ov.classList.remove('show');
+  }));
+
 // ---------------- 今天 ----------------
 async function renderHome() {
   destroyPlayers();
