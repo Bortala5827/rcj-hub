@@ -41,11 +41,6 @@ function destroyPlayers() {
   players.clear();
 }
 
-// 视图入场动画（RCJ Motion Engine · 纯 JS 内联样式，无额外 CSS 依赖）
-function animateViewIn() {
-  if (window.RCJMotion) window.RCJMotion.entrance(view.children, { y: 16, opacity: 0, duration: 0.55, stagger: 0.05, ease: 'power3.out' });
-}
-
 function setRoute(r) {
   route = r;
   document.querySelectorAll('.nav-btn').forEach((b) =>
@@ -305,8 +300,6 @@ async function renderHome() {
     if (recState === 'recording' || recState === 'starting') stopRec();
     else startRec();
   });
-
-  animateViewIn();
 }
 
 // ---------------- 声音日志 ----------------
@@ -359,8 +352,6 @@ async function renderLog() {
       }
     };
   });
-
-  animateViewIn();
 }
 
 // ---------------- 声音档案（观察，不评分） ----------------
@@ -434,8 +425,6 @@ async function renderExport() {
     exportData(out, fmt);
     toast('已导出');
   };
-
-  animateViewIn();
 }
 
 // ---------------- 关于 ----------------
@@ -485,8 +474,6 @@ async function renderAbout() {
       </details>
     </div>
   `;
-
-  animateViewIn();
 }
 
 // ---------------- 工具 ----------------
