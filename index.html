@@ -7,8 +7,7 @@
   <title>RCJ Lab · 个人产品实验室</title>
   <meta name="description" content="RCJ9527 的个人产品实验室——用 AI + Vibe Coding 做考试学习、面试陪练与开口练习的小工具。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260814nav" />
-  <link rel="stylesheet" href="/assets/rcj-motion.css?v=20260814hub" />
+  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260812a" />
   <style>
     /* 首页层级结构：母体 → 系列 → 子项 */
     .series-block { margin-bottom: 44px; }
@@ -82,17 +81,12 @@
         <span class="mark">R</span>
         <span class="wm-text">RCJ Lab</span>
       </a>
-      <nav class="nav-links" id="primary-nav" aria-label="主导航">
+      <nav class="nav-links" aria-label="主导航">
         <a href="#lab">作品</a>
         <a href="/archive">档案</a>
         <a href="/principles">原则</a>
         <a href="/assets">资产库</a>
       </nav>
-      <button class="nav-toggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="primary-nav">
-        <span class="nav-toggle-bar"></span>
-        <span class="nav-toggle-bar"></span>
-        <span class="nav-toggle-bar"></span>
-      </button>
       <a class="nav-github" href="https://github.com/Bortala5827/rcj-hub" target="_blank" rel="noopener" aria-label="GitHub">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.016-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.755-1.333-1.755-1.09-.745.083-.73.083-.73 1.205.085 1.838 1.237 1.838 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.776.42-1.305.763-1.605-2.665-.305-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.236-3.22-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.3 1.23.957-.266 1.98-.4 3-.405 1.02.005 2.04.14 3 .405 2.29-1.552 3.297-1.23 3.297-1.23.653 1.652.24 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.805 5.62-5.475 5.92.43.37.814 1.1.814 2.22 0 1.606-.015 2.898-.015 3.293 0 .322.216.697.825.577C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/></svg>
       </a>
@@ -201,27 +195,49 @@
 <script src="/assets/vendor/gsap.min.js"></script>
 <script src="/assets/vendor/ScrollTrigger.min.js"></script>
 <script src="/assets/vendor/SplitText.min.js"></script>
-<script src="/assets/rcj-motion.js?v=20260814hub"></script>
 <script>
 (function(){
   function showAll(){ [].forEach.call(document.querySelectorAll('.reveal'), function(e){ e.classList.add('visible'); }); }
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduce || !window.gsap || !window.ScrollTrigger || !window.RCJMotion) { showAll(); return; }
+  if (reduce || !window.gsap || !window.ScrollTrigger) { showAll(); return; }
   gsap.registerPlugin(ScrollTrigger, SplitText);
-  var M = window.RCJMotion;
 
-  /* ============ Layer 1 · 优雅出现（RCJ Motion Engine） ============ */
-  M.textReveal('.hero-inner h1');
-  M.entrance('.hero-inner .eyebrow', { y: 22, opacity: 0, duration: 0.7, ease: 'power3.out', delay: 0.08 });
-  M.parallax('.hero-inner', { yPercent: -26, opacity: 0.1, trigger: '.hero', start: 'top top', end: 'bottom top' });
-  M.revealOnScroll('.reveal', { y: 42, blur: 10, start: 'top 86%' });
+  /* ============ Layer 1 · 优雅出现 ============ */
+  // Hero 标题：逐行遮罩上浮（告别生硬淡入）
+  var h1 = document.querySelector('.hero-inner h1');
+  if (h1 && window.SplitText) {
+    var split = new SplitText(h1, { type: 'lines', mask: 'lines', linesClass: 'split-line' });
+    gsap.from(split.lines, { yPercent: 118, duration: 1.05, ease: 'power4.out', stagger: 0.12, delay: 0.25 });
+  } else if (h1) {
+    gsap.from(h1, { y: 30, opacity: 0, duration: 0.9, ease: 'back.out(1.6)', delay: 0.22 });
+  }
+  gsap.from('.hero-inner .eyebrow', { y: 22, opacity: 0, duration: 0.7, ease: 'power3.out', delay: 0.08 });
+
+  // Hero 随滚动淡出（scrub：滚动条即时间线）
+  gsap.to('.hero-inner', { yPercent: -26, opacity: 0.1, ease: 'none',
+    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+
+  // 区块入场：位移 + 透明 + 轻微模糊，质感更高级
+  gsap.utils.toArray('.reveal').forEach(function(el){
+    gsap.fromTo(el, { y: 42, opacity: 0, filter: 'blur(10px)' },
+      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.95, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 86%', toggleActions: 'play none none none' } });
+  });
 
   /* ============ Layer 2 · 微交互 ============ */
-  // 磁吸卡片：Exam 入口随指针轻微位移 + 按压回弹（RCJ Motion Engine）
+  // 磁吸卡片：Exam 入口随指针轻微位移 + 按压回弹
   document.querySelectorAll('[data-magnetic]').forEach(function(el){
     var strength = parseFloat(el.getAttribute('data-magnetic')) || 0.3;
-    M.magnetic(el, { strength: strength });
-    M.press(el);
+    var xTo = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3' });
+    var yTo = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3' });
+    el.addEventListener('pointermove', function(e){
+      var r = el.getBoundingClientRect();
+      xTo((e.clientX - r.left - r.width/2) * strength);
+      yTo((e.clientY - r.top - r.height/2) * strength);
+    });
+    el.addEventListener('pointerleave', function(){ xTo(0); yTo(0); });
+    el.addEventListener('pointerdown', function(){ gsap.to(el, { scale: 0.97, duration: 0.16 }); });
+    el.addEventListener('pointerup', function(){ gsap.to(el, { scale: 1, duration: 0.28, ease: 'power2.out' }); });
   });
 
   // 漂浮区：横滑轨道 + 指针邻近放大（macOS dock 般的灵动）
@@ -271,33 +287,6 @@
 
   // CTA 箭头：持续轻晃，把注意力引向「进入」
   gsap.to('.exam-cta .arrow', { x: 6, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-})();
-
-/* ============ 汉堡菜单 + 站内跳转幕布转场（纯 DOM，不依赖 GSAP） ============ */
-(function(){
-  var toggle = document.querySelector('.nav-toggle');
-  var nav = document.getElementById('primary-nav');
-  if (!toggle || !nav) return;
-  function closeMenu(){ nav.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); toggle.setAttribute('aria-label','打开菜单'); document.body.style.overflow=''; }
-  function openMenu(){ nav.classList.add('open'); toggle.setAttribute('aria-expanded','true'); toggle.setAttribute('aria-label','关闭菜单'); document.body.style.overflow='hidden'; }
-  toggle.addEventListener('click', function(e){ e.stopPropagation(); nav.classList.contains('open') ? closeMenu() : openMenu(); });
-  nav.addEventListener('click', function(e){ if (e.target.tagName === 'A') closeMenu(); });
-  document.addEventListener('click', function(e){ if (nav.classList.contains('open') && !nav.contains(e.target) && !toggle.contains(e.target)) closeMenu(); });
-  window.addEventListener('resize', function(){ if (window.innerWidth > 720) closeMenu(); });
-
-  // 站内跳转：幕布转场（pageWipe），降级时无动画直接跳
-  function go(href){
-    if (window.RCJMotion && window.RCJMotion.pageWipe) {
-      window.RCJMotion.pageWipe({ color: 'var(--ink)', onMid: function(){ window.location.href = href; } });
-    } else { window.location.href = href; }
-  }
-  [].forEach.call(nav.querySelectorAll('a'), function(a){
-    a.addEventListener('click', function(e){
-      var href = a.getAttribute('href') || '';
-      if (href.charAt(0) === '#' || a.target === '_blank' || a.hasAttribute('data-nowipe')) return;
-      e.preventDefault(); go(href);
-    });
-  });
 })();
 </script>
 <script>fetch("https://955827.xyz/api/track?site=hub",{method:"POST",mode:"no-cors"}).catch(function(){});</script>
