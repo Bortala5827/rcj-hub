@@ -476,65 +476,14 @@ section[id] { scroll-margin-top: 84px; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* ============== 移动端汉堡菜单 ============== */
-.nav-hamburger {
-  display: none; flex-direction: column; justify-content: center; gap: 5px;
-  width: 36px; height: 36px; padding: 6px;
-  background: transparent; border: 1px solid var(--line); border-radius: 10px;
-  cursor: pointer; transition: border-color 0.2s ease;
-}
-.nav-hamburger:hover { border-color: var(--ink-4); }
-.nav-hamburger span {
-  display: block; width: 100%; height: 2px; background: var(--ink);
-  border-radius: 2px; transition: transform 0.3s ease, opacity 0.3s ease;
-  transform-origin: center;
-}
-.nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
-.nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-/* ============== 移动端导航抽屉 ============== */
-.nav-drawer-overlay {
-  position: fixed; inset: 0; z-index: 990;
-  background: rgba(15,23,42,0.35); backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-.nav-drawer-overlay.active { opacity: 1; visibility: visible; }
-
-.nav-drawer {
-  position: fixed; top: 0; right: 0; z-index: 991;
-  width: min(300px, 80vw); height: 100%;
-  background: #fff; box-shadow: -8px 0 32px rgba(15,23,42,.14);
-  transform: translateX(100%);
-  /* 注意：transform 动画由 GSAP 接管，此处不设 transition 避免冲突 */
-  display: flex; flex-direction: column;
-  visibility: hidden;
-}
-.nav-drawer.open { visibility: visible; }
-.drawer-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 20px; border-bottom: 1px solid var(--line-2);
-}
-.drawer-header .wordmark { gap: 8px; }
-.drawer-header .mark { width: 28px; height: 28px; font-size: 12px; border-radius: 7px; }
-.drawer-header .wm-text { font-size: 14px; }
-.drawer-close {
-  display: flex; align-items: center; justify-content: center;
-  width: 34px; height: 34px; border-radius: 9px;
-  background: transparent; border: 1px solid var(--line); color: var(--ink-2);
-  cursor: pointer; transition: color 0.2s ease, background 0.2s ease;
-}
-.drawer-close:hover { color: var(--ink); background: var(--bg-soft); }
-.drawer-menu {
-  list-style: none; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px;
-}
-.drawer-menu li a {
-  display: block; padding: 14px 16px; font-size: 16px; font-weight: 500;
-  color: var(--ink); border-radius: 11px;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.drawer-menu li a:hover, .drawer-menu li a:focus { background: var(--bg-soft); color: var(--accent); }
+/* ============== 移动端独立适配已废弃（统一用顶部导航） ============== */
+/* 以下组件在 HTML 中已移除，仅保留 display:none 兜底，防止旧缓存残留误显示 */
+.nav-hamburger,
+.nav-drawer,
+.nav-drawer-overlay,
+.nav-drawer .drawer-header,
+.drawer-menu,
+.product-bar { display: none !important; }
 
 /* body 锁滚动（抽屉打开时） */
 body.drawer-open { overflow: hidden; }
@@ -572,7 +521,6 @@ body.drawer-open { overflow: hidden; }
 /* Footer 给底部栏留空间（移动端） */
 @media (max-width: 720px) {
   .site-footer { margin-bottom: 64px; }
-  .nav-hamburger { display: flex; }
 }
 
 /* ============== Responsive ============== */
@@ -581,11 +529,18 @@ body.drawer-open { overflow: hidden; }
   .hero { padding: 64px 0 56px; }
   .directions { padding: 56px 0 8px; }
   .site-footer { margin-top: 60px; font-size: 12px; margin-bottom: 64px; }
-  .nav-links { display: none; }
   .site-footer .footer-powered { font-size: 11px; }
   .avatar { width: 100px; height: 100px; border-radius: 20px; }
-  .nav-hamburger { display: flex; }
-  .product-bar { display: block; }
+
+  /* 手机端：顶部导航直接显示，统一不另做适配 */
+  .container.nav { flex-wrap: wrap; row-gap: 10px; }
+  .nav-links {
+    order: 3; width: 100%;
+    justify-content: space-between; gap: 6px;
+    padding-top: 10px; margin-top: 4px;
+    border-top: 1px solid var(--line-2);
+  }
+  .nav-links a { font-size: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
