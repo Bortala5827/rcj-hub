@@ -61,6 +61,7 @@ ul { list-style: none; }
   font-size: 14px; font-weight: 800; letter-spacing: -0.5px;
 }
 .wm-text { font-size: 15px; letter-spacing: 0.1px; color: var(--ink); }
+.container.nav { position: relative; }
 
 /* ============== 三横杠 + 下拉菜单（电脑手机统一，纯 class 切换无动画冲突） ============== */
 .nav-hamburger {
@@ -82,7 +83,7 @@ ul { list-style: none; }
 
 /* 下拉菜单：绝对定位在按钮下方，右侧对齐；默认隐藏，.open 才显示 */
 .nav-menu {
-  position: absolute; top: calc(100% + 10px); right: 20px;
+  position: absolute; top: calc(100% + 10px); right: 0;
   min-width: 176px; z-index: 60;
   display: none; flex-direction: column; gap: 2px;
   padding: 7px; background: #fff;
