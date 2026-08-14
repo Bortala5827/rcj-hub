@@ -7,7 +7,7 @@
   <title>RCJ Lab · 个人产品实验室</title>
   <meta name="description" content="RCJ9527 的个人产品实验室——用 AI + Vibe Coding 做考试学习、面试陪练与开口练习的小工具。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260814" />
+  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260814b" />
   <style>
     /* 首页层级结构：母体 → 系列 → 子项 */
     .series-block { margin-bottom: 44px; }
@@ -340,13 +340,13 @@
     overlay.classList.add('active');
     overlay.setAttribute('aria-hidden', 'false');
     document.body.classList.add('drawer-open');
-    // 入场动画
-    gsap.fromTo(drawer, { xPercent: 20 }, { xPercent: 0, duration: 0.35, ease: 'power3.out' });
+    // 抽屉从右侧滑入（GSAP 接管 transform，不与 CSS transition 冲突）
+    gsap.fromTo(drawer, { xPercent: 100 }, { xPercent: 0, duration: 0.35, ease: 'power3.out' });
     gsap.fromTo(overlay, { opacity: 0 }, { opacity: 1, duration: 0.3 });
     // 菜单项逐个滑入
     gsap.fromTo(drawerLinks,
       { x: 30, opacity: 0 },
-      { x: 0, opacity: 1, duration: 0.35, stagger: 0.06, ease: 'power3.out', delay: 0.1 }
+      { x: 0, opacity: 1, duration: 0.35, stagger: 0.06, ease: 'power3.out', delay: 0.15 }
     );
   }
 
