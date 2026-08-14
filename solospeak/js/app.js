@@ -5,10 +5,10 @@ import {
 import { Recorder } from './recorder.js?v=20260813b';
 import { mountLiveBars, renderWave, fitCanvas, lerpHex } from './waveform.js?v=20260813a';
 import { mountPlayer } from './player.js?v=20260813a';
-import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN, QUOTE } from './topics.js';
+import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN } from './topics.js';
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
 import { exportData, exportAudio } from './export.js';
-import { getDailyQuote } from './quotes.js';
+import { getDailyQuote, getLanguageQuote, nextLanguageQuote } from './quotes.js';
 import { markHighVolumeToday } from './streak.js';
 
 const view = document.getElementById('view');
@@ -41,6 +41,11 @@ function destroyPlayers() {
   players.clear();
 }
 
+// 视图入场动画（RCJ Motion Engine · 纯 JS 内联样式，无额外 CSS 依赖）
+function animateViewIn() {
+  if (window.RCJMotion) window.RCJMotion.entrance(view.children, { y: 16, opacity: 0, duration: 0.55, stagger: 0.05, ease: 'power3.out' });
+}
+
 function setRoute(r) {
   route = r;
   document.querySelectorAll('.nav-btn').forEach((b) =>
@@ -66,10 +71,16 @@ async function renderHome() {
   const makeupNote = (goal.makeupMin && goal.makeupMin > 0)
     ? `今天多补了 ${goal.makeupMin} 分钟（昨天没说完的）` : '';
 
+  const lq = getLanguageQuote();
   view.innerHTML = `
     <div class="greeting-jp">${GREETING_JP}</div>
     <div class="greeting-cn">${GREETING_CN}</div>
-    <div class="quote">${QUOTE}</div>
+    <div class="quote" id="homeQuote">
+      <span class="quote-tag" id="quoteTag">${esc(lq.type)}</span>
+      <span class="quote-text">"${esc(lq.text)}"</span>
+      <span class="quote-author">—— ${esc(lq.author)}</span>
+      <button class="quote-next" id="quoteNext" title="换一条">↻</button>
+    </div>
 
     <div class="goal">
       <div class="goal-top">
@@ -89,6 +100,7 @@ async function renderHome() {
       <div class="topic-text" id="topicText">${currentTopic ? esc(currentTopic.text) : '（暂无话题）'}</div>
       <div class="topic-actions">
         <button class="link-btn" id="swapTopic">换一个</button>
+        <button class="link-btn" id="aiTopic">✨ AI 出题</button>
       </div>
     </div>
 
@@ -105,6 +117,50 @@ async function renderHome() {
     currentTopic = await nextTopic(currentTopic ? currentTopic.id : null);
     const el = document.getElementById('topicText');
     if (el && currentTopic) el.textContent = currentTopic.text;
+  };
+
+  // 联网随机话题：用自备 Key 的 LLM 即时生成生活化话题（数据不出本机）
+  document.getElementById('aiTopic').onclick = async () => {
+    const ai = window.RCJ_AI;
+    const btn = document.getElementById('aiTopic');
+    const txt = document.getElementById('topicText');
+    if (!ai) return;
+    const cfg = ai.load();
+    if (!cfg.enabled || !cfg.key || !cfg.baseUrl || !cfg.model) {
+      ai.openSettings();
+      toast('想用 AI 出题？先点右上角 ⚙ 填一个自备 Key');
+      return;
+    }
+    if (btn) { btn.disabled = true; btn.textContent = '✨ 出题中…'; }
+    try {
+      const out = await ai.callLlm({
+        system: '你是 SoloSpeak（独声）的选题助手。SoloSpeak 是一个人独处时开口练习表达的小工具，用户对着自己说话，不评分、不评判。',
+        user: '请生成 1 个适合一个人独处时开口练习的、生活化、容易回答、没有标准答案的中文话题。只输出话题本身（不超过 30 字），不要序号、不要解释、不要引号。',
+        maxTokens: 120, temperature: 0.9
+      });
+      let topic = (out || '').trim().replace(/^["'「」“”\s]+|["'「」“”\s]+$/g, '').replace(/^\d+[.、)]\s*/, '');
+      if (!topic) { toast('AI 没给出话题，换个说法再试'); return; }
+      currentTopic = { id: null, level: null, text: topic };
+      if (txt) txt.textContent = topic;
+    } catch (err) {
+      toast('AI 出题失败：' + (err && err.message ? err.message : err));
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '✨ AI 出题'; }
+    }
+  };
+
+  document.getElementById('quoteNext').onclick = () => {
+    const q = nextLanguageQuote();
+    const box = document.getElementById('homeQuote');
+    if (box) {
+      box.style.opacity = '0';
+      setTimeout(() => {
+        box.querySelector('.quote-tag').textContent = q.type;
+        box.querySelector('.quote-text').textContent = `"${q.text}"`;
+        box.querySelector('.quote-author').textContent = `—— ${q.author}`;
+        box.style.opacity = '1';
+      }, 150);
+    }
   };
 
   document.getElementById('setGoal').onclick = () => {
@@ -249,6 +305,8 @@ async function renderHome() {
     if (recState === 'recording' || recState === 'starting') stopRec();
     else startRec();
   });
+
+  animateViewIn();
 }
 
 // ---------------- 声音日志 ----------------
@@ -301,6 +359,8 @@ async function renderLog() {
       }
     };
   });
+
+  animateViewIn();
 }
 
 // ---------------- 声音档案（观察，不评分） ----------------
@@ -374,6 +434,8 @@ async function renderExport() {
     exportData(out, fmt);
     toast('已导出');
   };
+
+  animateViewIn();
 }
 
 // ---------------- 关于 ----------------
@@ -423,6 +485,8 @@ async function renderAbout() {
       </details>
     </div>
   `;
+
+  animateViewIn();
 }
 
 // ---------------- 工具 ----------------

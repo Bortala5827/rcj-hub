@@ -8,6 +8,7 @@
   <meta name="description" content="RCJ9527 的个人产品实验室——用 AI + Vibe Coding 做考试学习、面试陪练与开口练习的小工具。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="/assets/hub.v2.css?v=20260812a" />
+  <link rel="stylesheet" href="/assets/rcj-motion.css?v=20260814hub" />
   <style>
     /* 首页层级结构：母体 → 系列 → 子项 */
     .series-block { margin-bottom: 44px; }
@@ -195,49 +196,27 @@
 <script src="/assets/vendor/gsap.min.js"></script>
 <script src="/assets/vendor/ScrollTrigger.min.js"></script>
 <script src="/assets/vendor/SplitText.min.js"></script>
+<script src="/assets/rcj-motion.js?v=20260814hub"></script>
 <script>
 (function(){
   function showAll(){ [].forEach.call(document.querySelectorAll('.reveal'), function(e){ e.classList.add('visible'); }); }
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduce || !window.gsap || !window.ScrollTrigger) { showAll(); return; }
+  if (reduce || !window.gsap || !window.ScrollTrigger || !window.RCJMotion) { showAll(); return; }
   gsap.registerPlugin(ScrollTrigger, SplitText);
+  var M = window.RCJMotion;
 
-  /* ============ Layer 1 · 优雅出现 ============ */
-  // Hero 标题：逐行遮罩上浮（告别生硬淡入）
-  var h1 = document.querySelector('.hero-inner h1');
-  if (h1 && window.SplitText) {
-    var split = new SplitText(h1, { type: 'lines', mask: 'lines', linesClass: 'split-line' });
-    gsap.from(split.lines, { yPercent: 118, duration: 1.05, ease: 'power4.out', stagger: 0.12, delay: 0.25 });
-  } else if (h1) {
-    gsap.from(h1, { y: 30, opacity: 0, duration: 0.9, ease: 'back.out(1.6)', delay: 0.22 });
-  }
-  gsap.from('.hero-inner .eyebrow', { y: 22, opacity: 0, duration: 0.7, ease: 'power3.out', delay: 0.08 });
-
-  // Hero 随滚动淡出（scrub：滚动条即时间线）
-  gsap.to('.hero-inner', { yPercent: -26, opacity: 0.1, ease: 'none',
-    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-
-  // 区块入场：位移 + 透明 + 轻微模糊，质感更高级
-  gsap.utils.toArray('.reveal').forEach(function(el){
-    gsap.fromTo(el, { y: 42, opacity: 0, filter: 'blur(10px)' },
-      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.95, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 86%', toggleActions: 'play none none none' } });
-  });
+  /* ============ Layer 1 · 优雅出现（RCJ Motion Engine） ============ */
+  M.textReveal('.hero-inner h1');
+  M.entrance('.hero-inner .eyebrow', { y: 22, opacity: 0, duration: 0.7, ease: 'power3.out', delay: 0.08 });
+  M.parallax('.hero-inner', { yPercent: -26, opacity: 0.1, trigger: '.hero', start: 'top top', end: 'bottom top' });
+  M.revealOnScroll('.reveal', { y: 42, blur: 10, start: 'top 86%' });
 
   /* ============ Layer 2 · 微交互 ============ */
-  // 磁吸卡片：Exam 入口随指针轻微位移 + 按压回弹
+  // 磁吸卡片：Exam 入口随指针轻微位移 + 按压回弹（RCJ Motion Engine）
   document.querySelectorAll('[data-magnetic]').forEach(function(el){
     var strength = parseFloat(el.getAttribute('data-magnetic')) || 0.3;
-    var xTo = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3' });
-    var yTo = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3' });
-    el.addEventListener('pointermove', function(e){
-      var r = el.getBoundingClientRect();
-      xTo((e.clientX - r.left - r.width/2) * strength);
-      yTo((e.clientY - r.top - r.height/2) * strength);
-    });
-    el.addEventListener('pointerleave', function(){ xTo(0); yTo(0); });
-    el.addEventListener('pointerdown', function(){ gsap.to(el, { scale: 0.97, duration: 0.16 }); });
-    el.addEventListener('pointerup', function(){ gsap.to(el, { scale: 1, duration: 0.28, ease: 'power2.out' }); });
+    M.magnetic(el, { strength: strength });
+    M.press(el);
   });
 
   // 漂浮区：横滑轨道 + 指针邻近放大（macOS dock 般的灵动）
