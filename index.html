@@ -7,7 +7,7 @@
   <title>RCJ Lab · 个人产品实验室</title>
   <meta name="description" content="RCJ9527 的个人产品实验室——用 AI + Vibe Coding 做考试学习、面试陪练与开口练习的小工具。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260812a" />
+  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260814" />
   <style>
     /* 首页层级结构：母体 → 系列 → 子项 */
     .series-block { margin-bottom: 44px; }
@@ -90,8 +90,28 @@
       <a class="nav-github" href="https://github.com/Bortala5827/rcj-hub" target="_blank" rel="noopener" aria-label="GitHub">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.016-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.333-1.755-1.333-1.755-1.09-.745.083-.73.083-.73 1.205.085 1.838 1.237 1.838 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.776.42-1.305.763-1.605-2.665-.305-5.467-1.332-5.467-5.93 0-1.31.468-2.38 1.236-3.22-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.3 1.23.957-.266 1.98-.4 3-.405 1.02.005 2.04.14 3 .405 2.29-1.552 3.297-1.23 3.297-1.23.653 1.652.24 2.873.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.805 5.62-5.475 5.92.43.37.814 1.1.814 2.22 0 1.606-.015 2.898-.015 3.293 0 .322.216.697.825.577C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/></svg>
       </a>
+      <button class="nav-hamburger" aria-label="菜单" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </header>
+
+  <!-- 移动端导航抽屉 -->
+  <div class="nav-drawer-overlay" aria-hidden="true"></div>
+  <nav class="nav-drawer" aria-label="移动端导航">
+    <div class="drawer-header">
+      <span class="wordmark"><span class="mark">R</span><span class="wm-text">RCJ Lab</span></span>
+      <button class="drawer-close" aria-label="关闭">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <ul class="drawer-menu">
+      <li><a href="#lab">作品</a></li>
+      <li><a href="/archive">档案</a></li>
+      <li><a href="/principles">原则</a></li>
+      <li><a href="/assets">资产库</a></li>
+    </ul>
+  </nav>
 
   <main>
     <!-- ============== HERO ============== -->
@@ -178,6 +198,24 @@
       </div>
     </section>
   </main>
+
+  <!-- ============== 底部产品快捷栏（移动端固定） ============== -->
+  <nav class="product-bar" aria-label="产品快捷入口">
+    <div class="pb-items">
+    <a class="pb-item" href="/solospeak/">
+      <span class="pb-label">SPEAK</span>
+    </a>
+    <a class="pb-item" href="/letout/">
+      <span class="pb-label">LETOUT</span>
+    </a>
+    <a class="pb-item" href="https://facetalk.955827.xyz" target="_blank" rel="noopener">
+      <span class="pb-label">FACETALK</span>
+    </a>
+    <a class="pb-item pb-item--exam" href="https://exam.955827.xyz" target="_blank" rel="noopener">
+      <span class="pb-label">EXAM</span>
+    </a>
+    </div>
+  </nav>
 
   <!-- ============== FOOTER ============== -->
   <footer class="site-footer">
@@ -287,6 +325,52 @@
 
   // CTA 箭头：持续轻晃，把注意力引向「进入」
   gsap.to('.exam-cta .arrow', { x: 6, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+
+  /* ============ Layer 4 · 移动端抽屉导航 ============ */
+  var hamburger = document.querySelector('.nav-hamburger');
+  var drawer = document.querySelector('.nav-drawer');
+  var overlay = document.querySelector('.nav-drawer-overlay');
+  var closeBtn = document.querySelector('.drawer-close');
+  var drawerLinks = document.querySelectorAll('.drawer-menu a');
+
+  function openDrawer() {
+    if (!hamburger || !drawer) return;
+    hamburger.setAttribute('aria-expanded', 'true');
+    drawer.classList.add('open');
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('drawer-open');
+    // 入场动画
+    gsap.fromTo(drawer, { xPercent: 20 }, { xPercent: 0, duration: 0.35, ease: 'power3.out' });
+    gsap.fromTo(overlay, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+    // 菜单项逐个滑入
+    gsap.fromTo(drawerLinks,
+      { x: 30, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.35, stagger: 0.06, ease: 'power3.out', delay: 0.1 }
+    );
+  }
+
+  function closeDrawer() {
+    if (!hamburger || !drawer) return;
+    hamburger.setAttribute('aria-expanded', 'false');
+    gsap.to(drawer, { xPercent: 100, duration: 0.28, ease: 'power3.in',
+      onComplete: function() {
+        drawer.classList.remove('open');
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('drawer-open');
+      }
+    });
+    gsap.to(overlay, { opacity: 0, duration: 0.2 });
+  }
+
+  if (hamburger) hamburger.addEventListener('click', openDrawer);
+  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+  if (overlay) overlay.addEventListener('click', closeDrawer);
+  drawerLinks.forEach(function(link) { link.addEventListener('click', closeDrawer); });
+
+  // ESC 关闭
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDrawer(); });
 })();
 </script>
 <script>fetch("https://955827.xyz/api/track?site=hub",{method:"POST",mode:"no-cors"}).catch(function(){});</script>
