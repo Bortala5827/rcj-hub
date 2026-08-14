@@ -1,17 +1,18 @@
-// sw.js — Service Worker：缓存壳 + 离线可用
-// 注意：每次发布新版本请把 CACHE 版本号 +1（如 v2→v3），并同步更新 index.html 里 sw.js 注册带的 ?v=
-// 这样浏览器才会装上新 SW、清掉旧缓存，避免小米/部分安卓自带浏览器一直吐旧版 JS（表现为录音按钮不显示等）。
-const CACHE = 'solospeak-v6';
-const SHELL = [
-  './', './index.html', './manifest.webmanifest',
-  './styles/app.css',
-  './js/app.20260814.js', './js/quotes.20260814.js', './js/db.js', './js/recorder.js', './js/waveform.js',
-  './js/player.js', './js/topics.js', './js/goals.js', './js/export.js',
-  './assets/icon-192.png', './assets/icon-512.png'
+// sw.js — Service Worker：离线壳 + 静态资产缓存（开发友好版）
+// ⚠️ 开发阶段策略（2026-08-14 按用户方案固化）：
+//   - HTML / JS / JSON / manifest：一律网络优先且不写入缓存 → 部署新版本立即生效，杜绝旧版残留
+//   - 图片 / 图标 / 字体 / 静态资源：缓存优先 → 离线可用 + 复访秒开
+// 每次发布新版本请把 CACHE 版本号 +1，并同步更新 app.js 里 sw.js 注册带的 ?v=
+const CACHE = 'solospeak-v7';
+const STATIC_ASSETS = [
+  './assets/icon-192.png',
+  './assets/icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(CACHE).then((c) => c.addAll(STATIC_ASSETS)).then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (e) => {
@@ -21,15 +22,27 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// 网络优先：先试网络（保证新部署立即生效），失败再回退缓存/离线壳。
-// 旧版是「缓存优先」，导致部分浏览器永久用旧 JS，录音按钮等不渲染。
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  const url = new URL(e.request.url);
+
+  // 静态资产（图片/图标/字体）：缓存优先 → 秒开 + 离线
+  if (/\.(png|jpe?g|webp|gif|svg|ico|woff2?|ttf|eot)$/.test(url.pathname)) {
+    e.respondWith(
+      caches.match(e.request).then((hit) => {
+        if (hit) return hit;
+        return fetch(e.request).then((resp) => {
+          const copy = resp.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy));
+          return resp;
+        }).catch(() => caches.match('./assets/icon-192.png'));
+      })
+    );
+    return;
+  }
+
+  // HTML / JS / JSON / 其余：网络优先，不写入缓存 → 部署立即生效
   e.respondWith(
-    fetch(e.request).then((resp) => {
-      const copy = resp.clone();
-      caches.open(CACHE).then((c) => c.put(e.request, copy));
-      return resp;
-    }).catch(() => caches.match(e.request).then((r) => r || caches.match('./index.html')))
+    fetch(e.request).catch(() => caches.match(e.request).then((r) => r || caches.match('./index.html')))
   );
 });
