@@ -3,6 +3,7 @@
 
 /
   Cache-Control: no-cache
+  Permissions-Policy: microphone=(self)
 /index.html
   Cache-Control: no-cache
 /js/*
