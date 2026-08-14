@@ -1,0 +1,21 @@
+# SoloSpeak 缓存策略（开发阶段：不缓存 HTML/JS，避免旧版本残留白屏）
+# 用户访问 index.html / JS / SW / manifest 一律回源验证，部署后立即生效
+
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/js/*
+  Cache-Control: no-cache
+/sw.js
+  Cache-Control: no-cache
+  Content-Type: application/javascript
+/manifest.webmanifest
+  Cache-Control: no-cache
+  Content-Type: application/manifest+json
+
+# 静态资源（图片/图标/字体）可短缓存，靠引用处 ?v= 版本号强制刷新
+/assets/*
+  Cache-Control: public, max-age=3600
+/styles/*
+  Cache-Control: public, max-age=3600
