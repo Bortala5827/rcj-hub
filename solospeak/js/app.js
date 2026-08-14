@@ -8,7 +8,7 @@ import { mountPlayer } from './player.js?v=20260813a';
 import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN } from './topics.js';
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
 import { exportData, exportAudio } from './export.js';
-import { getDailyQuote, getLanguageQuote, nextLanguageQuote } from './quotes.js';
+import { getDailyQuote, getLanguageQuote, nextLanguageQuote } from './quotes.20260814.js';
 import { markHighVolumeToday } from './streak.js';
 
 const view = document.getElementById('view');
