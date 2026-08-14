@@ -7,7 +7,7 @@
   <title>RCJ Lab · 个人产品实验室</title>
   <meta name="description" content="RCJ9527 的个人产品实验室——用 AI + Vibe Coding 做考试学习、面试陪练与开口练习的小工具。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260814e" />
+  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260814f" />
   <style>
     /* 首页层级结构：母体 → 系列 → 子项 */
     .series-block { margin-bottom: 44px; }
@@ -37,25 +37,13 @@
     .marquee-track span { font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace; font-size: 13px; font-weight: 500; letter-spacing: .14em; color: var(--ink-3); padding: 0 26px; }
     @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-    /* 角色横滑区（Speak Series）——可来回滚动 + 身份常驻 + 指针邻近放大 */
-    .float-scene { position: relative; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 18px 18px; }
-    .float-caption { text-align: center; margin-bottom: 16px; }
-    .float-caption b { display: block; font-size: clamp(18px, 2.4vw, 24px); font-weight: 700; color: var(--ink); letter-spacing: -0.01em; line-height: 1.3; }
-    .float-caption small { display: block; font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace; font-size: 11px; font-weight: 500; color: var(--ink-3); letter-spacing: .14em; margin-top: 8px; text-transform: uppercase; }
-    .float-viewport { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; -webkit-overflow-scrolling: touch; cursor: grab; scroll-behavior: smooth; }
-    .float-viewport.dragging { cursor: grabbing; scroll-behavior: auto; }
-    .float-viewport::-webkit-scrollbar { height: 7px; }
-    .float-viewport::-webkit-scrollbar-thumb { background: var(--ink-4); border-radius: 4px; }
-    .float-viewport::-webkit-scrollbar-track { background: transparent; }
-    .float-track { display: flex; gap: 18px; padding: 4px 2px 8px; width: max-content; }
-    .float-item { flex: 0 0 auto; width: clamp(190px, 24vw, 250px); will-change: transform; text-decoration: none; }
-    .float-inner { display: flex; flex-direction: column; align-items: center; gap: 9px; text-align: center; padding: 18px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 18px; transition: box-shadow .25s ease, border-color .25s ease; }
-    .float-item:hover .float-inner { box-shadow: 0 16px 34px rgba(15,23,42,.13); border-color: var(--ink-4); }
-    .float-item img { display: block; width: 116px; height: 116px; object-fit: contain; transition: filter .3s ease; }
-    .float-item:hover img { filter: brightness(1.05) drop-shadow(0 8px 16px rgba(15,23,42,.16)); }
-    .float-name { font-size: 15px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
-    .float-desc { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
-    .float-hint { text-align: center; margin-top: 12px; font-size: 12px; color: var(--ink-3); letter-spacing: .04em; }
+    /* Speak Series 简洁列表（替代漂浮区，画面更干净） */
+    .mini-list { display: grid; gap: 10px; }
+    .mini-item { display: flex; flex-direction: column; gap: 2px; padding: 16px 18px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); text-decoration: none; transition: border-color .2s ease, box-shadow .2s ease; }
+    .mini-item:hover { border-color: var(--ink-4); box-shadow: 0 10px 26px rgba(15,23,42,.10); }
+    .mini-name { font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+    .mini-name .ext { color: var(--ink-3); font-weight: 600; }
+    .mini-desc { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
 
     /* hero 光斑：随指针游走的柔光（视觉亮点） */
     .hero-spot { position: absolute; left: 0; top: 0; width: 460px; height: 460px; margin: -230px 0 0 -230px; border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(circle, rgba(56,150,240,.20), rgba(56,150,240,0) 70%); z-index: 1; }
@@ -64,7 +52,6 @@
       .series-head { flex-direction: column; align-items: flex-start; gap: 4px; }
       .exam-entry { flex-direction: column; align-items: flex-start; gap: 16px; }
       .exam-img { width: 80px; height: 80px; }
-      .float-item { width: 72vw; }
     }
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; }
@@ -85,6 +72,11 @@
         <span></span><span></span><span></span>
       </button>
       <nav class="nav-menu" aria-label="站点导航">
+        <span class="nav-group-label">Speak Series</span>
+        <a href="/solospeak/">SoloSpeak</a>
+        <a href="/letout/">LetOut</a>
+        <a href="https://facetalk.955827.xyz" target="_blank" rel="noopener">FaceTalk ↗</a>
+        <span class="nav-sep"></span>
         <a href="#lab">作品</a>
         <a href="/archive">档案</a>
         <a href="/principles">原则</a>
@@ -126,34 +118,19 @@
             <span class="series-label">Speak Series</span>
             <span class="series-sub">训练人与世界连接的表达工具</span>
           </div>
-          <div class="float-scene">
-            <div class="float-caption">说话，是一种练习。<small>EXPRESS · 三个角色，在世界各处漂浮</small></div>
-            <div class="float-viewport">
-              <div class="float-track">
-                <a class="float-item" href="/solospeak/">
-                  <span class="float-inner">
-                    <img src="/assets/roles/solospeak.png" alt="SoloSpeak" loading="lazy" />
-                    <span class="float-name">SoloSpeak</span>
-                    <span class="float-desc">一个人也敢开口，录完自己听</span>
-                  </span>
-                </a>
-                <a class="float-item" href="/letout/">
-                  <span class="float-inner">
-                    <img src="/assets/roles/letout.png" alt="LetOut" loading="lazy" />
-                    <span class="float-name">LetOut</span>
-                    <span class="float-desc">把情绪说出来，而不是憋着</span>
-                  </span>
-                </a>
-                <a class="float-item" href="https://facetalk.955827.xyz" target="_blank" rel="noopener">
-                  <span class="float-inner">
-                    <img src="/assets/roles/facetalk.png" alt="FaceTalk" loading="lazy" />
-                    <span class="float-name">FaceTalk</span>
-                    <span class="float-desc">面试搭子匹配筛选助手</span>
-                  </span>
-                </a>
-              </div>
-            </div>
-            <div class="float-hint">← 拖动 / 滚轮横向浏览 →</div>
+          <div class="mini-list">
+            <a class="mini-item" href="/solospeak/">
+              <span class="mini-name">SoloSpeak</span>
+              <span class="mini-desc">一个人也敢开口，录完自己听</span>
+            </a>
+            <a class="mini-item" href="/letout/">
+              <span class="mini-name">LetOut</span>
+              <span class="mini-desc">把情绪说出来，而不是憋着</span>
+            </a>
+            <a class="mini-item" href="https://facetalk.955827.xyz" target="_blank" rel="noopener">
+              <span class="mini-name">FaceTalk <span class="ext">↗</span></span>
+              <span class="mini-desc">面试搭子匹配筛选助手</span>
+            </a>
           </div>
         </div>
 
@@ -240,37 +217,7 @@
     el.addEventListener('pointerup', function(){ gsap.to(el, { scale: 1, duration: 0.28, ease: 'power2.out' }); });
   });
 
-  // 漂浮区：横滑轨道 + 指针邻近放大（macOS dock 般的灵动）
-  var vp = document.querySelector('.float-viewport');
-  if (vp) {
-    var items = [].slice.call(vp.querySelectorAll('.float-item'));
-    var scaleTo = items.map(function(it){ return gsap.quickTo(it, 'scale', { duration: 0.45, ease: 'power3' }); });
-    vp.addEventListener('pointermove', function(e){
-      var sr = vp.getBoundingClientRect();
-      var cx = e.clientX - sr.left, cy = e.clientY - sr.top;
-      items.forEach(function(it, i){
-        var r = it.getBoundingClientRect();
-        var ix = r.left - sr.left + r.width/2, iy = r.top - sr.top + r.height/2;
-        var d = Math.hypot(cx - ix, cy - iy);
-        scaleTo[i](d < 170 ? 1 + (170 - d) / 170 * 0.22 : 1);
-      });
-    });
-    vp.addEventListener('pointerleave', function(){ scaleTo.forEach(function(q){ q(1); }); });
-
-    // 桌面端：纵向滚轮 → 横向滚动
-    vp.addEventListener('wheel', function(e){
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { vp.scrollLeft += e.deltaY; e.preventDefault(); }
-    }, { passive: false });
-
-    // 拖拽滚动（并阻止拖拽误触链接）
-    var down = false, sx = 0, sl = 0, moved = false;
-    vp.addEventListener('pointerdown', function(e){ down = true; moved = false; sx = e.clientX; sl = vp.scrollLeft; vp.classList.add('dragging'); });
-    window.addEventListener('pointermove', function(e){ if (!down) return; var dx = e.clientX - sx; if (Math.abs(dx) > 4) moved = true; vp.scrollLeft = sl - dx; });
-    window.addEventListener('pointerup', function(){ down = false; vp.classList.remove('dragging'); });
-    vp.addEventListener('click', function(e){ if (moved) e.preventDefault(); }, true);
-  }
-
-  /* ============ Layer 3 · 视觉亮点 ============ */
+    /* ============ Layer 3 · 视觉亮点 ============ */
   // Hero 柔光随指针游走，赋予首屏呼吸感
   var hero = document.querySelector('.hero');
   var spot = document.querySelector('.hero-spot');
