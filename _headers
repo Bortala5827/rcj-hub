@@ -2,3 +2,7 @@
   Cache-Control: public, max-age=0, must-revalidate
 /assets/*
   Cache-Control: public, max-age=0, must-revalidate
+/solospeak/*
+  Permissions-Policy: microphone=(self)
+/letout/*
+  Permissions-Policy: microphone=(self)
