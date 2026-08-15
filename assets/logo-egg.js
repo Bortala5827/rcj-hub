@@ -49,8 +49,7 @@
     var heroRect = hero.getBoundingClientRect();
     maxX = Math.max(0, heroRect.width - baseline.w);
     maxY = Math.max(0, heroRect.height - baseline.h);
-    minX = -baseline.left;
-    minY = -baseline.top;
+    minX = 0; minY = 0;
   }
 
   // ---- 进入自由移动（在 hero 容器内漫游）----
@@ -77,7 +76,8 @@
     // 暂停内部图片的漂浮动画，避免其 transform 与容器运动叠加
     img.style.animation = 'none';
 
-    pos.x = 0; pos.y = 0;
+    // pos 为吉祥物左上角在 hero 容器内的绝对坐标
+    pos.x = baseline.left; pos.y = baseline.top;
     var ang = rand(0, Math.PI * 2);
     dir.x = Math.cos(ang); dir.y = Math.sin(ang);
     baseSpeed = rand(NORMAL_MIN, NORMAL_MAX);
@@ -106,8 +106,8 @@
     // 鼠标/指针靠近：轻避让（不瞬移、不过度敏感）
     if (pointer.active) {
       var heroRect = hero.getBoundingClientRect();
-      var cx = heroRect.left + baseline.left + pos.x + baseline.w / 2;
-      var cy = heroRect.top + baseline.top + pos.y + baseline.h / 2;
+      var cx = heroRect.left + pos.x + baseline.w / 2;
+      var cy = heroRect.top + pos.y + baseline.h / 2;
       var dx = cx - pointer.x, dy = cy - pointer.y;
       var dist = Math.hypot(dx, dy);
       if (dist < AVOID_RADIUS && dist > 0.001) {
@@ -128,7 +128,8 @@
     if (pos.y <= minY) { pos.y = minY; dir.y = Math.abs(dir.y); }
     else if (pos.y >= maxY) { pos.y = maxY; dir.y = -Math.abs(dir.y); }
 
-    box.style.transform = 'translate(' + pos.x.toFixed(2) + 'px,' + pos.y.toFixed(2) + 'px)';
+    // transform 是相对基准位置的偏移，保证吉祥物始终被约束在 hero 容器内
+    box.style.transform = 'translate(' + (pos.x - baseline.left).toFixed(2) + 'px,' + (pos.y - baseline.top).toFixed(2) + 'px)';
 
     if (state === S.MOVING || state === S.RAGE) rafId = requestAnimationFrame(tick);
     else rafId = null;
@@ -142,7 +143,7 @@
     box.classList.add('is-returning');
 
     box.style.transition = 'none';
-    box.style.transform = 'translate(' + pos.x.toFixed(2) + 'px,' + pos.y.toFixed(2) + 'px) scale(0.85)';
+    box.style.transform = 'translate(' + (pos.x - baseline.left).toFixed(2) + 'px,' + (pos.y - baseline.top).toFixed(2) + 'px) scale(0.85)';
     void box.offsetWidth;
     box.style.transition = 'transform .45s cubic-bezier(0.34,1.56,0.64,1), opacity .35s ease';
     box.style.transform = 'translate(0px,0px) scale(1)';
@@ -207,7 +208,7 @@
     var heroRect = hero.getBoundingClientRect();
     maxX = Math.max(0, heroRect.width - baseline.w);
     maxY = Math.max(0, heroRect.height - baseline.h);
-    minX = -baseline.left; minY = -baseline.top;
+    minX = 0; minY = 0;
     if (pos.x > maxX) pos.x = maxX;
     if (pos.x < minX) pos.x = minX;
     if (pos.y > maxY) pos.y = maxY;
