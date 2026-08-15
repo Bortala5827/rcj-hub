@@ -111,8 +111,13 @@
         {
           y: 0, opacity: 1, filter: 'blur(0px)',
           duration: opts.duration || 0.9, ease: opts.ease || 'power3.out',
-          clearProps: 'opacity,transform,filter',
-          scrollTrigger: { trigger: el, start: opts.start || 'top 85%', once: true }
+          scrollTrigger: { trigger: el, start: opts.start || 'top 85%', once: true },
+          // 动画结束后打 is-visible 标记并清内联样式：
+          // 即使后续 JS 异常，CSS 门控(.is-visible)仍保证内容可见，杜绝“动画完反而消失”的残留坑。
+          onComplete: function () {
+            el.classList.add('is-visible');
+            global.gsap.set(el, { clearProps: 'opacity,transform,filter' });
+          }
         });
     });
   };

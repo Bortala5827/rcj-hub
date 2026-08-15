@@ -8,7 +8,8 @@
   <meta name="description" content="RCJ9527 的个人产品实验室——用 AI + Vibe Coding 做考试学习、面试陪练与开口练习的小工具。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="/assets/hub.v2.css?v=20260814g" />
-  <link rel="stylesheet" href="/assets/rcj-motion.css?v=20260814r1" />
+  <link rel="stylesheet" href="/assets/rcj-motion.css?v=20260815m1" />
+  <script>document.documentElement.classList.add('rcj-anim');</script>
   <style>
     /* 首页层级结构：母体 → 系列 → 子项 */
     .series-block { margin-bottom: 44px; }
@@ -30,7 +31,7 @@
 
     /* 滚动进入视口逐块浮现（由 RCJMotion.revealOnScroll 接管 opacity 动画；
        clearProps 完成后不回退；无 JS 时引擎内部 showAll 设 inline opacity:1 兜底） */
-    .reveal.visible { opacity: 1; }
+    .reveal.is-visible { opacity: 1; }
 
     /* marquee 滚动带 */
     .marquee { overflow: hidden; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); padding: 14px 0; background: var(--bg-soft); }
@@ -184,10 +185,10 @@
 <script src="/assets/vendor/gsap.min.js?v=20260814"></script>
 <script src="/assets/vendor/ScrollTrigger.min.js?v=20260814"></script>
 <script src="/assets/vendor/SplitText.min.js?v=20260814"></script>
-<script src="/assets/rcj-motion.js?v=20260814r1"></script>
+<script src="/assets/rcj-motion.js?v=20260815m1"></script>
 <script>
 (function(){
-  function showAll(){ [].forEach.call(document.querySelectorAll('.reveal'), function(e){ e.classList.add('visible'); }); }
+  function showAll(){ [].forEach.call(document.querySelectorAll('.reveal'), function(e){ e.classList.add('is-visible'); }); }
   function init(){
     if (window.RCJMotion) {
       var M = window.RCJMotion;
