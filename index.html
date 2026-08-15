@@ -68,6 +68,11 @@
       .hero-mascot-img { animation: none; }
       .hero-mascot { display: none; }
     }
+
+    /* Logo 互动彩蛋：仅叠加交互，不改变现有视觉（位置/大小/配色/字体均不动） */
+    .wordmark { -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+    .wordmark.is-free { cursor: grab; }
+    .wordmark.is-returning { cursor: default; }
   </style>
 </head>
 <body class="hub">
@@ -186,6 +191,7 @@
 <script src="/assets/vendor/ScrollTrigger.min.js?v=20260814"></script>
 <script src="/assets/vendor/SplitText.min.js?v=20260814"></script>
 <script src="/assets/rcj-motion.js?v=20260815m1"></script>
+<script src="/assets/logo-egg.js?v=20260815"></script>
 <script>
 (function(){
   function showAll(){ [].forEach.call(document.querySelectorAll('.reveal'), function(e){ e.classList.add('is-visible'); }); }
