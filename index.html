@@ -53,8 +53,11 @@
     .mini-desc { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
 
     /* hero 角色图：克制的漂浮 + 滚动视差（呼应「角色图漂浮区」方向，不喧宾夺主） */
-    .hero-mascot { position: absolute; right: 6%; bottom: 4%; width: 132px; z-index: 1; pointer-events: none; will-change: transform; }
+    .hero-mascot { position: absolute; right: 6%; bottom: 4%; width: 132px; z-index: 1; pointer-events: auto; will-change: transform; cursor: pointer; }
     .hero-mascot-img { width: 100%; height: auto; opacity: .92; filter: drop-shadow(0 12px 28px rgba(15,23,42,.16)); animation: heroFloat 6s ease-in-out infinite; }
+    .hero-mascot:not(.is-free):not(.is-returning):hover .hero-mascot-img { transform: scale(1.03); transition: transform .18s ease; }
+    .hero-mascot.is-free { cursor: grab; }
+    .hero-mascot.is-returning { cursor: default; }
     @keyframes heroFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
     @media (max-width: 720px) {
@@ -69,11 +72,6 @@
       .hero-mascot { display: none; }
     }
 
-    /* Mascot 互动彩蛋：仅叠加交互，不改变现有视觉（位置/大小/配色/字体均不动） */
-    .hero-mascot-img { -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none; cursor: pointer; pointer-events: auto; transition: transform .18s ease; }
-    .hero-mascot-img:not(.is-free):not(.is-returning):hover { transform: scale(1.03); }
-    .hero-mascot-img.is-free { cursor: grab; transition: none; }
-    .hero-mascot-img.is-returning { cursor: default; transition: none; }
   </style>
 </head>
 <body class="hub">
