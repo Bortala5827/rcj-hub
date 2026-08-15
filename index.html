@@ -8,6 +8,7 @@
   <meta name="description" content="RCJ9527 的个人产品实验室——用 AI + Vibe Coding 做考试学习、面试陪练与开口练习的小工具。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="/assets/hub.v2.css?v=20260814g" />
+  <link rel="stylesheet" href="/assets/rcj-motion.css?v=20260814r1" />
   <style>
     /* 首页层级结构：母体 → 系列 → 子项 */
     .series-block { margin-bottom: 44px; }
@@ -27,8 +28,8 @@
 
     .playground { display: block; text-align: center; padding: 18px; border: 1px dashed var(--ink-4); border-radius: var(--radius); color: var(--ink-3); font-size: 14px; }
 
-    /* 滚动进入视口逐块浮现（初始隐藏，由 GSAP 接管入场；无 GSAP 时靠 .visible 兜底） */
-    .reveal { opacity: 0; }
+    /* 滚动进入视口逐块浮现（由 RCJMotion.revealOnScroll 接管 opacity 动画；
+       clearProps 完成后不回退；无 JS 时引擎内部 showAll 设 inline opacity:1 兜底） */
     .reveal.visible { opacity: 1; }
 
     /* marquee 滚动带 */
@@ -37,16 +38,23 @@
     .marquee-track span { font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace; font-size: 13px; font-weight: 500; letter-spacing: .14em; color: var(--ink-3); padding: 0 26px; }
     @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-    /* Speak Series 简洁列表（替代漂浮区，画面更干净） */
+    /* Speak Series 简洁列表 + 角色图缩略图 + 每项独特色彩（产品性格） */
     .mini-list { display: grid; gap: 10px; }
-    .mini-item { display: flex; flex-direction: column; gap: 2px; padding: 16px 18px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); text-decoration: none; transition: border-color .2s ease, box-shadow .2s ease; }
+    .mini-item { display: flex; flex-direction: row; align-items: center; gap: 14px; padding: 13px 18px; background: var(--bg); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: var(--radius); text-decoration: none; transition: border-color .2s ease, box-shadow .2s ease, border-left-color .2s ease; }
     .mini-item:hover { border-color: var(--ink-4); box-shadow: 0 10px 26px rgba(15,23,42,.10); }
+    .mini-item[data-color="speak"] { border-left-color: #6366f1; }   /* 靛蓝 · 独处表达 */
+    .mini-item[data-color="emotion"] { border-left-color: #f59e0b; }  /* 琥珀 · 情绪释放 */
+    .mini-item[data-color="connect"] { border-left-color: #14b8a6; }  /* 青绿 · 面试连接 */
+    .mini-img { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; flex: 0 0 auto; background: var(--bg-soft); box-shadow: 0 4px 12px rgba(15,23,42,.06); will-change: transform; }
+    .mini-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
     .mini-name { font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
     .mini-name .ext { color: var(--ink-3); font-weight: 600; }
     .mini-desc { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
 
-    /* hero 光斑：随指针游走的柔光（视觉亮点） */
-    .hero-spot { position: absolute; left: 0; top: 0; width: 460px; height: 460px; margin: -230px 0 0 -230px; border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(circle, rgba(56,150,240,.20), rgba(56,150,240,0) 70%); z-index: 1; }
+    /* hero 角色图：克制的漂浮 + 滚动视差（呼应「角色图漂浮区」方向，不喧宾夺主） */
+    .hero-mascot { position: absolute; right: 6%; bottom: 4%; width: 132px; z-index: 1; pointer-events: none; will-change: transform; }
+    .hero-mascot-img { width: 100%; height: auto; opacity: .92; filter: drop-shadow(0 12px 28px rgba(15,23,42,.16)); animation: heroFloat 6s ease-in-out infinite; }
+    @keyframes heroFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
     @media (max-width: 720px) {
       .series-head { flex-direction: column; align-items: flex-start; gap: 4px; }
@@ -56,7 +64,8 @@
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; }
       .marquee-track { animation: none; }
-      .hero-spot { display: none; }
+      .hero-mascot-img { animation: none; }
+      .hero-mascot { display: none; }
     }
   </style>
 </head>
@@ -85,7 +94,7 @@
     <section class="hero">
       <div class="hero-grid"></div>
       <div class="hero-glow"></div>
-      <div class="hero-spot" aria-hidden="true"></div>
+      <div class="hero-mascot" aria-hidden="true"><img class="hero-mascot-img" src="/assets/rcj-mascot.png?v=20260814r1" alt="" /></div>
       <div class="container hero-inner">
         <p class="eyebrow">RCJ LAB · Independent AI Product Studio</p>
         <h1>把想法，<br />做成顺手的小工具</h1>
@@ -114,17 +123,26 @@
             <span class="series-sub">训练人与世界连接的表达工具</span>
           </div>
           <div class="mini-list">
-            <a class="mini-item" href="/solospeak/">
-              <span class="mini-name">SoloSpeak</span>
-              <span class="mini-desc">一个人也敢开口，录完自己听</span>
+            <a class="mini-item" data-color="speak" href="/solospeak/">
+              <img class="mini-img" src="/assets/roles/solospeak.thumb.png?v=20260814r1" alt="SoloSpeak" loading="lazy" />
+              <span class="mini-text">
+                <span class="mini-name">SoloSpeak</span>
+                <span class="mini-desc">一个人也敢开口，录完自己听</span>
+              </span>
             </a>
-            <a class="mini-item" href="/letout/">
-              <span class="mini-name">LetOut</span>
-              <span class="mini-desc">把情绪说出来，而不是憋着</span>
+            <a class="mini-item" data-color="emotion" href="/letout/">
+              <img class="mini-img" src="/assets/roles/letout.thumb.png?v=20260814r1" alt="LetOut" loading="lazy" />
+              <span class="mini-text">
+                <span class="mini-name">LetOut</span>
+                <span class="mini-desc">把情绪说出来，而不是憋着</span>
+              </span>
             </a>
-            <a class="mini-item" href="https://facetalk.955827.xyz" target="_blank" rel="noopener">
-              <span class="mini-name">FaceTalk <span class="ext">↗</span></span>
-              <span class="mini-desc">面试搭子匹配筛选助手</span>
+            <a class="mini-item" data-color="connect" href="https://facetalk.955827.xyz" target="_blank" rel="noopener">
+              <img class="mini-img" src="/assets/roles/facetalk.thumb.png?v=20260814r1" alt="FaceTalk" loading="lazy" />
+              <span class="mini-text">
+                <span class="mini-name">FaceTalk <span class="ext">↗</span></span>
+                <span class="mini-desc">面试搭子匹配筛选助手</span>
+              </span>
             </a>
           </div>
         </div>
@@ -136,7 +154,6 @@
             <span class="series-sub">职业考试智能训练系统</span>
           </div>
           <a class="exam-entry reveal" data-magnetic="0.28" href="https://exam.955827.xyz" target="_blank" rel="noopener">
-            <img class="exam-img" src="/assets/roles/exam.png" alt="Exam Hub" loading="lazy" />
             <span class="exam-body">
               <h3>RCJ Exam Hub</h3>
               <p>职业考试智能训练系统</p>
@@ -167,70 +184,37 @@
 <script src="/assets/vendor/gsap.min.js?v=20260814"></script>
 <script src="/assets/vendor/ScrollTrigger.min.js?v=20260814"></script>
 <script src="/assets/vendor/SplitText.min.js?v=20260814"></script>
+<script src="/assets/rcj-motion.js?v=20260814r1"></script>
 <script>
 (function(){
   function showAll(){ [].forEach.call(document.querySelectorAll('.reveal'), function(e){ e.classList.add('visible'); }); }
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduce || !window.gsap || !window.ScrollTrigger) { showAll(); return; }
-  gsap.registerPlugin(ScrollTrigger, SplitText);
-
-  /* ============ Layer 1 · 优雅出现 ============ */
-  // Hero 标题：逐行遮罩上浮（告别生硬淡入）
-  var h1 = document.querySelector('.hero-inner h1');
-  if (h1 && window.SplitText) {
-    var split = new SplitText(h1, { type: 'lines', mask: 'lines', linesClass: 'split-line' });
-    gsap.from(split.lines, { yPercent: 118, duration: 1.05, ease: 'power4.out', stagger: 0.12, delay: 0.25 });
-  } else if (h1) {
-    gsap.from(h1, { y: 30, opacity: 0, duration: 0.9, ease: 'back.out(1.6)', delay: 0.22 });
+  function init(){
+    if (window.RCJMotion) {
+      var M = window.RCJMotion;
+      // Layer 1 · 优雅出现（文字遮罩上浮 + 副标题）
+      M.textReveal('.hero-inner h1', { delay: 0.25 });
+      M.entrance('.hero-inner .eyebrow', { y: 22, duration: 0.7, ease: 'power3.out', delay: 0.08 });
+      // Layer 1b · Hero 随滚动淡出（scrub：滚动条即时间线）
+      M.parallax('.hero-inner', { yPercent: -26, opacity: 0.1, trigger: '.hero' });
+      // Layer 2 · 区块 / 条目滚动浮现（位移 + 透明 + 轻微模糊）
+      M.revealOnScroll('.reveal');
+      // Layer 2b · 磁吸 + 按压（角色图缩略图 / Exam 入口）
+      M.magnetic('[data-magnetic]');
+      M.press('[data-magnetic]');
+      // Layer 3 · Hero 柔光随指针游走（引擎 spotlight）
+      M.spotlight('.hero');
+      // CTA 箭头轻晃（引擎未覆盖的一次性小动效）
+      if (window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        window.gsap.to('.exam-cta .arrow', { x: 6, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      }
+    } else {
+      showAll();
+    }
   }
-  gsap.from('.hero-inner .eyebrow', { y: 22, opacity: 0, duration: 0.7, ease: 'power3.out', delay: 0.08 });
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
 
-  // Hero 随滚动淡出（scrub：滚动条即时间线）
-  gsap.to('.hero-inner', { yPercent: -26, opacity: 0.1, ease: 'none',
-    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-
-  // 区块入场：位移 + 透明 + 轻微模糊，质感更高级
-  gsap.utils.toArray('.reveal').forEach(function(el){
-    gsap.fromTo(el, { y: 42, opacity: 0, filter: 'blur(10px)' },
-      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.95, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 86%', toggleActions: 'play none none none' } });
-  });
-
-  /* ============ Layer 2 · 微交互 ============ */
-  // 磁吸卡片：Exam 入口随指针轻微位移 + 按压回弹
-  document.querySelectorAll('[data-magnetic]').forEach(function(el){
-    var strength = parseFloat(el.getAttribute('data-magnetic')) || 0.3;
-    var xTo = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3' });
-    var yTo = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3' });
-    el.addEventListener('pointermove', function(e){
-      var r = el.getBoundingClientRect();
-      xTo((e.clientX - r.left - r.width/2) * strength);
-      yTo((e.clientY - r.top - r.height/2) * strength);
-    });
-    el.addEventListener('pointerleave', function(){ xTo(0); yTo(0); });
-    el.addEventListener('pointerdown', function(){ gsap.to(el, { scale: 0.97, duration: 0.16 }); });
-    el.addEventListener('pointerup', function(){ gsap.to(el, { scale: 1, duration: 0.28, ease: 'power2.out' }); });
-  });
-
-    /* ============ Layer 3 · 视觉亮点 ============ */
-  // Hero 柔光随指针游走，赋予首屏呼吸感
-  var hero = document.querySelector('.hero');
-  var spot = document.querySelector('.hero-spot');
-  if (hero && spot) {
-    var sx = gsap.quickTo(spot, 'x', { duration: 0.7, ease: 'power3' });
-    var sy = gsap.quickTo(spot, 'y', { duration: 0.7, ease: 'power3' });
-    hero.addEventListener('pointermove', function(e){
-      var r = hero.getBoundingClientRect();
-      sx(e.clientX - r.left); sy(e.clientY - r.top);
-    });
-    hero.addEventListener('pointerenter', function(){ gsap.to(spot, { opacity: 1, duration: 0.4 }); });
-    hero.addEventListener('pointerleave', function(){ gsap.to(spot, { opacity: 0, duration: 0.4 }); });
-  }
-
-  // CTA 箭头：持续轻晃，把注意力引向「进入」
-  gsap.to('.exam-cta .arrow', { x: 6, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-
-  /* ============ Layer 5 · 三横杠菜单（纯 class 切换，无动画冲突） ============ */
+  /* ============ 三横杠菜单（纯 class 切换，无动画冲突） ============ */
   var ham = document.querySelector('.nav-hamburger');
   var menu = document.querySelector('.nav-menu');
   if (ham && menu) {
@@ -239,7 +223,6 @@
       var open = menu.classList.toggle('open');
       ham.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
-    // 点击菜单外区域 / 点链接后关闭
     document.addEventListener('click', function(e) {
       if (!menu.contains(e.target) && !ham.contains(e.target)) {
         menu.classList.remove('open');
@@ -252,7 +235,6 @@
         ham.setAttribute('aria-expanded', 'false');
       });
     });
-    // ESC 关闭
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         menu.classList.remove('open');

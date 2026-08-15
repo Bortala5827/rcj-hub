@@ -132,9 +132,25 @@
     var saveBtn = document.getElementById('aiSettingsSave');
     var closeBtn = document.getElementById('aiSettingsClose');
     var testBtn = document.getElementById('aiTestBtn');
+    var toggleBtn = document.getElementById('aiDetailToggle');
+    var detailBody = document.getElementById('aiDetailBody');
     if (btn) btn.addEventListener('click', openSettings);
     if (closeBtn) closeBtn.addEventListener('click', closeSettings);
     ov.addEventListener('click', function (e) { if (e.target === ov) closeSettings(); });
+    // 折叠/展开详细配置
+    if (toggleBtn && detailBody) {
+      toggleBtn.addEventListener('click', function () {
+        var open = detailBody.classList.toggle('open');
+        toggleBtn.textContent = open ? '收起配置 ▴' : '展开配置 ▾';
+      });
+      // 启用 AI 时自动展开
+      document.getElementById('aiEnabled').addEventListener('change', function (e) {
+        if (e.target.checked && !detailBody.classList.contains('open')) {
+          detailBody.classList.add('open');
+          toggleBtn.textContent = '收起配置 ▴';
+        }
+      });
+    }
 
     if (saveBtn) saveBtn.addEventListener('click', function () {
       var s = {

@@ -2,3 +2,17 @@
 *.tmp
 .DS_Store
 Thumbs.db
+
+# ===== Web 自动化测试体系产物（不提交） =====
+node_modules/
+playwright-report/
+playwright/.cache/
+test-results/
+tests/screenshots/
+tests/traces/
+.lighthouseci/
+lighthouse-report/
+.network-throttle/
+# 本地开发用环境变量（含 token），勿提交
+.env
+.env.local

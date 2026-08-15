@@ -329,6 +329,12 @@ select { width: 100%; }
 .ai-panel-head { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
 .ai-panel-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
 .ai-check { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink); margin-bottom: 12px; cursor: pointer; }
+/* AI 详细配置折叠区（默认收起） */
+.ai-toggle-btn { display: block; width: 100%; padding: 8px 12px; margin-bottom: 10px; font-size: 13px; color: var(--muted); background: var(--bg-soft, #f5f4f0); border: 1px solid var(--line); border-radius: 9px; cursor: pointer; text-align: left; transition: background .15s; }
+.ai-toggle-btn:hover { background: var(--line); }
+.ai-detail-collapsed { display: none; overflow: hidden; }
+.ai-detail-collapsed.open { display: block; animation: aiSlideDown .25s ease; }
+@keyframes aiSlideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 500px; } }
 .ai-field { display: block; font-size: 12px; color: var(--muted); margin-bottom: 12px; }
 .ai-field input {
   display: block; width: 100%; margin-top: 5px; padding: 9px 11px;

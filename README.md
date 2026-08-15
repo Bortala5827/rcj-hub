@@ -39,6 +39,14 @@ RCJ Lab（个人 AI 创造实验室 · 母体品牌）
 改 `index.html` / `assets/hub.v2.css` → commit + push 到 `main` → CF Pages 自动上线。
 **改完线上 `Ctrl+F5` 硬刷**（Mac: `Cmd+Shift+R`）。
 
+## 自动化测试
+
+本仓库内置标准 Web 自动化测试体系：**Playwright（本机真实 Google Chrome）+ axe-core 无障碍 + Lighthouse CI + GitHub Actions 回归**。
+
+- 本地：`npm test`（冒烟+功能）、`npm run test:axe`（无障碍）、`npm run lighthouse`（性能/SEO）
+- CI：`push`/`PR` 到 `main` 自动跑，**只测试不部署**（不碰 CF 正式部署）
+- 完整说明见 [`TESTING.md`](./TESTING.md)
+
 ## RCJ 产品矩阵
 
 RCJ 产品生态共三类：

@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>SoloSpeak · 独声</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#6f7d5a" />
   <link rel="stylesheet" href="styles/app.css?v=20260814b" />
@@ -42,6 +43,8 @@
       <div class="ai-panel-head">🤖 AI 引导设置（自备 Key）</div>
       <div class="ai-panel-desc">Key 只存在你浏览器本地，不会上传到任何服务器。分析在你本机发起。</div>
       <label class="ai-check"><input type="checkbox" id="aiEnabled"> 启用 AI 引导</label>
+      <button class="mini-btn ai-toggle-btn" id="aiDetailToggle" type="button">展开配置 ▾</button>
+      <div class="ai-detail-collapsed" id="aiDetailBody">
       <label class="ai-field">API Base URL
         <input type="text" id="aiBaseUrl" placeholder="https://api.siliconflow.cn/v1" autocomplete="off" spellcheck="false">
       </label>
@@ -55,6 +58,7 @@
       <div class="ai-test-row">
         <button class="mini-btn" id="aiTestBtn">测试连接</button>
         <span class="ai-test-res" id="aiTestResult"></span>
+      </div>
       </div>
       <div class="ai-sep"></div>
       <div class="ai-panel-head">更多</div>
