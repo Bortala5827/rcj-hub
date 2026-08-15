@@ -57,7 +57,7 @@
     mascot.style.margin = '0';
     mascot.style.zIndex = '9999';
     mascot.style.willChange = 'transform';
-    mascot.style.animationPlayState = 'paused'; // 暂停原 heroFloat 漂浮动画
+    mascot.style.animation = 'none'; // 完全关闭原 heroFloat 漂浮动画，避免其 transform 覆盖运动
     mascot.classList.add('is-free');
 
     pos.x = 0; pos.y = 0;
@@ -137,7 +137,7 @@
       mascot.style.width = ''; mascot.style.height = '';
       mascot.style.margin = ''; mascot.style.zIndex = ''; mascot.style.willChange = '';
       mascot.style.transform = ''; mascot.style.transition = '';
-      mascot.style.animationPlayState = ''; // 恢复 heroFloat 动画
+      mascot.style.animation = ''; // 恢复 heroFloat 漂浮动画
       mascot.classList.remove('is-returning');
       state = S.IDLE;
     };
