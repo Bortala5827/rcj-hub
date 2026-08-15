@@ -46,8 +46,8 @@
   function enterFree() {
     var rect = box.getBoundingClientRect();
     baseline.left = rect.left; baseline.top = rect.top; baseline.w = rect.width; baseline.h = rect.height;
-    maxX = Math.max(0, vw() - baseline.w);
-    maxY = Math.max(0, vh() - baseline.h);
+    maxX = Math.max(0, vw() - baseline.w - baseline.left);
+    maxY = Math.max(0, vh() - baseline.h - baseline.top);
 
     // 把容器固定在当前视口位置（脱离 hero 的 absolute 布局，避免 will-change:transform 形成包含块导致坐标翻倍）
     box.style.position = 'fixed';
@@ -109,9 +109,9 @@
     pos.y += vy * dt;
 
     // 边界反弹（不穿透、不卡边、不抖动）
-    if (pos.x <= 0) { pos.x = 0; dir.x = Math.abs(dir.x); }
+    if (pos.x <= -baseline.left) { pos.x = -baseline.left; dir.x = Math.abs(dir.x); }
     else if (pos.x >= maxX) { pos.x = maxX; dir.x = -Math.abs(dir.x); }
-    if (pos.y <= 0) { pos.y = 0; dir.y = Math.abs(dir.y); }
+    if (pos.y <= -baseline.top) { pos.y = -baseline.top; dir.y = Math.abs(dir.y); }
     else if (pos.y >= maxY) { pos.y = maxY; dir.y = -Math.abs(dir.y); }
 
     box.style.transform = 'translate(' + pos.x.toFixed(2) + 'px,' + pos.y.toFixed(2) + 'px)';
@@ -193,8 +193,8 @@
   // ---- 视口变化：重算边界并夹取 ----
   window.addEventListener('resize', function () {
     if (state === S.IDLE) return;
-    maxX = Math.max(0, vw() - baseline.w);
-    maxY = Math.max(0, vh() - baseline.h);
+    maxX = Math.max(0, vw() - baseline.w - baseline.left);
+    maxY = Math.max(0, vh() - baseline.h - baseline.top);
     if (pos.x > maxX) pos.x = maxX;
     if (pos.y > maxY) pos.y = maxY;
   }, { passive: true });
