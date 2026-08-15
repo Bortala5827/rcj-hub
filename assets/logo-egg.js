@@ -1,9 +1,9 @@
 /*
- * logo-egg.js — RCJ Lab 主站 Logo 互动彩蛋（"会跑的 Logo"）
+ * logo-egg.js — RCJ Lab 主站吉祥物互动彩蛋（"会跑的 mascot"）
  *
  * 设计约束（来自需求文档）：
  *  - 原生 JS + CSS，不引入任何第三方库 / 游戏引擎 / 后端 / 数据库
- *  - 默认状态与原站完全一致；只在 .wordmark 上叠加互动能力
+ *  - 默认状态与原站完全一致；只在 .hero-mascot-img 上叠加互动能力
  *  - 移动用 transform + requestAnimationFrame，绝不改 top/left 引发布局重排
  *  - 状态机：IDLE → MOVING ⇄ RAGE → RETURNING → IDLE
  *  - 移动端用 tap（pointer/click）触发；touch-action:manipulation 关闭双击缩放
@@ -11,8 +11,8 @@
 (function () {
   'use strict';
 
-  var wm = document.querySelector('.wordmark');
-  if (!wm) return; // 页面没有 Logo，安全退出
+  var mascot = document.querySelector('.hero-mascot-img');
+  if (!mascot) return; // 页面没有吉祥物，安全退出
 
   var S = { IDLE: 'idle', MOVING: 'moving', RAGE: 'rage', RETURNING: 'returning' };
   var state = S.IDLE;
@@ -43,19 +43,22 @@
 
   // ---- 进入自由移动 ----
   function enterFree() {
-    var rect = wm.getBoundingClientRect();
+    var rect = mascot.getBoundingClientRect();
     baseline.left = rect.left; baseline.top = rect.top; baseline.w = rect.width; baseline.h = rect.height;
     maxX = Math.max(0, vw() - baseline.w);
     maxY = Math.max(0, vh() - baseline.h);
 
-    // 固定在当前视口位置（脱离 header 文档流，但不影响 header 高度）
-    wm.style.position = 'fixed';
-    wm.style.left = baseline.left + 'px';
-    wm.style.top = baseline.top + 'px';
-    wm.style.margin = '0';
-    wm.style.zIndex = '9999';
-    wm.style.willChange = 'transform';
-    wm.classList.add('is-free');
+    // 固定在当前视口位置（脱离 hero 文档流，但不影响页面布局）
+    mascot.style.position = 'fixed';
+    mascot.style.left = baseline.left + 'px';
+    mascot.style.top = baseline.top + 'px';
+    mascot.style.width = baseline.w + 'px';
+    mascot.style.height = baseline.h + 'px';
+    mascot.style.margin = '0';
+    mascot.style.zIndex = '9999';
+    mascot.style.willChange = 'transform';
+    mascot.style.animationPlayState = 'paused'; // 暂停原 heroFloat 漂浮动画
+    mascot.classList.add('is-free');
 
     pos.x = 0; pos.y = 0;
     var ang = rand(0, Math.PI * 2);
@@ -105,9 +108,9 @@
     if (pos.x <= 0) { pos.x = 0; dir.x = Math.abs(dir.x); }
     else if (pos.x >= maxX) { pos.x = maxX; dir.x = -Math.abs(dir.x); }
     if (pos.y <= 0) { pos.y = 0; dir.y = Math.abs(dir.y); }
-    else if (pos.y >= maxY) { pos.y = -Math.abs(dir.y) * 0 + maxY; dir.y = -Math.abs(dir.y); }
+    else if (pos.y >= maxY) { pos.y = maxY; dir.y = -Math.abs(dir.y); }
 
-    wm.style.transform = 'translate(' + pos.x.toFixed(2) + 'px,' + pos.y.toFixed(2) + 'px)';
+    mascot.style.transform = 'translate(' + pos.x.toFixed(2) + 'px,' + pos.y.toFixed(2) + 'px)';
 
     if (state === S.MOVING || state === S.RAGE) rafId = requestAnimationFrame(tick);
     else rafId = null;
@@ -117,26 +120,28 @@
   function returnHome() {
     if (rafId != null) { cancelAnimationFrame(rafId); rafId = null; }
     state = S.RETURNING;
-    wm.classList.remove('is-free');
-    wm.classList.add('is-returning');
+    mascot.classList.remove('is-free');
+    mascot.classList.add('is-returning');
 
-    wm.style.transition = 'none';
-    wm.style.transform = 'translate(' + pos.x.toFixed(2) + 'px,' + pos.y.toFixed(2) + 'px) scale(0.82)';
-    void wm.offsetWidth; // 强制 reflow，让下一次 transform 走过渡
-    wm.style.transition = 'transform .42s cubic-bezier(0.34,1.56,0.64,1)';
-    wm.style.transform = 'translate(0px,0px) scale(1)';
+    mascot.style.transition = 'none';
+    mascot.style.transform = 'translate(' + pos.x.toFixed(2) + 'px,' + pos.y.toFixed(2) + 'px) scale(0.82)';
+    void mascot.offsetWidth; // 强制 reflow，让下一次 transform 走过渡
+    mascot.style.transition = 'transform .42s cubic-bezier(0.34,1.56,0.64,1)';
+    mascot.style.transform = 'translate(0px,0px) scale(1)';
 
     var done = function (e) {
       if (e && e.propertyName && e.propertyName !== 'transform') return;
-      wm.removeEventListener('transitionend', done);
-      // 还原为文档流中的正常 Logo
-      wm.style.position = ''; wm.style.left = ''; wm.style.top = '';
-      wm.style.margin = ''; wm.style.zIndex = ''; wm.style.willChange = '';
-      wm.style.transform = ''; wm.style.transition = '';
-      wm.classList.remove('is-returning');
+      mascot.removeEventListener('transitionend', done);
+      // 还原为文档流中的正常 mascot
+      mascot.style.position = ''; mascot.style.left = ''; mascot.style.top = '';
+      mascot.style.width = ''; mascot.style.height = '';
+      mascot.style.margin = ''; mascot.style.zIndex = ''; mascot.style.willChange = '';
+      mascot.style.transform = ''; mascot.style.transition = '';
+      mascot.style.animationPlayState = ''; // 恢复 heroFloat 动画
+      mascot.classList.remove('is-returning');
       state = S.IDLE;
     };
-    wm.addEventListener('transitionend', done);
+    mascot.addEventListener('transitionend', done);
     // 兜底：若 transitionend 未触发（如 reduced-motion），500ms 后强制还原
     setTimeout(function () { if (state === S.RETURNING) done(); }, 520);
   }
@@ -150,7 +155,8 @@
 
   // ---- 触发：单击切换 / 双击狂暴 ----
   function onClick(e) {
-    e.preventDefault(); // 阻止 Logo 作为链接跳转（彩蛋接管点击）
+    e.preventDefault(); // 阻止默认行为（如图片拖动）
+    e.stopPropagation();
     var t = Date.now();
     if (t - lastClick < DBL_MS) {
       // 双击
@@ -189,6 +195,6 @@
     if (pos.y > maxY) pos.y = maxY;
   }, { passive: true });
 
-  // 绑定到 Logo（capture 阶段，确保在其它 document click 处理之前拦截跳转）
-  wm.addEventListener('click', onClick);
+  // 绑定到吉祥物
+  mascot.addEventListener('click', onClick);
 })();

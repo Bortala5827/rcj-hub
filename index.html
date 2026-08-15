@@ -69,11 +69,11 @@
       .hero-mascot { display: none; }
     }
 
-    /* Logo 互动彩蛋：仅叠加交互，不改变现有视觉（位置/大小/配色/字体均不动） */
-    .wordmark { -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none; cursor: pointer; transition: transform .18s ease; }
-    .wordmark:not(.is-free):not(.is-returning):hover { transform: scale(1.03); }
-    .wordmark.is-free { cursor: grab; transition: none; }
-    .wordmark.is-returning { cursor: default; transition: none; }
+    /* Mascot 互动彩蛋：仅叠加交互，不改变现有视觉（位置/大小/配色/字体均不动） */
+    .hero-mascot-img { -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none; cursor: pointer; pointer-events: auto; transition: transform .18s ease; }
+    .hero-mascot-img:not(.is-free):not(.is-returning):hover { transform: scale(1.03); }
+    .hero-mascot-img.is-free { cursor: grab; transition: none; }
+    .hero-mascot-img.is-returning { cursor: default; transition: none; }
   </style>
 </head>
 <body class="hub">
