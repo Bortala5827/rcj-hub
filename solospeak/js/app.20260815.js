@@ -3,7 +3,9 @@ import {
   putRecording, getAllRecordings, deleteRecording, setFavorite, getMeta, putMeta,
 } from './db.js';
 import { Recorder } from './recorder.js?v=20260813b';
-import { mountLiveBars, renderWave, fitCanvas, lerpHex } from './waveform.js?v=20260813a';
+import { renderWave, fitCanvas, lerpHex } from './waveform.js?v=20260813a';
+import WaveSurfer from './vendor/wavesurfer/wavesurfer.esm.js?v=20260815w';
+import RecordPlugin from './vendor/wavesurfer/record.esm.js?v=20260815w';
 import { mountPlayer } from './player.js?v=20260813a';
 import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN } from './topics.js';
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
@@ -19,6 +21,8 @@ let currentTopic = null;
 let recorder = null;
 let liveStop = null;
 let recStartTs = 0;
+let wsRecord = null; // wavesurfer 实时波形实例
+let recordPlugin = null; // wavesurfer Record plugin
 const players = new Set(); // 活跃 player，切页时销毁
 
 function fmtMMSS(sec) {
@@ -107,7 +111,7 @@ async function renderHome() {
     </div>
 
     <div class="record-zone">
-      <canvas class="wave-canvas" id="liveWave"></canvas>
+      <div class="wave-canvas" id="liveWave"></div>
       <div class="vol-meter-live"><div class="vml-fill" id="volMeterFill"></div></div>
       <div class="rec-timer" id="recTimer">00:00</div>
       <button class="rec-btn" id="recBtn" aria-label="点击开始录音">●</button>
@@ -196,26 +200,39 @@ async function renderHome() {
         else if (max >= 0.25) c = '#6f9b8a'; // 绿：中音量
         fill.style.background = c;
       };
-      await recorder.start();
+      // 用 wavesurfer Record plugin 打开麦克风并渲染实时滚动波形
+      wsRecord = WaveSurfer.create({
+        container: liveWave,
+        waveColor: '#6f9b8a',
+        progressColor: '#6f9b8a',
+        height: 72,
+        interact: false,
+        cursorWidth: 0,
+      });
+      recordPlugin = wsRecord.registerPlugin(RecordPlugin.create({
+        scrollingWaveform: true,
+        renderRecordedAudio: false,
+      }));
+      const stream = await recordPlugin.startMic({ echoCancellation: true, noiseSuppression: true });
+      // Recorder 复用 wavesurfer 已拿到的麦克风流，避免重复请求权限
+      await recorder.start(stream);
     } catch (e) {
       toast('独声需要麦克风权限');
+      if (recordPlugin) { try { recordPlugin.stopMic(); } catch (e2) {} recordPlugin = null; }
+      if (wsRecord) { try { wsRecord.destroy(); } catch (e2) {} wsRecord = null; }
       recorder = null;
       recState = 'idle';
       return;
     }
     // 启动期间用户已松开 -> 立即停
     if (recState === 'stopping') {
+      await stopWaveMic();
       await recorder.stop();
       recorder = null;
       recState = 'idle';
       return;
     }
     recState = 'recording';
-    fitCanvas(liveWave, 72);
-    // 波形随音量着色：小音量→苔绿，大音量→暖黄
-    liveStop = mountLiveBars(liveWave, recorder.analyser, {
-      colorFn: (v) => lerpHex('#6f9b8a', '#e3a857', Math.min(1, v * 1.5)),
-    });
     recBtn.classList.add('recording');
     recBtn.textContent = '■';
     recStartTs = Date.now();
@@ -231,14 +248,19 @@ async function renderHome() {
     tick();
   };
 
+  const stopWaveMic = async () => {
+    if (recordPlugin) { try { recordPlugin.stopMic(); } catch (e) {} recordPlugin = null; }
+    if (wsRecord) { try { wsRecord.destroy(); } catch (e) {} wsRecord = null; }
+  };
+
   const stopRec = async () => {
     if (recState === 'starting') { recState = 'stopping'; return; } // 等 start 完成后再停
     if (recState !== 'recording') return;
     recState = 'stopping';
-    if (liveStop) { liveStop(); liveStop = null; }
     clearTimeout(recorder._timer);
     const dur = Date.now() - recStartTs;
     const result = await recorder.stop();
+    await stopWaveMic();
     recorder = null;
     recBtn.classList.remove('recording');
     recBtn.textContent = '●';

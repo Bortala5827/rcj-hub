@@ -29,10 +29,11 @@ export class Recorder {
 
   get isRecording() { return !!this.mediaRecorder && this.mediaRecorder.state === 'recording'; }
 
-  async start() {
-    this.stream = await navigator.mediaDevices.getUserMedia({
+  async start(externalStream = null) {
+    // 支持外部传入 MediaStream（例如 wavesurfer 已打开的麦克风流），避免重复请求权限
+    this.stream = externalStream || (await navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: true, noiseSuppression: true }
-    });
+    }));
     const AC = window.AudioContext || window.webkitAudioContext;
     this.audioCtx = new AC();
     const source = this.audioCtx.createMediaStreamSource(this.stream);

@@ -1,7 +1,8 @@
 // app.js — LetOut 主逻辑（释放 / 库房 / 关于）
 import { putRelease, getAllReleases, deleteRelease } from './db.js?v=20260813a';
 import { Recorder } from './recorder.js?v=20260813b';
-import { mountLiveBars, fitCanvas } from './waveform.js?v=20260813a';
+import WaveSurfer from './vendor/wavesurfer/wavesurfer.esm.js?v=20260815w';
+import RecordPlugin from './vendor/wavesurfer/record.esm.js?v=20260815w';
 import { mountPlayer, mountAudioPlayer } from './player.js?v=20260813a';
 import { openShareCard } from './sharecard.js?v=20260813a';
 import { startGhostGuide } from './ghost-guide.js?v=20260813a';
@@ -148,7 +149,7 @@ function renderHome() {
     </div>
 
     <div class="release-zone" id="releaseZone">
-      <canvas class="wave-canvas" id="liveWave"></canvas>
+      <div class="wave-canvas" id="liveWave"></div>
       <div class="ghost-guide" id="ghostGuide">想到什么就说什么。</div>
       <div class="rec-timer" id="recTimer">00:00</div>
       <button class="rec-btn" id="recBtn" aria-label="开始释放">●</button>
@@ -239,44 +240,50 @@ function wireRecord() {
   if (ghostStop) ghostStop();
   ghostStop = startGhostGuide(document.getElementById('ghostGuide'), 3000);
 
+  let wsRecord = null, recordPlugin = null;
+
+  const stopWaveMic = async () => {
+    if (recordPlugin) { try { recordPlugin.stopMic(); } catch (e) {} recordPlugin = null; }
+    if (wsRecord) { try { wsRecord.destroy(); } catch (e) {} wsRecord = null; }
+  };
+
   const startRec = async () => {
     if (recState !== 'idle') return;
     recState = 'starting';
     try {
       recorder = new Recorder();
-      await recorder.start();
+      recorder.onLevel = setLiveLevel; // 复用 Recorder 的音量检测驱动环境光
+      // 用 wavesurfer Record plugin 打开麦克风并渲染实时滚动波形
+      wsRecord = WaveSurfer.create({
+        container: liveWave,
+        waveColor: currentEmotion.grad[0],
+        progressColor: currentEmotion.grad[1] || currentEmotion.grad[0],
+        height: 72,
+        interact: false,
+        cursorWidth: 0,
+      });
+      recordPlugin = wsRecord.registerPlugin(RecordPlugin.create({
+        scrollingWaveform: true,
+        renderRecordedAudio: false,
+      }));
+      const stream = await recordPlugin.startMic({ echoCancellation: true, noiseSuppression: true });
+      // Recorder 复用 wavesurfer 已拿到的麦克风流
+      await recorder.start(stream);
     } catch (e) {
       toast('LetOut 需要麦克风权限');
+      await stopWaveMic();
       recorder = null;
       recState = 'idle';
       return;
     }
     if (recState === 'stopping') {
       await recorder.stop();
+      await stopWaveMic();
       recorder = null;
       recState = 'idle';
       return;
     }
     recState = 'recording';
-    fitCanvas(liveWave, 72);
-    // 波形：按情绪配色渐变 + 声纹微调（抖动/律动）
-    const wcfg = Object.assign({}, currentEmotion.wave, currentVoice.mod || {});
-    liveStop = mountLiveBars(liveWave, recorder.analyser, {
-      gradient: currentEmotion.grad,
-      wobble: wcfg.wobble || 0,
-      pulse: wcfg.pulse || 0,
-      alpha: wcfg.alpha != null ? wcfg.alpha : 0.9,
-      minBarHeight: wcfg.minBarHeight || 2,
-      smoothing: wcfg.smoothing != null ? wcfg.smoothing : 0.7,
-      bloom: wcfg.bloom != null ? wcfg.bloom : 0,
-      floorGlow: currentEmotion.glow,
-      mirror: wcfg.mirror !== false,
-      mirrorAsym: wcfg.mirrorAsym || 0,
-      barWidthRatio: wcfg.barWidthRatio || 1,
-      capStyle: wcfg.capStyle || 'soft',
-      wobbleKind: wcfg.wobbleKind || 'random',
-      onLevel: setLiveLevel,
-    });
     document.documentElement.dataset.rec = '1';
     if (window.__particles) window.__particles.pause(); // 录音时暂停粒子，省电/避免小米卡顿
     recBtn.classList.add('recording');
@@ -295,13 +302,13 @@ function wireRecord() {
     if (recState === 'starting') { recState = 'stopping'; return; }
     if (recState !== 'recording') return;
     recState = 'stopping';
-    if (liveStop) { liveStop(); liveStop = null; }
     delete document.documentElement.dataset.rec;
     if (window.__particles) window.__particles.resume();
     setLiveLevel(0);
     clearTimeout(recorder._timer);
     const dur = Date.now() - recStartTs;
     const result = await recorder.stop();
+    await stopWaveMic();
     recorder = null;
     recBtn.classList.remove('recording');
     recBtn.textContent = '●';
