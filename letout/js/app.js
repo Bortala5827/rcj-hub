@@ -1,7 +1,7 @@
 // app.js — LetOut 主逻辑（释放 / 库房 / 关于）
 import { putRelease, getAllReleases, deleteRelease } from './db.js?v=20260813a';
 import { Recorder } from './recorder.js?v=20260813b';
-import { mountLiveBars, fitCanvas } from './waveform.js?v=20260813a';
+import { renderWave, fitCanvas, lerpHex, mountLiveBars } from './waveform.js?v=20260816a';
 import { mountPlayer, mountAudioPlayer } from './player.js?v=20260813a';
 import { openShareCard } from './sharecard.js?v=20260813a';
 import { startGhostGuide } from './ghost-guide.js?v=20260813a';
@@ -244,6 +244,7 @@ function wireRecord() {
     recState = 'starting';
     try {
       recorder = new Recorder();
+      recorder.onLevel = setLiveLevel; // 复用 Recorder 的音量检测驱动环境光
       await recorder.start();
     } catch (e) {
       toast('LetOut 需要麦克风权限');
@@ -252,31 +253,20 @@ function wireRecord() {
       return;
     }
     if (recState === 'stopping') {
+      if (liveStop) { liveStop(); liveStop = null; }
       await recorder.stop();
       recorder = null;
       recState = 'idle';
       return;
     }
-    recState = 'recording';
+    // 用自研频谱柱状图替代 wavesurfer 滚动波形，情绪驱动着色/抖动/呼吸
     fitCanvas(liveWave, 72);
-    // 波形：按情绪配色渐变 + 声纹微调（抖动/律动）
-    const wcfg = Object.assign({}, currentEmotion.wave, currentVoice.mod || {});
     liveStop = mountLiveBars(liveWave, recorder.analyser, {
       gradient: currentEmotion.grad,
-      wobble: wcfg.wobble || 0,
-      pulse: wcfg.pulse || 0,
-      alpha: wcfg.alpha != null ? wcfg.alpha : 0.9,
-      minBarHeight: wcfg.minBarHeight || 2,
-      smoothing: wcfg.smoothing != null ? wcfg.smoothing : 0.7,
-      bloom: wcfg.bloom != null ? wcfg.bloom : 0,
-      floorGlow: currentEmotion.glow,
-      mirror: wcfg.mirror !== false,
-      mirrorAsym: wcfg.mirrorAsym || 0,
-      barWidthRatio: wcfg.barWidthRatio || 1,
-      capStyle: wcfg.capStyle || 'soft',
-      wobbleKind: wcfg.wobbleKind || 'random',
-      onLevel: setLiveLevel,
+      ...currentEmotion.wave,
+      ...currentVoice.mod,
     });
+    recState = 'recording';
     document.documentElement.dataset.rec = '1';
     if (window.__particles) window.__particles.pause(); // 录音时暂停粒子，省电/避免小米卡顿
     recBtn.classList.add('recording');
@@ -295,10 +285,10 @@ function wireRecord() {
     if (recState === 'starting') { recState = 'stopping'; return; }
     if (recState !== 'recording') return;
     recState = 'stopping';
-    if (liveStop) { liveStop(); liveStop = null; }
     delete document.documentElement.dataset.rec;
     if (window.__particles) window.__particles.resume();
     setLiveLevel(0);
+    if (liveStop) { liveStop(); liveStop = null; }
     clearTimeout(recorder._timer);
     const dur = Date.now() - recStartTs;
     const result = await recorder.stop();
