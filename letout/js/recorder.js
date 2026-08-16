@@ -29,23 +29,16 @@ export class Recorder {
 
   get isRecording() { return !!this.mediaRecorder && this.mediaRecorder.state === 'recording'; }
 
-  async start(externalStream = null) {
-    // 支持外部传入 MediaStream（例如 wavesurfer 已打开的麦克风流），避免重复请求权限
-    this.stream = externalStream || (await navigator.mediaDevices.getUserMedia({
+  async start() {
+    this.stream = await navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: true, noiseSuppression: true }
-    }));
+    });
     const AC = window.AudioContext || window.webkitAudioContext;
     this.audioCtx = new AC();
     const source = this.audioCtx.createMediaStreamSource(this.stream);
     this.analyser = this.audioCtx.createAnalyser();
     this.analyser.fftSize = 2048;
     source.connect(this.analyser);
-    // 防御：AudioContext 可能在用户手势之外被创建为 suspended 状态，
-    // 此时 analyser 输出全 128（静默），实时频谱会变成直线。
-    // 显式 resume() 确保录音/可视化期间上下文处于 running。
-    if (this.audioCtx.state === 'suspended') {
-      try { await this.audioCtx.resume(); } catch (e) { /* ignore */ }
-    }
 
     this._frames = [];
     this._chunks = [];

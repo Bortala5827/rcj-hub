@@ -74,15 +74,7 @@
   pointer-events: none;
 }
 
-/* ---- Reveal gate ----
- * 内容默认可见；仅当 <html> 带上 .rcj-anim（JS 确认动效可用）后才预先隐藏，
- * 由引擎在滚动进入视口时揭示并打 .is-visible。
- * 无 JS / GSAP 加载失败 / prefers-reduced-motion：never 隐藏内容。 */
-.rcj-anim .reveal { opacity: 0; }
-.rcj-anim .reveal.is-visible { opacity: 1 !important; transform: none !important; filter: none !important; }
-
-/* Reduced-motion: never hide content if JS fails to run / user opts out */
+/* Reduced-motion: never hide content if JS fails to run */
 @media (prefers-reduced-motion: reduce) {
   .rcj-btn, .rcj-tile, .rcj-split-line { transform: none !important; }
-  .rcj-anim .reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
 }

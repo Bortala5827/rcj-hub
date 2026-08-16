@@ -3,7 +3,7 @@
 //   - HTML / JS / JSON / manifest：一律网络优先且不写入缓存 → 部署新版本立即生效，杜绝旧版残留
 //   - 图片 / 图标 / 字体 / 静态资源：缓存优先 → 离线可用 + 复访秒开
 // 每次发布新版本请把 CACHE 版本号 +1，并同步更新 app.js 里 sw.js 注册带的 ?v=
-const CACHE = 'solospeak-v7';
+const CACHE = 'solospeak-v8';
 const STATIC_ASSETS = [
   './assets/icon-192.png',
   './assets/icon-512.png'
@@ -42,7 +42,13 @@ self.addEventListener('fetch', (e) => {
   }
 
   // HTML / JS / JSON / 其余：网络优先，不写入缓存 → 部署立即生效
+  // 注意：失败时只能对「导航请求」回退到 index.html；
+  // 对模块脚本(.js)绝不能回退 HTML，否则浏览器报
+  // "Expected a JavaScript module script but the server responded with a MIME type of text/html"
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request).then((r) => r || caches.match('./index.html')))
+    fetch(e.request).catch(() => {
+      if (e.request.mode === 'navigate') return caches.match('./index.html');
+      return new Response('', { status: 504, statusText: 'offline' });
+    })
   );
 });

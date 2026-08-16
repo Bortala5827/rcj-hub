@@ -7,7 +7,7 @@ import { getAllTopics, putTopic, incrementTopicUsage } from './db.js';
 
 export const GREETING_JP = '今日も、あなたの声を聞かせて。';
 export const GREETING_CN = '今天，也听听自己的声音。';
-// QUOTE 已迁移至 quotes.js 的 getLanguageQuote()（语言/表达主题轮换名言）
+export const QUOTE = '“独居的人每天要说足够多的话。” —— 张朝阳';
 
 // 三级权重（合计=1）
 const LEVEL_WEIGHT = { light: 0.40, medium: 0.35, heavy: 0.25 };

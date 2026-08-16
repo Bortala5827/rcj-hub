@@ -8,8 +8,7 @@
   <meta name="description" content="RCJ9527 的个人产品实验室——用 AI + Vibe Coding 做考试学习、面试陪练与开口练习的小工具。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="/assets/hub.v2.css?v=20260814g" />
-  <link rel="stylesheet" href="/assets/rcj-motion.css?v=20260815m1" />
-  <script>document.documentElement.classList.add('rcj-anim');</script>
+  <link rel="stylesheet" href="/assets/rcj-motion.css?v=20260814r1" />
   <style>
     /* 首页层级结构：母体 → 系列 → 子项 */
     .series-block { margin-bottom: 44px; }
@@ -31,7 +30,7 @@
 
     /* 滚动进入视口逐块浮现（由 RCJMotion.revealOnScroll 接管 opacity 动画；
        clearProps 完成后不回退；无 JS 时引擎内部 showAll 设 inline opacity:1 兜底） */
-    .reveal.is-visible { opacity: 1; }
+    .reveal.visible { opacity: 1; }
 
     /* marquee 滚动带 */
     .marquee { overflow: hidden; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); padding: 14px 0; background: var(--bg-soft); }
@@ -52,20 +51,15 @@
     .mini-name .ext { color: var(--ink-3); font-weight: 600; }
     .mini-desc { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
 
-    /* hero 角色图：退到背景层作为氛围水印，不干扰文字；hover/互动时轻微浮现 */
-    .hero-mascot { position: absolute; right: 4%; bottom: 4%; width: 150px; z-index: 0; pointer-events: auto; will-change: transform; cursor: pointer; opacity: .16; transition: opacity .35s ease; }
-    .hero-mascot-img { width: 100%; height: auto; filter: drop-shadow(0 10px 24px rgba(15,23,42,.10)); animation: heroFloat 7s ease-in-out infinite; }
-    .hero-mascot:not(.is-free):not(.is-returning):hover { opacity: .46; }
-    .hero-mascot:not(.is-free):not(.is-returning):hover .hero-mascot-img { transform: scale(1.04); transition: transform .22s ease; }
-    .hero-mascot.is-free { opacity: .62; cursor: grab; z-index: 2; }
-    .hero-mascot.is-returning { opacity: .46; cursor: default; z-index: 2; }
-    @keyframes heroFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+    /* hero 角色图：克制的漂浮 + 滚动视差（呼应「角色图漂浮区」方向，不喧宾夺主） */
+    .hero-mascot { position: absolute; right: 6%; bottom: 4%; width: 132px; z-index: 1; pointer-events: none; will-change: transform; }
+    .hero-mascot-img { width: 100%; height: auto; opacity: .92; filter: drop-shadow(0 12px 28px rgba(15,23,42,.16)); animation: heroFloat 6s ease-in-out infinite; }
+    @keyframes heroFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
     @media (max-width: 720px) {
       .series-head { flex-direction: column; align-items: flex-start; gap: 4px; }
       .exam-entry { flex-direction: column; align-items: flex-start; gap: 16px; }
       .exam-img { width: 80px; height: 80px; }
-      .hero-mascot { width: 110px; right: 3%; bottom: 3%; opacity: .14; }
     }
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; }
@@ -73,7 +67,6 @@
       .hero-mascot-img { animation: none; }
       .hero-mascot { display: none; }
     }
-
   </style>
 </head>
 <body class="hub">
@@ -101,7 +94,7 @@
     <section class="hero">
       <div class="hero-grid"></div>
       <div class="hero-glow"></div>
-      <div class="hero-mascot" aria-hidden="true"><img class="hero-mascot-img" src="/assets/rcj-mascot-20260815.png?v=20260815a1" alt="" /></div>
+      <div class="hero-mascot" aria-hidden="true"><img class="hero-mascot-img" src="/assets/rcj-mascot.png?v=20260814r1" alt="" /></div>
       <div class="container hero-inner">
         <p class="eyebrow">RCJ LAB · Independent AI Product Studio</p>
         <h1>把想法，<br />做成顺手的小工具</h1>
@@ -191,11 +184,10 @@
 <script src="/assets/vendor/gsap.min.js?v=20260814"></script>
 <script src="/assets/vendor/ScrollTrigger.min.js?v=20260814"></script>
 <script src="/assets/vendor/SplitText.min.js?v=20260814"></script>
-<script src="/assets/rcj-motion.js?v=20260815m1"></script>
-<script src="/assets/logo-egg.js?v=20260815c"></script>
+<script src="/assets/rcj-motion.js?v=20260814r1"></script>
 <script>
 (function(){
-  function showAll(){ [].forEach.call(document.querySelectorAll('.reveal'), function(e){ e.classList.add('is-visible'); }); }
+  function showAll(){ [].forEach.call(document.querySelectorAll('.reveal'), function(e){ e.classList.add('visible'); }); }
   function init(){
     if (window.RCJMotion) {
       var M = window.RCJMotion;

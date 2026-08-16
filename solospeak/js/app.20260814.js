@@ -3,7 +3,7 @@ import {
   putRecording, getAllRecordings, deleteRecording, setFavorite, getMeta, putMeta,
 } from './db.js';
 import { Recorder } from './recorder.js?v=20260813b';
-import { mountLiveBars, renderWave, fitCanvas, lerpHex } from './waveform.js?v=20260813a';
+import { mountLiveBars, renderWave, fitCanvas, lerpHex, mountLiveWave } from './waveform.js?v=20260816c';
 import { mountPlayer } from './player.js?v=20260813a';
 import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN } from './topics.js';
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
@@ -18,6 +18,7 @@ let route = 'home';
 let currentTopic = null;
 let recorder = null;
 let liveStop = null;
+let liveLineStop = null;   // 左侧实时波形线（声纹波动）
 let recStartTs = 0;
 const players = new Set(); // 活跃 player，切页时销毁
 
@@ -54,6 +55,13 @@ function setRoute(r) {
 
 document.querySelectorAll('.nav-btn').forEach((b) =>
   b.addEventListener('click', () => setRoute(b.dataset.route)));
+
+// 面板内导航按钮点击后自动关闭设置面板
+document.querySelectorAll('.ai-nav-btn').forEach((b) =>
+  b.addEventListener('click', () => {
+    var ov = document.getElementById('aiSettingsOverlay');
+    if (ov) ov.classList.remove('show');
+  }));
 
 // ---------------- 今天 ----------------
 async function renderHome() {
@@ -100,7 +108,10 @@ async function renderHome() {
     </div>
 
     <div class="record-zone">
-      <canvas class="wave-canvas" id="liveWave"></canvas>
+      <div class="wave-row">
+        <canvas class="wave-canvas" id="liveWaveLine"></canvas>
+        <canvas class="wave-canvas" id="liveWave"></canvas>
+      </div>
       <div class="vol-meter-live"><div class="vml-fill" id="volMeterFill"></div></div>
       <div class="rec-timer" id="recTimer">00:00</div>
       <button class="rec-btn" id="recBtn" aria-label="点击开始录音">●</button>
@@ -170,6 +181,7 @@ async function renderHome() {
 
   const recBtn = document.getElementById('recBtn');
   const liveWave = document.getElementById('liveWave');
+    const liveWaveLine = document.getElementById('liveWaveLine');
   const timer = document.getElementById('recTimer');
 
   // 状态机：idle -> starting -> recording -> idle（防止快速点按竞态）
@@ -209,6 +221,10 @@ async function renderHome() {
     liveStop = mountLiveBars(liveWave, recorder.analyser, {
       colorFn: (v) => lerpHex('#6f9b8a', '#e3a857', Math.min(1, v * 1.5)),
     });
+      if (liveWaveLine) {
+        fitCanvas(liveWaveLine, 72);
+        liveLineStop = mountLiveWave(liveWaveLine, recorder.analyser, { color: '#6f9b8a' });
+      }
     recBtn.classList.add('recording');
     recBtn.textContent = '■';
     recStartTs = Date.now();
@@ -229,6 +245,7 @@ async function renderHome() {
     if (recState !== 'recording') return;
     recState = 'stopping';
     if (liveStop) { liveStop(); liveStop = null; }
+      if (liveLineStop) { liveLineStop(); liveLineStop = null; }
     clearTimeout(recorder._timer);
     const dur = Date.now() - recStartTs;
     const result = await recorder.stop();
@@ -488,7 +505,7 @@ function fmtFull(ts) {
 // ---------------- 启动 ----------------
 async function boot() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20260813a').catch(() => {});
+    navigator.serviceWorker.register('sw.js?v=20260814v7').catch(() => {});
   }
   await seedIfEmpty();
   await getMeta('onboarded'); // 预留
