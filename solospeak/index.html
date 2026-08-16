@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SoloSpeak · 独声</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#6f7d5a" />
+  <link rel="stylesheet" href="styles/app.css?v=20260814b" />
+</head>
+<body>
+  <div id="app">
+    <div class="series-bar">
+      <a href="https://955827.xyz/">← RCJ</a>
+      <span class="series-name">Speak Series</span>
+      <a href="https://955827.xyz/letout/">LetOut →</a>
+    </div>
+
+    <header class="topbar">
+      <div class="brand">SoloSpeak <span class="brand-sub">独声</span></div>
+      <nav class="nav">
+        <button class="nav-btn active" data-route="home">今天</button>
+        <button class="nav-gear" id="aiSettingsBtn" title="设置" aria-label="设置">⚙</button>
+      </nav>
+    </header>
+
+    <main id="view" class="view"></main>
+
+    <footer class="site-footer">
+      <p class="mother-slogan">开口，本身就是一种力量。</p>
+      <p class="foot-links">
+        <a href="https://facetalk.955827.xyz/" target="_blank" rel="noopener">FaceTalk</a>
+        <a href="https://exam.955827.xyz/" target="_blank" rel="noopener">Exam Hub</a>
+      </p>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <div id="aiSettingsOverlay" class="ai-overlay">
+    <div class="ai-panel">
+      <div class="ai-panel-head">🤖 AI 引导设置（自备 Key）</div>
+      <div class="ai-panel-desc">Key 只存在你浏览器本地，不会上传到任何服务器。分析在你本机发起。</div>
+      <label class="ai-check"><input type="checkbox" id="aiEnabled"> 启用 AI 引导</label>
+      <label class="ai-field">API Base URL
+        <input type="text" id="aiBaseUrl" placeholder="https://api.siliconflow.cn/v1" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="ai-field">API Key
+        <input type="password" id="aiApiKey" placeholder="sk-..." autocomplete="off" spellcheck="false">
+      </label>
+      <label class="ai-field">模型名
+        <input type="text" id="aiModel" placeholder="deepseek-ai/DeepSeek-V3 · Qwen/Qwen3-... · ..." autocomplete="off" spellcheck="false">
+      </label>
+      <div class="ai-tut">没有 Key？看 <a href="https://exam.955827.xyz/tutorials/api-key.html" target="_blank" rel="noopener">RCJ · 国内大模型免费 API 获取教程</a></div>
+      <div class="ai-test-row">
+        <button class="mini-btn" id="aiTestBtn">测试连接</button>
+        <span class="ai-test-res" id="aiTestResult"></span>
+      </div>
+      <div class="ai-sep"></div>
+      <div class="ai-panel-head">更多</div>
+      <button class="nav-btn ai-nav-btn" data-route="log">📋 声音日志</button>
+      <button class="nav-btn ai-nav-btn" data-route="export">📦 导出</button>
+      <button class="nav-btn ai-nav-btn" data-route="about">ℹ️ 关于</button>
+      <div class="ai-panel-actions">
+        <button class="mini-btn" id="aiSettingsClose">取消</button>
+        <button class="big-btn ai-save" id="aiSettingsSave">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/ai-settings.js?v=20260814"></script>
+  <script type="module" src="js/app.20260815.js?v=20260816a"></script>
+</body>
+</html>

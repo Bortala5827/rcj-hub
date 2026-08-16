@@ -3,7 +3,7 @@ import {
   putRecording, getAllRecordings, deleteRecording, setFavorite, getMeta, putMeta,
 } from './db.js';
 import { Recorder } from './recorder.js?v=20260813b';
-import { renderWave, fitCanvas, lerpHex, mountLiveBars, mountLiveWave } from './waveform.js?v=20260816a';
+import { mountLiveBars, renderWave, fitCanvas, lerpHex } from './waveform.js?v=20260813a';
 import { mountPlayer } from './player.js?v=20260813a';
 import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN } from './topics.js';
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
@@ -18,7 +18,6 @@ let route = 'home';
 let currentTopic = null;
 let recorder = null;
 let liveStop = null;
-let liveLineStop = null;   // 左侧实时波形线（声纹波动）
 let recStartTs = 0;
 const players = new Set(); // 活跃 player，切页时销毁
 
@@ -55,13 +54,6 @@ function setRoute(r) {
 
 document.querySelectorAll('.nav-btn').forEach((b) =>
   b.addEventListener('click', () => setRoute(b.dataset.route)));
-
-// 面板内导航按钮点击后自动关闭设置面板
-document.querySelectorAll('.ai-nav-btn').forEach((b) =>
-  b.addEventListener('click', () => {
-    var ov = document.getElementById('aiSettingsOverlay');
-    if (ov) ov.classList.remove('show');
-  }));
 
 // ---------------- 今天 ----------------
 async function renderHome() {
@@ -108,10 +100,7 @@ async function renderHome() {
     </div>
 
     <div class="record-zone">
-      <div class="wave-row">
-        <canvas class="wave-canvas" id="liveWaveLine"></canvas>
-        <canvas class="wave-canvas" id="liveWave"></canvas>
-      </div>
+      <canvas class="wave-canvas" id="liveWave"></canvas>
       <div class="vol-meter-live"><div class="vml-fill" id="volMeterFill"></div></div>
       <div class="rec-timer" id="recTimer">00:00</div>
       <button class="rec-btn" id="recBtn" aria-label="点击开始录音">●</button>
@@ -200,21 +189,8 @@ async function renderHome() {
         else if (max >= 0.25) c = '#6f9b8a'; // 绿：中音量
         fill.style.background = c;
       };
-      // 启动录音引擎（同时创建 AudioContext + Analyser）
       await recorder.start();
-      // 用自研频谱柱状图替代 wavesurfer 滚动波形，避免 1101/直线 bug
-      fitCanvas(liveWave, 72);
-      liveStop = mountLiveBars(liveWave, recorder.analyser, {
-        colorFn: (v) => lerpHex('#6f9b8a', '#e3a857', Math.min(1, v * 1.5)),
-      });
-      // 左侧实时波形线（声纹波动）——与右侧频率柱共享同一 analyser
-      const liveWaveLine = document.getElementById('liveWaveLine');
-      if (liveWaveLine) {
-        fitCanvas(liveWaveLine, 72);
-        liveLineStop = mountLiveWave(liveWaveLine, recorder.analyser, { color: '#6f9b8a' });
-      }
     } catch (e) {
-      if (liveLineStop) { try { liveLineStop(); } catch (_) {} liveLineStop = null; }
       toast('独声需要麦克风权限');
       recorder = null;
       recState = 'idle';
@@ -222,14 +198,17 @@ async function renderHome() {
     }
     // 启动期间用户已松开 -> 立即停
     if (recState === 'stopping') {
-      if (liveStop) { liveStop(); liveStop = null; }
-      if (liveLineStop) { try { liveLineStop(); } catch (_) {} liveLineStop = null; }
       await recorder.stop();
       recorder = null;
       recState = 'idle';
       return;
     }
     recState = 'recording';
+    fitCanvas(liveWave, 72);
+    // 波形随音量着色：小音量→苔绿，大音量→暖黄
+    liveStop = mountLiveBars(liveWave, recorder.analyser, {
+      colorFn: (v) => lerpHex('#6f9b8a', '#e3a857', Math.min(1, v * 1.5)),
+    });
     recBtn.classList.add('recording');
     recBtn.textContent = '■';
     recStartTs = Date.now();
@@ -250,7 +229,6 @@ async function renderHome() {
     if (recState !== 'recording') return;
     recState = 'stopping';
     if (liveStop) { liveStop(); liveStop = null; }
-    if (liveLineStop) { try { liveLineStop(); } catch (_) {} liveLineStop = null; }
     clearTimeout(recorder._timer);
     const dur = Date.now() - recStartTs;
     const result = await recorder.stop();
@@ -510,7 +488,7 @@ function fmtFull(ts) {
 // ---------------- 启动 ----------------
 async function boot() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=20260814v7').catch(() => {});
+    navigator.serviceWorker.register('sw.js?v=20260813a').catch(() => {});
   }
   await seedIfEmpty();
   await getMeta('onboarded'); // 预留
