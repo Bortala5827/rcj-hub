@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RCJ Motion · ③ 滚动 Scroll</title>
+<link rel="stylesheet" href="../../rcj-motion.css" />
+<style>
+  body { margin:0; font-family:system-ui,-apple-system,"PingFang SC",sans-serif; background:var(--bg-soft); color:var(--ink); }
+  .banner { height: 46vh; min-height: 240px; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(120deg, var(--accent), #7c3aed); color:#fff; overflow:hidden; }
+  .banner h2 { font-size: clamp(24px,4vw,40px); font-weight:800; will-change: transform; }
+  .spacer { height: 22vh; }
+</style>
+</head>
+<body>
+<div class="rcj-stage" style="padding-bottom:0;">
+  <h1 class="rcj-h1">③ 滚动 Scroll</h1>
+  <p class="rcj-sub">滚动进入视口时揭示（y + opacity + blur(10px) → 清晰），ScrollTrigger 单次触发；横幅做 scrub 视差。基于 RCJ Hub 区块揭示与首屏视差。</p>
+</div>
+
+<div class="banner"><h2 id="bannerText">向下滚动 ↓</h2></div>
+<div class="spacer"></div>
+
+<div class="rcj-stage" style="padding-top:0;">
+  <div class="rcj-card" data-reveal><h2 class="rcj-title">知识能力</h2><p class="rcj-text">Exam 系列把真题讲透，结构化框架让答案一眼清晰。</p></div>
+  <div class="rcj-card" data-reveal><h2 class="rcj-title">表达能力</h2><p class="rcj-text">Speak 系列训练你与世界连接的表达，录下来回听才长进。</p></div>
+  <div class="rcj-card" data-reveal><h2 class="rcj-title">身体能力</h2><p class="rcj-text">Train 模块把体能训练嵌进职业考试通过率的闭环。</p></div>
+  <div class="rcj-card" data-reveal><h2 class="rcj-title">长期资产</h2><p class="rcj-text">RCJ Lab 把每次创造沉淀为可复用资产，而非发布即丢弃。</p></div>
+  <p class="rcj-note">滚动到底再向上，揭示只播一次（once:true）；视差随滚动连续联动。</p>
+</div>
+
+<script src="../../vendor/gsap.min.js"></script>
+<script src="../../vendor/ScrollTrigger.min.js"></script>
+<script src="../../vendor/SplitText.min.js"></script>
+<script src="../../rcj-motion.js"></script>
+<script>
+  RCJMotion.ready(function () {
+    RCJMotion.revealOnScroll('[data-reveal]', { y: 48, blur: 10, start: 'top 85%' });
+    RCJMotion.parallax('#bannerText', { yPercent: -40, opacity: 0.2 });
+  });
+</script>
+</body>
+</html>

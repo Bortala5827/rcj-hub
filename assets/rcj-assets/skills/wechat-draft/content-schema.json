@@ -1,0 +1,28 @@
+{
+  "_comment": "公众号推文内容数据（meta.json）——省 token 架构（Trae 教训）：AI 只生成这个 JSON，build.js 渲染 HTML，capture 用 rcj-screenshots。输出约定：内容存 wechat-xhs-content/。",
+  "title": "一个人用 Playwright 给 4 个产品做体检，踩了 10 个坑",
+  "author": "RCJ9527",
+  "summary": "做了几个月产品，第一次写自动化测试。给 4 个线上产品做了一次产品体检，顺便踩了 10 个坑。",
+  "cover": { "src": "wechat-xhs-content/wechat-cover.png", "note": "PNG 900×383 无水印，后台手动上传" },
+  "sections": [
+    {
+      "heading": "为什么要做自动化测试",
+      "paragraphs": [
+        "做了几个月产品，从来没写过自动化测试。每次改完代码，手动打开浏览器看一眼——嗯，没坏，上线吧。",
+        "直到产品越做越多，改完一个，其他三个也可能受影响。"
+      ],
+      "list": ["RCJ Hub（955827.xyz）——产品总览站", "SoloSpeak（955827.xyz/solospeak）——独声练习", "LetOut（955827.xyz/letout）——情绪出口", "FaceTalk（facetalk.955827.xyz）——面试搭子"]
+    },
+    {
+      "heading": "坑 1：浏览器下载失败",
+      "paragraphs": ["装 Playwright 的时候，浏览器下载卡了一下午。最后发现是网络问题，换镜像源才装上。"],
+      "screenshot": { "src": "wechat-xhs-content/shots/solospeak.png", "desc": "SoloSpeak 页面（▲ 截图标注示例）" }
+    },
+    {
+      "heading": "教训",
+      "paragraphs": ["自动化测试不是银弹，但能逼你把产品状态想清楚。"],
+      "blockquote": "直接跑 Playwright 生成内容不省 token——JSON 驱动 + AI 只做生成阶段更优。"
+    }
+  ],
+  "out": { "html": "wechat-xhs-content/article.html", "screenshots": "wechat-xhs-content/shots" }
+}

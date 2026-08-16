@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RCJ Motion · ② 文字 Text Reveal</title>
+<link rel="stylesheet" href="../../rcj-motion.css" />
+<style>
+  body { margin:0; font-family:system-ui,-apple-system,"PingFang SC",sans-serif; background:var(--bg-soft); color:var(--ink); }
+  .big { font-size: clamp(28px, 5vw, 52px); font-weight: 800; line-height: 1.18; max-width: 720px; margin: 0; }
+</style>
+</head>
+<body>
+<div class="rcj-stage">
+  <h1 class="rcj-h1">② 文字 Text Reveal</h1>
+  <p class="rcj-sub">SplitText 按行遮罩上推揭示（yPercent:118 → 0，power4.out，stagger）。基于 RCJ Hub 首屏大标题揭示。无 SplitText 时自动降级为整体淡入。</p>
+
+  <div class="rcj-card">
+    <h2 class="big" id="headline">我们不只做几个工具，<br>而是让你一眼感到它们属于同一个世界。</h2>
+  </div>
+
+  <button class="rcj-btn" id="replay" type="button">↻ 重播揭示</button>
+  <p class="rcj-note">SplitText 已随 GSAP 免费，自托管于 vendor/，不引外部 CDN。</p>
+</div>
+
+<script src="../../vendor/gsap.min.js"></script>
+<script src="../../vendor/ScrollTrigger.min.js"></script>
+<script src="../../vendor/SplitText.min.js"></script>
+<script src="../../rcj-motion.js"></script>
+<script>
+  function play() { RCJMotion.textReveal('#headline', { stagger: 0.14 }); }
+  RCJMotion.ready(play);
+  document.getElementById('replay').addEventListener('click', play);
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RCJ Motion · ④ 交互 Interaction</title>
+<link rel="stylesheet" href="../../rcj-motion.css" />
+<style>
+  body { margin:0; font-family:system-ui,-apple-system,"PingFang SC",sans-serif; background:var(--bg-soft); color:var(--ink); }
+  .row { display:flex; gap:14px; flex-wrap:wrap; margin: 14px 0 26px; }
+</style>
+</head>
+<body>
+<div class="rcj-stage">
+  <h1 class="rcj-h1">④ 交互 Interaction</h1>
+  <p class="rcj-sub">三类指针交互：磁吸跟随（magnetic）、按压回弹（press）、容器内光斑（spotlight）。基于 RCJ Hub 磁吸按钮与光斑。减少动态效果时全部关闭。</p>
+
+  <h2 class="rcj-h2">磁吸按钮</h2>
+  <div class="row">
+    <button class="rcj-btn" id="mag1" type="button">把我吸过去 →</button>
+    <button class="rcj-btn ghost" id="mag2" type="button">弱磁吸</button>
+  </div>
+
+  <h2 class="rcj-h2">按压回弹</h2>
+  <div class="row">
+    <button class="rcj-btn" id="press1" type="button">按我</button>
+    <div class="rcj-tile" id="press2" style="cursor:pointer;">卡片也能按</div>
+  </div>
+
+  <h2 class="rcj-h2">光斑跟随（在卡片内移动指针）</h2>
+  <div class="rcj-card rcj-spotlight-host" id="spotHost" style="min-height:160px;">
+    <p class="rcj-eyebrow">Hover me</p>
+    <p class="rcj-text">指针在框内移动，柔光会跟过来。适合产品卡、CTA 区。</p>
+  </div>
+</div>
+
+<script src="../../vendor/gsap.min.js"></script>
+<script src="../../vendor/ScrollTrigger.min.js"></script>
+<script src="../../vendor/SplitText.min.js"></script>
+<script src="../../rcj-motion.js"></script>
+<script>
+  RCJMotion.ready(function () {
+    RCJMotion.magnetic('#mag1', { strength: 0.4 });
+    RCJMotion.magnetic('#mag2', { strength: 0.2 });
+    RCJMotion.press('#press1');
+    RCJMotion.press('#press2');
+    RCJMotion.spotlight('#spotHost');
+  });
+</script>
+</body>
+</html>

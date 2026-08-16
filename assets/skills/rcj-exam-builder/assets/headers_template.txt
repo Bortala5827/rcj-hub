@@ -1,0 +1,27 @@
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/*.html
+  Cache-Control: public, max-age=300
+
+/data-written.js
+  Cache-Control: public, max-age=3600, s-maxage=86400
+
+/data-interview.js
+  Cache-Control: public, max-age=3600, s-maxage=86400
+
+/config.js
+  Cache-Control: public, max-age=3600, s-maxage=86400
+
+# 图片：no-cache = 每次使用前用 ETag 向服务器校验；换图后原地覆盖同名文件即可，
+# push 后浏览器自动拉新图，无需加 ?v= 版本号，也无需强刷（Ctrl+F5）
+/*.png
+  Cache-Control: no-cache
+/*.jpg
+  Cache-Control: no-cache
+/*.jpeg
+  Cache-Control: no-cache
+/*.webp
+  Cache-Control: no-cache

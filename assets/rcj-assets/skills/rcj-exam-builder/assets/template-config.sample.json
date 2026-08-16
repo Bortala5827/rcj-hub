@@ -1,0 +1,51 @@
+{
+  "siteTitle": "辅警真题卡组",
+  "siteEmoji": "🚔",
+  "subtitle": "真实考试真题 · 笔试+面试 · 离线可用",
+  "logo": "",
+  "cover": "cover.png",
+  "themeColor": "#1e3a5f",
+  "contact": "",
+  "xianyuCode": "RCJ9527",
+  "promoTitle": "作者 · rcj9527",
+  "promoText": "本题库为开源项目，<b>双击浏览器即用、零安装</b>，离线可用、可自由修改；进阶可选 <b>Anki 记忆卡组</b> 辅助背诵。需要完整题库或私人定制，去闲鱼搜 <b>RCJ9527</b>。",
+  "rewardImage": "wechat-reward.png",
+  "rewardTitle": "打赏作者 · 支持开源",
+  "rewardDesc": "如果这个开源题库对你有帮助，请作者喝杯奶茶 ☕",
+  "footerText": "© 辅警真题卡组 · 开源离线版",
+  "timerSeconds": 180,
+  "examPreset": {
+    "label": "标准模考",
+    "single": 36,
+    "multi": 12,
+    "bool": 12,
+    "minutes": 60,
+    "typing": true,
+    "typingMinutes": 10
+  },
+  "typingText": "辅警是公安机关的重要辅助力量，承担着维护社会治安、服务人民群众的重要职责。每一位辅警都应当以高度的责任感和使命感，认真履行岗位职责，严格遵守工作纪律，做到忠诚、干净、担当，为建设平安中国贡献自己的力量。",
+  "enabledModules": {
+    "promo": true,
+    "xianyu": false,
+    "reward": false,
+    "progress": true,
+    "themeToggle": true,
+    "record": false
+  },
+  "defaultPage": "written",
+  "examType": "paper",
+  "examYear": "2024-2026",
+  "realQuestions": true,
+  "realQuestionsNote": "本站题目全部为真实考试真题，无拼凑与洗白内容。",
+  "modules": {
+    "mockExam": true,
+    "targeted": true,
+    "random": true,
+    "written": true,
+    "interview": true
+  },
+  "datasets": [
+    { "mode": "written",   "globalName": "DATA_WRITTEN",   "json": "data-written.json",   "js": "data-written.js" },
+    { "mode": "interview", "globalName": "DATA_INTERVIEW", "json": "data-interview.json", "js": "data-interview.js" }
+  ]
+}

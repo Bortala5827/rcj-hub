@@ -1,0 +1,151 @@
+{
+  "library": "RCJ Interaction Asset Library",
+  "repo": "rcj-interaction-assets",
+  "version": 1,
+  "engines": ["RCJ Voice Engine", "RCJ Motion Engine", "RCJ Particle Engine"],
+  "modules": [
+    {
+      "id": "voice-waveform",
+      "category": "voice",
+      "name": "Waveform / 声纹波形",
+      "status": "done",
+      "tech": ["Web Audio API", "Canvas"],
+      "desc": "实时频谱柱状 + 波形线 + 静态回放。对数频率映射 + A 计权，人声更突出。",
+      "usedBy": ["SoloSpeak", "FaceTalk"],
+      "path": "voice/waveform",
+      "demo": "voice/waveform/index.html"
+    },
+    {
+      "id": "voice-particles",
+      "category": "voice",
+      "name": "Voice Particles / 声纹粒子",
+      "status": "done",
+      "tech": ["Web Audio API", "AnalyserNode RMS"],
+      "desc": "麦克风声纹驱动表情/粒子实时跳动，面试前暖场用。",
+      "usedBy": ["FaceTalk"],
+      "path": "voice/voice-particles",
+      "demo": "voice/voice-particles/index.html"
+    },
+    {
+      "id": "voice-spectrum",
+      "category": "voice",
+      "name": "Spectrum / 频谱视图",
+      "status": "done",
+      "tech": ["Web Audio API", "Canvas"],
+      "desc": "复用 waveform.js 的 mountLiveBars 做频谱可视化。",
+      "usedBy": ["SoloSpeak", "FaceTalk"],
+      "path": "voice/spectrum",
+      "demo": "voice/spectrum/index.html"
+    },
+    {
+      "id": "relax-bubble-pop",
+      "category": "relax",
+      "name": "Bubble Pop / 压力泡泡",
+      "status": "planned",
+      "tech": ["Canvas", "Web Audio"],
+      "desc": "点击爆破压力泡泡，粒子+音效+数字反馈。LetOut「点击释放」核心。",
+      "usedBy": ["LetOut"],
+      "path": "relax/bubble-pop"
+    },
+    {
+      "id": "relax-shake",
+      "category": "relax",
+      "name": "Shake / 甩一甩升级版",
+      "status": "planned",
+      "tech": ["Canvas", "物理（重力/碰撞/弹性）"],
+      "desc": "压力球拖动撞击墙壁，加入重力/碰撞/弹性。参考 LittleJS 轻量引擎。",
+      "usedBy": ["LetOut"],
+      "path": "relax/shake"
+    },
+    {
+      "id": "relax-particle-burst",
+      "category": "relax",
+      "name": "Particle Burst / 粒子爆炸",
+      "status": "planned",
+      "tech": ["canvas-confetti", "Canvas"],
+      "desc": "文字/庆祝粒子炸开。适用于「我要上岸！」式情绪释放与成功反馈。",
+      "usedBy": ["LetOut", "SoloSpeak", "FaceTalk"],
+      "path": "relax/particle-burst"
+    },
+    {
+      "id": "relax-breathe",
+      "category": "relax",
+      "name": "Breathe / 呼吸圆圈",
+      "status": "planned",
+      "tech": ["CSS", "Canvas"],
+      "desc": "圆圈吸气扩大/呼气缩小，引导呼吸。适合 SoloSpeak 情绪练习。",
+      "usedBy": ["SoloSpeak"],
+      "path": "relax/breathe"
+    },
+    {
+      "id": "motion-floating-text",
+      "category": "motion",
+      "name": "Floating Text / 漂浮文字",
+      "status": "planned",
+      "tech": ["CSS", "Canvas"],
+      "desc": "情绪词漂浮/破碎动效。",
+      "usedBy": ["LetOut"],
+      "path": "motion/floating-text"
+    },
+    {
+      "id": "motion-gsap-effects",
+      "category": "motion",
+      "name": "GSAP Motion Engine / 动效引擎",
+      "status": "done",
+      "tech": ["GSAP", "ScrollTrigger", "SplitText"],
+      "desc": "RCJ 品牌动效原子库：暴露 rcj-motion.js（window.RCJMotion）6 类 API——entrance/text/scroll(reveal+parallax)/interaction(magnetic+press+spotlight)/timeline/pageWipe。自托管 vendor（gsap+ScrollTrigger+SplitText），含 reduce-motion 降级。六类效果各带独立 demo+README。",
+      "usedBy": ["SoloSpeak", "LetOut", "FaceTalk", "RCJ Hub", "Exam Hub"],
+      "path": "motion/gsap-effects",
+      "core": "motion/gsap-effects/rcj-motion.js",
+      "vendor": "motion/gsap-effects/vendor",
+      "effects": [
+        "motion/gsap-effects/effects/entrance",
+        "motion/gsap-effects/effects/text",
+        "motion/gsap-effects/effects/scroll",
+        "motion/gsap-effects/effects/interaction",
+        "motion/gsap-effects/effects/timeline",
+        "motion/gsap-effects/effects/page-transition"
+      ]
+    },
+    {
+      "id": "motion-page-transition",
+      "category": "motion",
+      "name": "Page Transition / 页面转场",
+      "status": "done",
+      "tech": ["GSAP", "CSS"],
+      "desc": "幕布擦除转场（curtain wipe），onMid 切换内容/路由。属 Motion Engine 第六类效果。",
+      "usedBy": ["RCJ Hub", "Exam Hub", "Speak Series"],
+      "path": "motion/gsap-effects/effects/page-transition"
+    },
+    {
+      "id": "particles-confetti",
+      "category": "particles",
+      "name": "Confetti / 庆祝纸屑",
+      "status": "planned",
+      "tech": ["canvas-confetti"],
+      "desc": "轻量庆祝粒子，打卡/匹配成功反馈。",
+      "usedBy": ["SoloSpeak", "FaceTalk", "RCJ Hub"],
+      "path": "particles/confetti"
+    },
+    {
+      "id": "particles-stars",
+      "category": "particles",
+      "name": "Stars / 星尘轨迹",
+      "status": "planned",
+      "tech": ["Canvas"],
+      "desc": "鼠标移动产生星光轨迹，「声音留下痕迹」。",
+      "usedBy": ["SoloSpeak", "RCJ Hub"],
+      "path": "particles/stars"
+    },
+    {
+      "id": "particles-firework",
+      "category": "particles",
+      "name": "Firework / 烟花",
+      "status": "planned",
+      "tech": ["Canvas"],
+      "desc": "庆祝烟花，里程碑反馈。",
+      "usedBy": ["RCJ Hub"],
+      "path": "particles/firework"
+    }
+  ]
+}

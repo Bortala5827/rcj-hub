@@ -1,0 +1,48 @@
+[
+  {
+    "num": 1,
+    "batch": "样例·单选题",
+    "type": "single",
+    "stem": "（示例）违法行为轻微并及时纠正，没有造成危害后果的，（）行政处罚。",
+    "options": [
+      { "letter": "A", "text": "应当从轻" },
+      { "letter": "B", "text": "应当减轻" },
+      { "letter": "C", "text": "可以从轻" },
+      { "letter": "D", "text": "不予" }
+    ],
+    "answer": "D",
+    "explanation": "示例解析：依据相关法律，不予处罚。",
+    "tags": "示例 行政处罚法",
+    "_idx": 0
+  },
+  {
+    "num": 2,
+    "batch": "样例·多选题",
+    "type": "multiple",
+    "stem": "（示例）下列属于辅警工作职责的有（）。",
+    "options": [
+      { "letter": "A", "text": "治安巡逻" },
+      { "letter": "B", "text": "独立刑事侦查" },
+      { "letter": "C", "text": "疏导交通" },
+      { "letter": "D", "text": "信息采集" }
+    ],
+    "answer": ["A", "C", "D"],
+    "explanation": "示例解析：辅警无独立刑事侦查权。",
+    "tags": "示例 职责",
+    "_idx": 1
+  },
+  {
+    "num": 3,
+    "batch": "样例·判断题",
+    "type": "judge",
+    "stem": "（示例）辅警可以独立作出行政处罚决定。",
+    "options": [
+      { "letter": "A", "text": "对" },
+      { "letter": "B", "text": "错" }
+    ],
+    "answer": "错",
+    "explanation": "示例解析：辅警无独立执法主体资格。",
+    "tags": "示例 执法资格",
+    "_idx": 2
+  }
+]

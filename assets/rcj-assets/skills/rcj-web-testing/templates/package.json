@@ -1,0 +1,28 @@
+{
+  "name": "rcj-web-testing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RCJ 标准 Web 自动化测试体系模板（Playwright + axe-core + Lighthouse CI + GitHub Actions）",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "serve": "http-server -p 4173 -c-1 .",
+    "test": "playwright test",
+    "test:smoke": "playwright test tests/smoke.spec.ts",
+    "test:axe": "playwright test tests/axe.spec.ts",
+    "test:headed": "playwright test --headed",
+    "test:live": "cross-env BASE_URL=https://YOUR_DOMAIN TEST_LIVE_ECOSYSTEM=1 playwright test",
+    "lighthouse": "node scripts/lhci-serve.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@lhci/cli": "^0.13.0",
+    "@playwright/test": "^1.48.0",
+    "cross-env": "^7.0.3",
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "proxy-agent": "^6.3.1"
+  }
+}

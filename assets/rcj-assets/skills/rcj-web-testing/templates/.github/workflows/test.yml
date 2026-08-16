@@ -1,0 +1,69 @@
+name: Web 自动化测试
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 本工作流仅做「测试 / 验收」，不部署生产环境（Cloudflare Pages 正式部署流程保持不变）。
+permissions:
+  contents: read
+
+jobs:
+  web-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Checkout
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 3. Install dependencies
+        run: npm ci
+
+      - name: 4. 安装 Playwright Chromium（CI 自带浏览器，不连本机 Chrome）
+        run: npx playwright install --with-deps chromium
+
+      - name: 5. 安装 Google Chrome（供 Lighthouse CI 使用）
+        uses: browser-actions/setup-chrome@v1
+
+      - name: 5b. 定位 Chrome 路径并注入环境变量
+        run: |
+          CHROME=$(which google-chrome-stable || which google-chrome || which chrome || echo "")
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+
+      - name: 7. Playwright Smoke + 功能测试
+        run: npx playwright test tests/smoke.spec.ts --reporter=html
+        env:
+          CI: 'true'
+
+      - name: 8. axe-core 无障碍测试
+        run: npx playwright test tests/axe.spec.ts --reporter=list
+        env:
+          CI: 'true'
+
+      - name: 9. Lighthouse CI（性能 / 无障碍 / 最佳实践 / SEO）
+        run: |
+          npx http-server -p 4200 -c-1 . > /tmp/lhci-server.log 2>&1 &
+          SRV_PID=$!
+          sleep 5
+          npx lhci autorun
+          LHCI_EXIT=$?
+          kill $SRV_PID 2>/dev/null || true
+          exit $LHCI_EXIT
+
+      - name: 10. 保存测试报告（Playwright + Lighthouse）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-test-reports
+          path: |
+            playwright-report/
+            test-results/
+            .lighthouseci/
+          retention-days: 14

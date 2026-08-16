@@ -1,0 +1,24 @@
+<!-- ===== Google Mic Recorder · HTML 片段 ===== -->
+<!-- 复制此 <section> 块到页面目标位置。ID 可按需改名，但需同步改 CSS/JS 中的选择器。 -->
+
+<section class="mic-card" id="mic-card">
+  <div class="mic-stage">
+    <!-- 三态按钮：空闲(灰) → 悬停(白底红标) → 录音中(红底+灰环) -->
+    <button class="mic-btn" id="mic-btn" aria-label="开始录音" type="button">
+      <!-- SVG 麦克风：currentColor 自动继承父元素 color -->
+      <svg class="mic-icon" id="mic-icon" width="52" height="52" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="1" width="6" height="12" rx="3"/>
+        <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+        <line x1="12" y1="17" x2="12" y2="1"/>
+      </svg>
+    </button>
+
+    <!-- 状态文案 -->
+    <p class="mic-caption" id="mic-caption">点击开始录音</p>
+
+    <!-- 计时器 -->
+    <div class="mic-timer" id="mic-timer">00:00</div>
+  </div>
+</section>

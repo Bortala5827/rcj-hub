@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RCJ Motion · ① 入场 Entrance</title>
+<link rel="stylesheet" href="../../rcj-motion.css" />
+<style>
+  body { margin:0; font-family:system-ui,-apple-system,"PingFang SC",sans-serif; background:var(--bg-soft); color:var(--ink); }
+</style>
+</head>
+<body>
+<div class="rcj-stage">
+  <h1 class="rcj-h1">① 入场 Entrance</h1>
+  <p class="rcj-sub">淡入 + 轻微上浮 + 可选缩放，back.out 缓动，支持 stagger 错落。基于 RCJ Hub 首屏标题/eyebrow 入场。</p>
+
+  <div id="group">
+    <div class="rcj-card">
+      <p class="rcj-eyebrow">STEP 01</p>
+      <h2 class="rcj-title">先松松手</h2>
+      <p class="rcj-text">对着声纹随便说几句，把紧张先抖出去。</p>
+    </div>
+    <div class="rcj-card">
+      <p class="rcj-eyebrow">STEP 02</p>
+      <h2 class="rcj-title">再开口练</h2>
+      <p class="rcj-text">用结构化框架把一道题讲清楚，录下来回听。</p>
+    </div>
+    <div class="rcj-card">
+      <p class="rcj-eyebrow">STEP 03</p>
+      <h2 class="rcj-title">合得来再组队</h2>
+      <p class="rcj-text">60 秒试音筛选，找到同频的面试搭子。</p>
+    </div>
+  </div>
+
+  <button class="rcj-btn" id="replay" type="button">↻ 重播入场</button>
+  <p class="rcj-note">提示：开启系统「减少动态效果」后，所有元素直接显示、不做动画（降级保护）。</p>
+</div>
+
+<script src="../../vendor/gsap.min.js"></script>
+<script src="../../vendor/ScrollTrigger.min.js"></script>
+<script src="../../vendor/SplitText.min.js"></script>
+<script src="../../rcj-motion.js"></script>
+<script>
+  function play() {
+    RCJMotion.entrance('#group .rcj-card', { y: 30, stagger: 0.12, ease: 'back.out(1.7)' });
+  }
+  RCJMotion.ready(play);
+  document.getElementById('replay').addEventListener('click', play);
+</script>
+</body>
+</html>

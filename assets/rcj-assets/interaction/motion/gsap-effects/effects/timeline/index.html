@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RCJ Motion · ⑤ 时间线 Timeline</title>
+<link rel="stylesheet" href="../../rcj-motion.css" />
+<style>
+  body { margin:0; font-family:system-ui,-apple-system,"PingFang SC",sans-serif; background:var(--bg-soft); color:var(--ink); }
+  .hero { max-width:680px; margin: 8vh auto; padding: 0 16px; }
+</style>
+</head>
+<body>
+<div class="rcj-stage" style="padding-bottom:0;">
+  <h1 class="rcj-h1">⑤ 时间线 Timeline</h1>
+  <p class="rcj-sub">用一条时间线把多个元素按顺序编排（eyebrow → 标题 → 副文 → CTA），统一错落节奏。基于 RCJ Hub 首屏入场链。</p>
+</div>
+
+<div class="hero">
+  <p class="rcj-eyebrow" id="t-eyebrow">RCJ LAB · 个人产品实验室</p>
+  <h1 class="rcj-title" id="t-title" style="font-size:30px;">把创造沉淀为资产</h1>
+  <p class="rcj-text" id="t-sub">做功能 → 沉淀资产 → 建立方法 → 下一次直接调用。</p>
+  <button class="rcj-btn" id="t-cta" type="button">开始探索 →</button>
+</div>
+
+<button class="rcj-btn" id="replay" type="button" style="display:block;margin:0 auto 60px;">↻ 重播时间线</button>
+
+<script src="../../vendor/gsap.min.js"></script>
+<script src="../../vendor/ScrollTrigger.min.js"></script>
+<script src="../../vendor/SplitText.min.js"></script>
+<script src="../../rcj-motion.js"></script>
+<script>
+  var map = { eyebrow:'#t-eyebrow', title:'#t-title', sub:'#t-sub', cta:'#t-cta' };
+  var steps = [
+    { target:'eyebrow', from:{ y:18, opacity:0 }, to:{ y:0, opacity:1 }, duration:0.6, ease:'power3.out' },
+    { target:'title',   from:{ y:30, opacity:0 }, to:{ y:0, opacity:1 }, duration:0.8, ease:'back.out(1.5)' },
+    { target:'sub',     from:{ y:24, opacity:0 }, to:{ y:0, opacity:1 }, duration:0.7, ease:'power3.out' },
+    { target:'cta',     from:{ y:20, opacity:0, scale:0.96 }, to:{ y:0, opacity:1, scale:1 }, duration:0.6, ease:'power3.out' }
+  ];
+  function play() { RCJMotion.sequence(map, { steps: steps, delay: 0.1 }); }
+  RCJMotion.ready(play);
+  document.getElementById('replay').addEventListener('click', play);
+</script>
+</body>
+</html>

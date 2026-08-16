@@ -1,0 +1,8 @@
+node_modules/
+playwright-report/
+test-results/
+tests/screenshots/
+tests/traces/
+.lighthouseci/
+lighthouse-report/
+# 保留 package-lock.json（CI 用 npm ci 需要）

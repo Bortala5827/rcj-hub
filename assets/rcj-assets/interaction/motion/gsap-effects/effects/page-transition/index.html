@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RCJ Motion · ⑥ 页面转场 Page Transition</title>
+<link rel="stylesheet" href="../../rcj-motion.css" />
+<style>
+  body { margin:0; font-family:system-ui,-apple-system,"PingFang SC",sans-serif; background:var(--bg-soft); color:var(--ink); }
+  #view { transition: none; }
+</style>
+</head>
+<body>
+<div class="rcj-stage">
+  <h1 class="rcj-h1">⑥ 页面转场 Page Transition</h1>
+  <p class="rcj-sub">幕布擦除转场（curtain wipe）：从底部覆盖 → 在完全遮罩时切换内容（onMid）→ 从顶部揭开。适合 SPA 式导航 / 区块切换。基于 RCJ「同一世界」视觉语言。</p>
+
+  <div class="rcj-card" id="view">
+    <p class="rcj-eyebrow">VIEW A</p>
+    <h2 class="rcj-title">深圳辅警 · 笔试题库</h2>
+    <p class="rcj-text">真题卡组 + 结构化答题框架，随刷随记。</p>
+  </div>
+
+  <button class="rcj-btn" id="go" type="button">切换视图 →</button>
+  <p class="rcj-note">真实项目里把路由 / 内容替换写在 <code>onMid</code> 回调中。</p>
+</div>
+
+<script src="../../vendor/gsap.min.js"></script>
+<script src="../../vendor/ScrollTrigger.min.js"></script>
+<script src="../../vendor/SplitText.min.js"></script>
+<script src="../../rcj-motion.js"></script>
+<script>
+  var views = [
+    { eyebrow:'VIEW A', title:'深圳辅警 · 笔试题库', text:'真题卡组 + 结构化答题框架，随刷随记。' },
+    { eyebrow:'VIEW B', title:'消防专项 · 体能训练', text:'把体能嵌进通过率闭环，Train 模块直接调用。' },
+    { eyebrow:'VIEW C', title:'Speak Series · 表达', text:'独处表达 / 情绪释放 / 面试连接，一套音频引擎。' }
+  ];
+  var i = 0;
+  document.getElementById('go').addEventListener('click', function () {
+    RCJMotion.pageWipe({
+      in: 0.45, out: 0.45,
+      onMid: function () {
+        i = (i + 1) % views.length;
+        var v = views[i];
+        document.querySelector('#view .rcj-eyebrow').textContent = v.eyebrow;
+        document.querySelector('#view .rcj-title').textContent = v.title;
+        document.querySelector('#view .rcj-text').textContent = v.text;
+      }
+    });
+  });
+</script>
+</body>
+</html>

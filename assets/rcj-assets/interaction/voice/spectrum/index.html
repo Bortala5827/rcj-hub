@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RCJ · voice/spectrum demo</title>
+<style>
+  :root { --accent:#7c3aed; }
+  body { margin:0; font-family:system-ui,-apple-system,"PingFang SC",sans-serif; background:#0f172a; color:#e2e8f0; padding:32px 16px; }
+  .wrap { max-width:720px; margin:0 auto; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .sub { color:#94a3b8; font-size:13px; margin:0 0 20px; }
+  .stage { background:#111827; border:1px solid #1e293b; border-radius:16px; padding:18px; }
+  canvas { width:100%; height:160px; display:block; }
+  button { margin-top:14px; border:none; background:var(--accent); color:#fff; padding:8px 16px; border-radius:999px; font-size:14px; cursor:pointer; }
+  .hint { color:#64748b; font-size:12px; margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📊 voice/spectrum</h1>
+  <p class="sub">RCJ Voice Engine · 频谱视图（复用 waveform.js 的 mountLiveBars）</p>
+  <div class="stage">
+    <canvas id="cv"></canvas>
+    <button id="mic">🎤 开麦克风</button>
+    <p class="hint" id="hint">点「开麦克风」看频谱随声纹起伏。</p>
+  </div>
+</div>
+
+<script type="module">
+  import { mountLiveBars, fitCanvas } from '../waveform/waveform.js';
+
+  const cv = document.getElementById('cv');
+  fitCanvas(cv, 160);
+  const hint = document.getElementById('hint');
+  let stop = null;
+
+  document.getElementById('mic').addEventListener('click', async () => {
+    if (stop) { stop(); stop = null; hint.textContent = '已停止。'; return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AC();
+      const src = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      src.connect(analyser);
+      stop = mountLiveBars(cv, analyser, {
+        gradient: ['#38bdf8', '#7c3aed'],
+        bars: 96,
+        capStyle: 'hard',   // 锯齿/爆发感，情绪更躁
+        bloom: 0.4,
+      });
+      hint.textContent = '正在采集 —— 说话即可。';
+    } catch (e) { hint.textContent = '麦克风权限被拒，再点一次授权 🎤'; }
+  });
+</script>
+</body>
+</html>
