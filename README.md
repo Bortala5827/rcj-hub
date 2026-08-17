@@ -63,30 +63,30 @@ RCJ 产品生态共三类：
 | --- | --- | --- |
 | RCJ Exam Hub · 综合公职真题 | https://exam.955827.xyz | rcj-exam-bank |
 | 辅警题库 · 多城市刷题 | https://fj.955827.xyz | aux-police-exam |
-| 消防员题库 | https://xf.955827.xyz | xf-firefighter-exam |
+| 消防员题库（内置 /xf） | https://exam.955827.xyz/xf | rcj-exam-bank（原 xf-firefighter-exam 已并入） |
 
 **③ Speak Series（开口表达系列）**
 
 | 产品 | 站点 | 仓库 |
 | --- | --- | --- |
-| SoloSpeak · 独声 | https://955827.xyz/solospeak | solospeak |
-| LetOut · 大声说 | https://955827.xyz/letout | letout |
+| SoloSpeak · 独声 | https://955827.xyz/solospeak | rcj-hub（子路径，无独立仓） |
+| LetOut · 大声说 | https://955827.xyz/letout | rcj-hub（子路径，无独立仓） |
 | FaceTalk · 面试搭子 | https://facetalk.955827.xyz | facetalk |
 
-> ③ 当前统一在 Speak Series 下运营；若某产品（如 FaceTalk）数据跑出独立价值，可后续拆为独立产品——但不是现在。
+> ③ 当前统一在 Speak Series 下运营；SoloSpeak / LetOut 作为 rcj-hub 子路径部署，FaceTalk 独立成仓。若某产品（如 FaceTalk）数据跑出独立价值，可后续进一步拆分——但不是现在。
 
-## 资产层（统一仓库，供上层产品复用）
+## 资产层（统一收口到 rcj-hub/assets）
 
-产品层做完就丢是浪费；能复用的一律沉淀到资产仓库，上层只「调用模块」。
+产品层做完就丢是浪费；能复用的一律沉淀到资产层，上层只「调用模块」。
 
-> **2026-08-13 合并**：原 `skills` + `rcj-media-assets` + `rcj-interaction-assets` 三仓合一为 **`rcj-assets`**（旧仓已归档不删除）。
+> **2026-08-16 二次合并**：`rcj-assets` 仓库已并入本仓库 `assets/rcj-assets/`，旧仓 `skills` / `rcj-media-assets` / `rcj-interaction-assets` 此前也已归档。资产不再有独立仓库。
 
 | 目录 | 存什么 | 被谁调用 |
 | --- | --- | --- |
-| `skills/` | AI 技能（SKILL.md）/ 音频引擎 / 题库生成器 / 工作流 | 全部项目 |
-| `media/` | 音频 MP3 素材 / 媒体处理脚本 | Speak Series |
-| `interaction/` | 声纹动画 / 解压互动 / GSAP 动效 / 粒子效果 | Speak Series、RCJ Hub |
+| `assets/rcj-assets/skills/` | AI 技能（SKILL.md）/ 音频引擎 / 题库生成器 / 工作流 | 全部项目 |
+| `assets/rcj-assets/media/` | 音频 MP3 素材 / 媒体处理脚本 | Speak Series |
+| `assets/rcj-assets/interaction/` | 声纹动画 / 解压互动 / GSAP 动效 / 粒子效果 | Speak Series、RCJ Hub |
 
-**仓库**：[`Bortala5827/rcj-assets`](https://github.com/Bortala5827/rcj-assets)
+**仓库**：[`Bortala5827/rcj-hub`](https://github.com/Bortala5827/rcj-hub)（资产位于 `assets/rcj-assets/`）
 
 资产总目录（我有什么资产，一页看全）：**[955827.xyz/assets](https://955827.xyz/assets)**
