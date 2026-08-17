@@ -52,22 +52,14 @@
     .mini-desc { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
     .mini-eyebrow { display: block; font-size: 11.5px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; margin: 10px 0 4px; }
 
-    /* hero 角色图：克制的漂浮 + 滚动视差（呼应「角色图漂浮区」方向，不喧宾夺主） */
-    .hero-mascot { position: absolute; right: 6%; bottom: 2%; width: 110px; z-index: 1; pointer-events: none; will-change: transform; }
-    .hero-mascot-img { width: 100%; height: auto; opacity: .92; filter: drop-shadow(0 12px 28px rgba(15,23,42,.16)); animation: heroFloat 6s ease-in-out infinite; }
-    @keyframes heroFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-
     @media (max-width: 720px) {
       .series-head { flex-direction: column; align-items: flex-start; gap: 4px; }
       .exam-entry { flex-direction: column; align-items: flex-start; gap: 16px; }
       .exam-img { width: 80px; height: 80px; }
-      .hero-mascot { width: 80px; bottom: 6%; right: 3%; }
     }
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; }
       .marquee-track { animation: none; }
-      .hero-mascot-img { animation: none; }
-      .hero-mascot { display: none; }
     }
   </style>
 </head>
@@ -96,7 +88,6 @@
     <section class="hero">
       <div class="hero-grid"></div>
       <div class="hero-glow"></div>
-      <div class="hero-mascot" aria-hidden="true"><img class="hero-mascot-img" src="/assets/rcj-mascot.png?v=20260817t" alt="" /></div>
       <div class="container hero-inner">
         <p class="eyebrow">RCJ LAB · Independent AI Product Studio</p>
         <h1>把想法，<br />做成顺手的小工具</h1>
@@ -161,7 +152,7 @@
               <img class="mini-img" src="/assets/roles/facetalk.thumb.png?v=20260814r1" alt="FaceTalk" loading="lazy" />
               <span class="mini-text">
                 <span class="mini-name">FaceTalk <span class="ext">↗</span></span>
-                <span class="mini-desc">匹配与筛选 · 找到合适的练习搭子</span>
+                <span class="mini-desc">通过一次真实表达，找到合适的练习搭子</span>
               </span>
             </a>
           </div>
