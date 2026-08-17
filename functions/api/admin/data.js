@@ -176,6 +176,10 @@ export async function onRequestGet({ request, env }) {
         visits: auxVisits,
         visitTrend: auxVisitTrend,
         signalMatch: auxMap.signal_match || 0,
+        // aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除；exam 站当前未绑定 D1，
+        // 辅警留言墙/信号匹配历史数据未迁移，故 wallTotal/signalMatch 暂为 0（真 0，非查询异常）。
+        deprecated: true,
+        note: 'aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除；exam 站当前未绑定 D1，辅警留言墙/信号匹配历史数据未迁移，故 wallTotal / signalMatch 暂为 0（真实状态，非统计异常）。',
       },
       analytics: { allVisits, series: analyticsSeries, bySite },
       note: '数据源：mianshi-dazi-d1（FaceTalk 互动数据）+ rcj-analytics-d1（统一浏览统计，含 site=aux 辅警站点）。aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除。',

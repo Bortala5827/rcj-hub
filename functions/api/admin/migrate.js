@@ -56,22 +56,11 @@ async function d1(env, dbId, sql, ms = 8000) {
 
 export async function onRequestGet({ request, env }) {
   if (!(await verifyAuth(request, env))) return json({ error: '未登录' }, 401);
-  if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) return json({ error: 'CF 环境变量未配置' }, 500);
-  try {
-    const rows = await d1(env, DBS.aux, "SELECT ip, day, n FROM visit_counts");
-    if (!rows.length) return json({ ok: true, migrated: 0, note: '辅警库无历史浏览数据' });
-    // 分批写入统一库（每批 200 行，避免单条 SQL 过长）
-    const BATCH = 200;
-    let done = 0;
-    for (let i = 0; i < rows.length; i += BATCH) {
-      const chunk = rows.slice(i, i + BATCH);
-      const vals = chunk.map(r => `('aux',${JSON.stringify(r.day)},${JSON.stringify(r.ip)},${Number(r.n) || 1})`).join(',');
-      await d1(env, DBS.analytics, `INSERT OR REPLACE INTO visits(site,day,ip,n) VALUES ${vals}`);
-      done += chunk.length;
-    }
-    const tot = await d1(env, DBS.analytics, "SELECT site, SUM(n) s, COUNT(DISTINCT ip) u FROM visits WHERE site='aux' GROUP BY site");
-    return json({ ok: true, migrated: done, unifiedAux: tot[0] || null });
-  } catch (e) {
-    return json({ error: '迁移失败：' + e.message }, 500);
-  }
+  // aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除，无历史数据可迁；
+  // exam 站当前未绑定 D1，迁移脚本不再执行任何 D1 查询（避免 database/undefined 报错）。
+  return json({
+    ok: true,
+    migrated: 0,
+    note: 'aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除，辅警历史浏览数据无需再迁移。',
+  });
 }
