@@ -62,8 +62,8 @@ RCJ 产品生态共三类：
 | 产品 | 站点 | 仓库 |
 | --- | --- | --- |
 | RCJ Exam Hub · 综合公职真题 | https://exam.955827.xyz | rcj-exam-bank |
-| 辅警题库 · 多城市刷题 | https://fj.955827.xyz | aux-police-exam |
-| 消防员题库（内置 /xf） | https://exam.955827.xyz/xf | rcj-exam-bank（原 xf-firefighter-exam 已并入） |
+| 辅警题库 · 多城市刷题（内置 /fj） | https://exam.955827.xyz/fj | rcj-exam-bank（原 aux-police-exam 已并入并删除） |
+| 消防员题库（内置 /xf） | https://exam.955827.xyz/xf | rcj-exam-bank（原 xf-firefighter-exam 已并入并删除） |
 
 **③ Speak Series（开口表达系列）**
 
