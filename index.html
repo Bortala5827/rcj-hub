@@ -50,6 +50,7 @@
     .mini-name { font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
     .mini-name .ext { color: var(--ink-3); font-weight: 600; }
     .mini-desc { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
+    .mini-eyebrow { display: block; font-size: 11.5px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; margin: 10px 0 4px; }
 
     /* hero 角色图：克制的漂浮 + 滚动视差（呼应「角色图漂浮区」方向，不喧宾夺主） */
     .hero-mascot { position: absolute; right: 6%; bottom: 2%; width: 110px; z-index: 1; pointer-events: none; will-change: transform; }
@@ -60,6 +61,7 @@
       .series-head { flex-direction: column; align-items: flex-start; gap: 4px; }
       .exam-entry { flex-direction: column; align-items: flex-start; gap: 16px; }
       .exam-img { width: 80px; height: 80px; }
+      .hero-mascot { width: 80px; bottom: 6%; right: 3%; }
     }
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; }
@@ -154,6 +156,7 @@
                 <span class="mini-desc">结构化面试 · 辅警真题 · 消防结构化</span>
               </span>
             </a>
+            <span class="mini-eyebrow">匹配与筛选工具</span>
             <a class="mini-item" data-color="connect" href="https://facetalk.955827.xyz" target="_blank" rel="noopener">
               <img class="mini-img" src="/assets/roles/facetalk.thumb.png?v=20260814r1" alt="FaceTalk" loading="lazy" />
               <span class="mini-text">
