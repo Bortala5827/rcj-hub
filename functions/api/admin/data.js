@@ -7,7 +7,6 @@
 
 const DBS = {
   facetalk: 'f93a89d7-ef5f-49c5-863d-5f1611e1a7f4',  // mianshi-dazi-d1 (FaceTalk)
-  aux: 'ab639fbe-39b7-4ea8-bd67-18cdaa133599',        // aux-police-exam-d1 (辅警)
   analytics: 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828',  // rcj-analytics-d1 (统一浏览统计)
 };
 
@@ -97,10 +96,10 @@ export async function onRequestGet({ request, env }) {
       d1(env, DBS.facetalk, "SELECT a, b, mode, status, created FROM pairs ORDER BY created DESC LIMIT 6"),
       // [3] facetalk: 近期 wall
       d1(env, DBS.facetalk, "SELECT name, text, created_at FROM wall ORDER BY created_at DESC LIMIT 6"),
-      // [4] aux: wall 城市 + 总数（合并）
-      d1(env, DBS.aux, "SELECT city, COUNT(*) c FROM wall GROUP BY city ORDER BY c DESC"),
-      // [5] aux: wall 总数 + signal_match（合并）
-      d1(env, DBS.aux, "SELECT 'wall' AS k, COUNT(*) c FROM wall UNION ALL SELECT 'signal_match', COUNT(*) FROM signal_match"),
+      // [4][5] 辅警库已删除（2026-08-17 并入 exam 后下线），停止对其 D1 的查询；
+      //         辅警站点浏览统计仍由 rcj-analytics-d1 的 site='aux' 承接（见下方 auxUni）。
+      Promise.resolve(null),
+      Promise.resolve(null),
       // [6] analytics: 趋势 + 汇总（合并为一次——按 site 聚合 day + total/u/d 一起算）
       d1(env, DBS.analytics, "SELECT site, day, SUM(n) s, 0 as total, 0 as u, 0 as d FROM visits GROUP BY site, day UNION ALL SELECT site, '' as day, SUM(n) as s, SUM(n) as total, COUNT(DISTINCT ip) as u, COUNT(DISTINCT day) as d FROM visits GROUP BY site ORDER BY site, day"),
     ]);
@@ -179,7 +178,7 @@ export async function onRequestGet({ request, env }) {
         signalMatch: auxMap.signal_match || 0,
       },
       analytics: { allVisits, series: analyticsSeries, bySite },
-      note: '数据源：mianshi-dazi-d1 / aux-police-exam-d1（互动数据）+ rcj-analytics-d1（统一浏览统计）。',
+      note: '数据源：mianshi-dazi-d1（FaceTalk 互动数据）+ rcj-analytics-d1（统一浏览统计，含 site=aux 辅警站点）。aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除。',
       warns: warns.length ? warns : undefined,
     };
 

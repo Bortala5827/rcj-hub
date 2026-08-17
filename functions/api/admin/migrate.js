@@ -3,7 +3,7 @@
 // 幂等：INSERT OR REPLACE，重复执行安全。仅管理员可触发。
 
 const DBS = {
-  aux: 'ab639fbe-39b7-4ea8-bd67-18cdaa133599',        // aux-police-exam-d1
+  // aux: 'ab639fbe-39b7-4ea8-bd67-18cdaa133599',  // aux-police-exam-d1 —— 已于 2026-08-17 并入 exam 后删除，本迁移脚本随之作废
   analytics: 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828',  // rcj-analytics-d1
 };
 
