@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RCJ Voice Recorder · 统一录音组件</title>
+<link rel="stylesheet" href="recorder.css" />
+<style>
+  body {
+    margin: 0; background: #111; color: #e8eaed;
+    font-family: system-ui, -apple-system, "PingFang SC", sans-serif;
+    padding: 32px 16px;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px; color: #fff; }
+  .sub { color: #9aa0a6; font-size: 13px; margin: 0 0 28px; }
+  .demo-row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .demo-card {
+    flex: 1; min-width: 300px; max-width: 480px;
+    border-radius: 12px; overflow: hidden;
+  }
+  .demo-label {
+    padding: 10px 16px; font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .08em;
+    background: rgba(255,255,255,.06); color: #9aa0a6;
+  }
+</style>
+</head>
+<body>
+<div style="max-width:960px;margin:auto">
+  <h1>🎙 RCJ Voice Recorder</h1>
+  <p class="sub">统一录音 UI · Google 风格极简 + 声纹球可视化（替代柱状波形）<br>各产品仅换色，结构完全一致。</p>
+
+  <div class="demo-row">
+    <!-- Google 默认红 -->
+    <div class="demo-card">
+      <div class="demo-label">Google 风格（默认红）</div>
+      <div class="rcj-recorder" id="rec-google"></div>
+    </div>
+
+    <!-- LetOut 暖橙 -->
+    <div class="demo-card">
+      <div class="demo-label">LetOut（暖橙）</div>
+      <div class="rcj-recorder" id="rec-letout"></div>
+    </div>
+
+    <!-- SoloSpeak 苔绿 -->
+    <div class="demo-card">
+      <div class="demo-label">SoloSpeak（苔绿）</div>
+      <div class="rcj-recorder" id="rec-solospeak"></div>
+    </div>
+  </div>
+
+  <p style="color:#5f6368;font-size:12px;margin-top:24px;text-align:center">
+    点击圆形按钮开始/停止录音 · 声纹球随声音呼吸律动 · 录音完成弹出结果
+  </p>
+</div>
+
+<script type="module">
+  import { mountRecorder } from './recorder.js';
+
+  // Google 默认
+  mountRecorder(document.getElementById('rec-google'), {
+    accent: '#ea4335',
+    hint: '请开始说话',
+    hintRecording: '正在聆听…',
+    onResult: (r) => alert(`✅ 录音完成\n时长: ${(r.durationMs / 1000).toFixed(1)}s\n大小: ${(r.blob.size / 1024).toFixed(1)}KB`),
+    onError: (m) => alert(`⚠ ${m}`),
+  });
+
+  // LetOut
+  mountRecorder(document.getElementById('rec-letout'), {
+    accent: '#e07850',
+    hint: '释放你的声音',
+    hintRecording: '正在释放…',
+    onResult: (r) => alert(`🔥 LetOut 完成\n${(r.durationMs / 1000).toFixed(1)}s`),
+    onError: (m) => console.warn('[LetOut]', m),
+  });
+
+  // SoloSpeak
+  mountRecorder(document.getElementById('rec-solospeak'), {
+    accent: '#6f9b8a',
+    hint: '点一下开始，再点一下停止',
+    hintRecording: '开口中…',
+    onResult: (r) => alert(`🎤 SoloSpeak 完成\n${(r.durationMs / 1000).toFixed(1)}s`),
+    onError: (m) => console.warn('[SoloSpeak]', m),
+  });
+</script>
+</body>
+</html>

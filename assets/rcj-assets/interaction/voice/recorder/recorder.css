@@ -1,0 +1,134 @@
+/*
+ * RCJ Voice Recorder — 统一录音 UI（Google 风格极简）
+ * 设计语言：深色底 + 提示文字 + 圆形麦克风按钮 + 声纹球可视化
+ * 各产品仅通过 CSS 变量换色/调性，结构完全统一。
+ *
+ * 用法：
+ *   <div class="rcj-recorder" data-accent="#e07850">
+ *     <span class="rcj-recorder__hint">请开始说话</span>
+ *     <button class="rcj-recorder__btn" aria-label="录音">
+ *       <svg class="rcj-recorder__mic" viewBox="0 0 24 24" width="28" height="28">
+ *         <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+ *         <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+ *       </svg>
+ *     </button>
+ *     <div class="rcj-recorder__orb"></div>
+ *     <span class="rcj-recorder__timer">00:00</span>
+ *   </div>
+ */
+
+/* ── 容器 ── */
+.rcj-recorder {
+  --rcj-accent: #ea4335;        /* 产品主色（默认 Google 红，各产品覆盖） */
+  --rcj-bg: #202124;            /* 深色底 */
+  --rcj-text: #9aa0a6;          /* 提示文字灰 */
+  --rcj-text-active: #e8eaed;   /* 录音中文字亮 */
+  --rcj-ring: rgba(255,255,255,.12); /* 按钮外圈 */
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 48px 24px;
+  min-height: 260px;
+  background: var(--rcj-bg);
+  border-radius: 16px;
+  font-family: system-ui, -apple-system, "PingFang SC", sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── 主操作区：提示文字 + 麦克风按钮（横排）── */
+.rcj-recorder__stage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 420px;
+  gap: 32px;
+}
+
+.rcj-recorder__hint {
+  color: var(--rcj-text);
+  font-size: 18px;
+  letter-spacing: .02em;
+  transition: color .3s;
+}
+
+/* ── 圆形麦克风按钮（Google 同款比例）── */
+.rcj-recorder__btn {
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: var(--rcj-accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform .2s ease, box-shadow .25s ease, background .2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18), 0 0 0 4px var(--rcj-ring);
+}
+
+.rcj-recorder__btn:hover { transform: scale(1.04); }
+.rcj-recorder__btn:active { transform: scale(.94); }
+
+.rcj-recorder__btn:focus-visible {
+  outline: 3px solid var(--rcj-accent);
+  outline-offset: 3px;
+}
+
+/* 录音中：按钮变透明环 + 内部图标变色 */
+.rcj-recorder--recording .rcj-recorder__btn {
+  background: transparent;
+  color: var(--rcj-accent);
+  box-shadow: 0 0 0 3px var(--rcj-accent),
+              0 0 calc(12px + var(--rcj-level, 0) * 40px) calc(2px + var(--rcj-level, 0) * 8px) var(--rcj-accent);
+  transform: scale(calc(1 + var(--rcj-level, 0) * .06));
+  transition: box-shadow .1s linear, transform .1s ease-out;
+}
+
+/* ── 声纹球容器（替代柱状波形）── */
+.rcj-recorder__orb {
+  width: 160px;
+  height: 160px;
+  position: relative;
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+.rcj-recorder--recording .rcj-recorder__orb { opacity: 1; }
+
+/* ── 计时器 ── */
+.rcj-recorder__timer {
+  color: var(--rcj-text);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .06em;
+  transition: color .3s;
+}
+.rcj-recorder--recording .rcj-recorder__timer {
+  color: var(--rcj-text-active);
+}
+
+/* ── 减少动态效果降级 ── */
+@media (prefers-reduced-motion: reduce) {
+  .rcj-recorder__btn,
+  .rcj-recorder--recording .rcj-recorder__btn {
+    transition: none !important;
+    transform: none !important;
+  }
+  .rcj-recorder__orb { opacity: 1 !important; }
+}
+
+/* ── 移动端适配 ── */
+@media (max-width: 480px) {
+  .rcj-recorder { padding: 32px 16px; min-height: 220px; }
+  .rcj-recorder__hint { font-size: 15px; }
+  .rcj-recorder__btn { width: 80px; height: 80px; }
+  .rcj-recorder__mic { width: 24px; height: 24px; }
+  .rcj-recorder__orb { width: 130px; height: 130px; }
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RCJ Motion · 声纹生命体 Voice Orb</title>
+<link rel="stylesheet" href="../../rcj-motion.css" />
+<style>
+  :root { --bg:#0e1116; --ink:#e8edf2; --accent:#9fb87a; --accent2:#5fb0a6; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; font-family:system-ui,-apple-system,"PingFang SC",sans-serif;
+         background: radial-gradient(120% 120% at 50% 30%, #161b22 0%, var(--bg) 70%);
+         color:var(--ink); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .rcj-stage { text-align:center; padding:32px 20px; }
+  .orb-wrap { position:relative; width:300px; height:300px; margin:0 auto; cursor:pointer;
+              -webkit-tap-highlight-color:transparent; }
+  .orb-svg { width:100%; height:100%; overflow:visible; display:block; }
+  .ring, .core { transform-box:fill-box; transform-origin:center; }
+  .ring { fill:none; }
+  .core { fill:var(--accent); }
+  .rcj-h1 { font-size:22px; margin:30px 0 8px; letter-spacing:.02em; font-weight:700; }
+  .rcj-sub { font-size:14px; color:#9aa6b2; max-width:460px; margin:0 auto; line-height:1.65; }
+  .rcj-note { margin-top:18px; font-size:12.5px; color:#6b7785; }
+  /* 降级：减少动态效果时静止展示 */
+  @media (prefers-reduced-motion: reduce) { .ring, .core { animation:none !important; } }
+</style>
+</head>
+<body>
+<div class="rcj-stage">
+  <div class="orb-wrap" id="orb" role="img" aria-label="声纹生命体，点击产生涟漪">
+    <svg class="orb-svg" viewBox="0 0 300 300">
+      <circle class="ring" id="r1" cx="150" cy="150" r="62"  stroke="#9fb87a" stroke-width="2"   opacity="0.9"/>
+      <circle class="ring" id="r2" cx="150" cy="150" r="92"  stroke="#7fae8e" stroke-width="1.5" opacity="0.6"/>
+      <circle class="ring" id="r3" cx="150" cy="150" r="122" stroke="#5fb0a6" stroke-width="1"   opacity="0.35"/>
+      <circle class="core" id="core" cx="150" cy="150" r="26"/>
+    </svg>
+  </div>
+  <h1 class="rcj-h1">声纹生命体 · Voice Orb</h1>
+  <p class="rcj-sub">呼吸式的同心声纹 + 点击涟漪，由 GSAP 时间线驱动。可作为 <b>SoloSpeak / LetOut</b> 的招牌首屏母题——「开口，本身就是一种力量」。开启系统「减少动态效果」后自动静止。</p>
+  <p class="rcj-note">提示：点击 / 触摸声纹产生涟漪。</p>
+</div>
+
+<script src="../../vendor/gsap.min.js"></script>
+<script src="../../vendor/ScrollTrigger.min.js"></script>
+<script src="../../vendor/SplitText.min.js"></script>
+<script src="../../rcj-motion.js"></script>
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!window.gsap || reduce) return; // 降级：静态展示，不报错
+
+  // 呼吸：同心环错落缩放 + 透明度脉动（无限 yoyo）
+  var breath = gsap.timeline({ repeat: -1, yoyo: true, defaults: { ease: 'sine.inOut' } });
+  breath.to('#r1', { scale: 1.12, opacity: 0.5,  duration: 2.4 }, 0)
+        .to('#r2', { scale: 1.16, opacity: 0.35, duration: 2.4 }, 0.3)
+        .to('#r3', { scale: 1.20, opacity: 0.18, duration: 2.4 }, 0.6)
+        .to('#core', { scale: 1.10, duration: 1.6 }, 0);
+
+  // 点击 / 触摸涟漪
+  var orb = document.getElementById('orb');
+  var svg = orb.querySelector('svg');
+  function ripple(e) {
+    var rect = svg.getBoundingClientRect();
+    var cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    var cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', 6);
+    c.setAttribute('fill', 'none'); c.setAttribute('stroke', '#9fb87a'); c.setAttribute('stroke-width', '2');
+    c.style.transformBox = 'fill-box'; c.style.transformOrigin = 'center';
+    svg.appendChild(c);
+    gsap.fromTo(c, { opacity: 0.9, scale: 0.2 },
+      { opacity: 0, scale: 6, duration: 1.1, ease: 'power2.out', onComplete: function () { c.remove(); } });
+  }
+  orb.addEventListener('click', ripple);
+  orb.addEventListener('touchstart', function (e) { ripple(e); }, { passive: true });
+})();
+</script>
+</body>
+</html>
