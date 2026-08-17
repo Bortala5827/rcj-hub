@@ -112,17 +112,11 @@ export async function onRequestGet({ request, env }) {
     const ftCountsRaw  = v(1); // [{k,c}, ...]
     const ftPairsRecent= v(2);
     const ftWallRecent = v(3);
-    const auxWallCity  = v(4);
-    const auxMerged    = v(5); // [{k,c}, ...]
     const uniAll       = v(6); // 合并的趋势+汇总
 
     // ── 解析 facetalk 计数 ──
     const ftCounts = {};
     (ftCountsRaw || []).forEach(r => { ftCounts[r.k] = (r.c || 0); });
-
-    // ── 解析 aux 合并计数 ──
-    const auxMap = {};
-    (auxMerged || []).forEach(r => { auxMap[r.k] = (r.c || 0); });
 
     // ── 统一浏览统计：从合并结果拆分趋势和汇总 ──
     const bySite = {};
@@ -171,15 +165,11 @@ export async function onRequestGet({ request, env }) {
         recentWall: ftWallRecent || [],
       },
       aux: {
-        wallTotal: auxMap.wall || 0,
-        wallByCity: auxWallCity || [],
         visits: auxVisits,
         visitTrend: auxVisitTrend,
-        signalMatch: auxMap.signal_match || 0,
-        // aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除；exam 站当前未绑定 D1，
-        // 辅警留言墙/信号匹配历史数据未迁移，故 wallTotal/signalMatch 暂为 0（真 0，非查询异常）。
-        deprecated: true,
-        note: 'aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除；exam 站当前未绑定 D1，辅警留言墙/信号匹配历史数据未迁移，故 wallTotal / signalMatch 暂为 0（真实状态，非统计异常）。',
+        // 辅警站点只接入浏览统计（rcj-analytics-d1 · site='aux'）。
+        // 留言墙 / 信号匹配是 FaceTalk（mianshi-dazi-d1）专属功能，辅警从未开通，故不含 wallTotal/signalMatch 字段。
+        note: '辅警站点仅接入浏览统计（rcj-analytics-d1 · site=aux）；留言墙与信号匹配为 FaceTalk 专属功能，辅警未开通，故无互动数据。',
       },
       analytics: { allVisits, series: analyticsSeries, bySite },
       note: '数据源：mianshi-dazi-d1（FaceTalk 互动数据）+ rcj-analytics-d1（统一浏览统计，含 site=aux 辅警站点）。aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除。',

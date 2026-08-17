@@ -281,7 +281,6 @@ function renderOverview(){
   const cards=[
     {cls:'ft',num:F.pairsTotal,label:'FaceTalk 匹配',sub:F.intents+' 意图 / '+F.applications+' 申请'},
     {cls:'aux',num:allVisits,label:'全站浏览量',sub:fullSeries.filter(s=>s.total>0).length+' 个站点有数据 · 辅警 '+A.visits.s},
-    {cls:'aux',num:A.wallTotal,label:'辅警留言墙',sub:A.wallTotal? (A.signalMatch+' 次信号匹配') : '历史库已下线 · 暂为 0'},
   ];
   let html='<div class="stats">';
   cards.forEach(c=>html+='<div class="stat '+c.cls+'"><div class="stat-num">'+c.num+'</div><div class="stat-label">'+c.label+'</div><div class="stat-sub">'+c.sub+'</div></div>');
@@ -310,7 +309,7 @@ function miniModuleList(){
   const d=DATA, F=d.facetalk, A=d.aux;
   const rows=[
     ['💬 FaceTalk','匹配 '+F.pairsTotal+' · 留言墙 '+F.wall+' · 举报 '+F.reports+' · 评分 '+F.ratings],
-    ['🛡️ 辅警题库','留言 '+A.wallTotal+' · 浏览 '+A.visits.s+' · 信号匹配 '+A.signalMatch],
+    ['🛡️ 辅警题库','浏览 '+A.visits.s+' · 独立访客 '+A.visits.u],
   ];
   let h='<div style="display:flex;flex-direction:column;gap:12px">';
   rows.forEach(r=>h+='<div style="display:flex;gap:10px;font-size:13px"><span>'+r[0]+'</span><span class="muted">'+r[1]+'</span></div>');
@@ -363,27 +362,13 @@ function renderFaceTalk(){
 function renderAux(){
   const A=DATA.aux;
   let html='<div class="stats">';
-  [['aux',A.wallTotal,'留言墙总数',''],
-   ['aux',A.visits.s,'浏览量','近 '+A.visits.d+' 天'],
-   ['aux',A.visits.u,'独立访客',''],
-   ['aux',A.signalMatch,'信号匹配','']].forEach(c=>html+='<div class="stat '+c[0]+'"><div class="stat-num">'+c[1]+'</div><div class="stat-label">'+c[2]+'</div>'+(c[3]?'<div class="stat-sub">'+c[3]+'</div>':'')+'</div>');
+  [['aux',A.visits.s,'浏览量','近 '+A.visits.d+' 天'],
+   ['aux',A.visits.u,'独立访客','']].forEach(c=>html+='<div class="stat '+c[0]+'"><div class="stat-num">'+c[1]+'</div><div class="stat-label">'+c[2]+'</div>'+(c[3]?'<div class="stat-sub">'+c[3]+'</div>':'')+'</div>');
   html+='</div>';
 
   html+='<div class="panel"><p class="small muted">'+esc(A.note||'')+'</p></div>';
 
   html+='<div class="panel"><h3>近 14 日浏览趋势 <span class="tag">rcj-analytics-d1</span></h3><div class="chart-wrap">'+lineChart(A.visitTrend)+'</div></div>';
-
-  html+='<div class="panel"><h3>留言墙 · 按城市 <span class="tag">wall</span></h3>';
-  if(!A.wallByCity.length) html+='<div class="empty">'+(A.note?esc(A.note):'暂无留言')+'</div>';
-  else{
-    const max=Math.max(...A.wallByCity.map(x=>x.c),1);
-    html+='<div style="margin-top:6px">';
-    A.wallByCity.slice(0,10).forEach(x=>{
-      html+='<div class="bar-row"><span class="bar-label">'+esc(x.city||'未标注')+'</span><span class="bar-track"><span class="bar-fill" style="width:'+(x.c/max*100).toFixed(1)+'%"></span></span><span class="bar-val">'+x.c+'</span></div>';
-    });
-    html+='</div>';
-  }
-  html+='</div>';
 
   document.getElementById('content').innerHTML=html;
 }
