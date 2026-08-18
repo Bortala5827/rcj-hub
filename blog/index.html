@@ -15,12 +15,26 @@
     .note-hero h1 { font-size: clamp(24px, 3.2vw, 30px); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 8px; }
     .note-hero p { font-size: 14px; color: var(--ink-3); line-height: 1.7; }
 
-    .composer { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(15,23,42,.08); margin-bottom: 28px; }
+    .composer { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(15,23,42,.08); margin-bottom: 20px; }
     .composer textarea { width: 100%; min-height: 76px; border: none; outline: none; resize: vertical; font: inherit; font-size: 15px; line-height: 1.7; color: var(--ink); background: transparent; }
     .composer .c-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
     .c-hint { font-size: 12px; color: var(--ink-4); }
+    .c-hint.warn { color: #dc2626; }
     .btn { padding: 8px 18px; font-size: 14px; font-weight: 600; border: none; border-radius: 9px; background: var(--accent); color: #fff; cursor: pointer; }
     .btn:hover { background: #1565c0; }
+
+    .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .toolbar .search { flex: 1; min-width: 180px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 14px; outline: none; background: #fff; color: var(--ink); }
+    .toolbar .search:focus { border-color: var(--accent); }
+    .btn-ghost { padding: 8px 14px; font-size: 13px; font-weight: 600; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink-2); cursor: pointer; }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .chip { padding: 5px 13px; font-size: 13px; border: 1px solid var(--line-2); border-radius: 999px; background: #fff; color: var(--ink-3); cursor: pointer; }
+    .chip:hover { color: var(--accent); border-color: var(--accent); }
+    .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .month-head { font-size: 13px; font-weight: 600; color: var(--ink-3); margin: 18px 0 10px; letter-spacing: .02em; }
 
     .note-list { display: flex; flex-direction: column; gap: 12px; }
     .note-card { position: relative; background: #fff; border: 1px solid var(--line-2); border-radius: 12px; padding: 14px 16px; }
@@ -64,6 +78,13 @@
         </div>
       </div>
 
+      <div class="toolbar">
+        <input class="search" id="search" type="search" placeholder="搜索手记内容…" oninput="onSearch(this.value)" />
+        <button class="btn-ghost" onclick="exportNotes('json')">导出 JSON</button>
+        <button class="btn-ghost" onclick="exportNotes('md')">导出 MD</button>
+      </div>
+      <div class="chips" id="chips"></div>
+
       <div class="note-list" id="list"><div class="note-loading">读取中…</div></div>
     </div>
   </main>
@@ -82,6 +103,9 @@
 
   <script>
     const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    let ALL_NOTES = [];
+    let state = { q: '', year: null };
 
     async function api(method, path, body) {
       try {
@@ -118,6 +142,61 @@
       return (sameYear ? '' : d.getFullYear() + '年') + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
     }
 
+    function fmtMonthHead(iso) {
+      const d = new Date(iso);
+      return d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月';
+    }
+
+    function noteOf(n) {
+      return '<div class="note-card">'
+        + '<button class="note-del" title="删除" data-id="' + n.id + '">×</button>'
+        + '<div class="note-time">' + esc(fmtTime(n.created_at)) + '</div>'
+        + '<div class="note-text">' + esc(n.text) + '</div>'
+        + '</div>';
+    }
+
+    function buildChips() {
+      const years = [...new Set(ALL_NOTES.map((n) => new Date(n.created_at).getFullYear()))].sort((a, b) => b - a);
+      const wrap = document.getElementById('chips');
+      const items = ['全部', ...years];
+      wrap.innerHTML = items.map((y) => {
+        const active = (y === '全部' && state.year == null) || y === state.year;
+        return '<span class="chip' + (active ? ' active' : '') + '" data-year="' + (y === '全部' ? '' : y) + '">' + y + '</span>';
+      }).join('');
+      wrap.querySelectorAll('.chip').forEach((c) => {
+        c.addEventListener('click', () => {
+          const y = c.dataset.year;
+          state.year = y === '' ? null : Number(y);
+          buildChips();
+          render();
+        });
+      });
+    }
+
+    function render() {
+      const el = document.getElementById('list');
+      const q = state.q.trim().toLowerCase();
+      let notes = ALL_NOTES;
+      if (state.year != null) notes = notes.filter((n) => new Date(n.created_at).getFullYear() === state.year);
+      if (q) notes = notes.filter((n) => (n.text || '').toLowerCase().includes(q));
+
+      if (!ALL_NOTES.length) { el.innerHTML = '<div class="note-empty">还没有手记，写第一条吧。</div>'; return; }
+      if (!notes.length) { el.innerHTML = '<div class="note-empty">没有匹配的手记。</div>'; return; }
+
+      const groups = [];
+      const map = new Map();
+      for (const n of notes) {
+        const d = new Date(n.created_at);
+        const key = d.getFullYear() + '-' + d.getMonth();
+        if (!map.has(key)) { const arr = []; map.set(key, arr); groups.push({ label: fmtMonthHead(n.created_at), arr }); }
+        map.get(key).push(n);
+      }
+      el.innerHTML = groups.map((g) => '<div class="month-head">' + esc(g.label) + '</div>' + g.arr.map(noteOf).join('')).join('');
+      el.querySelectorAll('.note-del').forEach((b) => {
+        b.addEventListener('click', () => del(b.dataset.id));
+      });
+    }
+
     async function load() {
       const el = document.getElementById('list');
       el.innerHTML = '<div class="note-loading">读取中…</div>';
@@ -126,18 +205,39 @@
         el.innerHTML = '<div class="note-empty">加载失败：' + esc((r.data && r.data.error) || '未知错误') + '</div>';
         return;
       }
-      const notes = r.data.notes || [];
-      if (!notes.length) { el.innerHTML = '<div class="note-empty">还没有手记，写第一条吧。</div>'; return; }
-      el.innerHTML = notes.map((n) =>
-        '<div class="note-card">'
-        + '<button class="note-del" title="删除" data-id="' + n.id + '">×</button>'
-        + '<div class="note-time">' + esc(fmtTime(n.created_at)) + '</div>'
-        + '<div class="note-text">' + esc(n.text) + '</div>'
-        + '</div>'
-      ).join('');
-      el.querySelectorAll('.note-del').forEach((b) => {
-        b.addEventListener('click', () => del(b.dataset.id));
-      });
+      ALL_NOTES = r.data.notes || [];
+      state.q = ''; state.year = null;
+      document.getElementById('search').value = '';
+      buildChips();
+      render();
+    }
+
+    function onSearch(v) { state.q = v || ''; render(); }
+
+    function download(filename, content, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function exportNotes(fmt) {
+      if (!ALL_NOTES.length) { alert('还没有手记可导出'); return; }
+      const stamp = new Date().toISOString().slice(0, 10);
+      if (fmt === 'json') {
+        download('创始人手记-' + stamp + '.json', JSON.stringify(ALL_NOTES, null, 2), 'application/json');
+      } else {
+        const md = ALL_NOTES.slice().reverse().map((n) => {
+          const d = new Date(n.created_at);
+          const pad = (x) => (x < 10 ? '0' + x : '' + x);
+          const ts = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+          return '## ' + ts + '\n\n' + n.text + '\n';
+        }).join('\n---\n\n');
+        download('创始人手记-' + stamp + '.md', '# 创始人手记\n\n' + md, 'text/markdown');
+      }
     }
 
     async function save() {
@@ -149,8 +249,8 @@
         if (!(await requireLogin())) return;
         r = await api('POST', '/api/notes', { text });
       }
-      if (r.ok && r.data && r.data.ok) { ta.value = ''; document.getElementById('hint').textContent = ''; load(); }
-      else { document.getElementById('hint').textContent = (r.data && r.data.error) || '保存失败'; }
+      if (r.ok && r.data && r.data.ok) { ta.value = ''; updateHint(''); load(); }
+      else { updateHint((r.data && r.data.error) || '保存失败'); }
     }
 
     async function del(id) {
@@ -164,8 +264,20 @@
       else alert((r.data && r.data.error) || '删除失败');
     }
 
+    function updateHint(text) {
+      const h = document.getElementById('hint');
+      h.textContent = text || '';
+      h.classList.toggle('warn', !!text && /上限|过长/.test(text));
+    }
+
     document.getElementById('input').addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') save();
+    });
+    document.getElementById('input').addEventListener('input', (e) => {
+      const len = e.target.value.trim().length;
+      if (len === 0) updateHint('');
+      else if (len > 5000) updateHint('已达上限 5000 字');
+      else updateHint(len + ' 字');
     });
 
     load();
