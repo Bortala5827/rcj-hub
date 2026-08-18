@@ -1,0 +1,26 @@
+{
+  "updated": "2026-08-18",
+  "experiments": [
+    {
+      "date": "2026-08-18",
+      "title": "主站信息架构升级",
+      "summary": "产品卡片增加差异化徽章与关键差异点；汉堡菜单新增 LOG 实验日志入口；底部新增收尾场景。",
+      "type": "feature",
+      "tags": ["hub", "info-arch"]
+    },
+    {
+      "date": "2026-08-18",
+      "title": "SoloSpeak IndexedDB 旧缓存报错修复",
+      "summary": "排查线上 NotFoundError 报错，确认为旧版 schema 残留；清理后控制台零错误，线上功能正常。",
+      "type": "bugfix",
+      "tags": ["solospeak", "indexeddb"]
+    },
+    {
+      "date": "2026-08-15",
+      "title": "SoloSpeak 录音引擎模块化拆分",
+      "summary": "recorder / waveform / player 拆分为独立模块，主应用通过 ES Module 导入，便于后续维护。",
+      "type": "feature",
+      "tags": ["solospeak", "refactor"]
+    }
+  ]
+}

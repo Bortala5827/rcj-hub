@@ -31,6 +31,38 @@
        clearProps 完成后不回退；无 JS 时引擎内部 showAll 设 inline opacity:1 兜底） */
     .reveal.visible { opacity: 1; }
 
+    /* ============== Closing Scene：让网站不是突然结束 ============== */
+    .closing {
+      max-width: 680px; margin: 96px auto 0; padding: 56px 24px 32px;
+      text-align: center; position: relative;
+    }
+    .closing::before {
+      content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--ink-4), transparent);
+    }
+    .closing-eyebrow {
+      font-size: 10.5px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--ink-3); margin-bottom: 18px;
+    }
+    .closing-line {
+      font-size: clamp(18px, 2.4vw, 22px); font-weight: 600;
+      letter-spacing: -0.012em; color: var(--ink); line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .closing-sub { font-size: 14px; color: var(--ink-3); line-height: 1.7; max-width: 460px; margin: 0 auto; }
+    .closing-mark {
+      margin-top: 32px; font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace;
+      font-size: 12px; letter-spacing: .14em; color: var(--ink-4);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .closing-mark .dot {
+      width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(30,136,229,.14);
+      animation: closing-pulse 2.8s ease-in-out infinite;
+    }
+    @keyframes closing-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+    @media (prefers-reduced-motion: reduce) { .closing-mark .dot { animation: none; } }
+
     /* marquee 滚动带 */
     .marquee { overflow: hidden; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); padding: 14px 0; background: var(--bg-soft); }
     .marquee-track { display: inline-flex; white-space: nowrap; animation: marquee 30s linear infinite; }
@@ -44,10 +76,26 @@
     .mini-item[data-color="speak"] { border-left-color: #6366f1; }   /* 靛蓝 · 独处表达 */
     .mini-item[data-color="emotion"] { border-left-color: #f59e0b; }  /* 琥珀 · 情绪释放 */
     .mini-item[data-color="connect"] { border-left-color: #14b8a6; }  /* 青绿 · 面试连接 */
+    .mini-item[data-color="exam"] { border-left-color: #1e88e5; }     /* 蓝 · 考试训练 */
     .mini-img { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; flex: 0 0 auto; background: var(--bg-soft); box-shadow: 0 4px 12px rgba(15,23,42,.06); will-change: transform; }
-    .mini-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .mini-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+    .mini-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
     .mini-name { font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+    /* 差异化徽章：一眼看出产品不同定位 */
+    .mini-badge {
+      font-size: 10.5px; font-weight: 700; letter-spacing: .04em;
+      padding: 2px 8px; border-radius: 999px;
+      background: var(--bg-soft); color: var(--ink-3);
+      border: 1px solid var(--line); white-space: nowrap;
+    }
+    .mini-item[data-color="speak"] .mini-badge { color: #6366f1; background: #eef0fe; border-color: #d8dcfb; }
+    .mini-item[data-color="emotion"] .mini-badge { color: #b45309; background: #fef3e2; border-color: #f7d6b1; }
+    .mini-item[data-color="connect"] .mini-badge { color: #0f766e; background: #e6f7f4; border-color: #c2ebe4; }
+    .mini-item[data-color="exam"] .mini-badge { color: #1565c0; background: #e8f1fc; border-color: #c7def6; }
     .mini-desc { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
+    /* 差异化短句：用 · 分隔的关键差异点 */
+    .mini-diff { font-size: 12.5px; color: var(--ink-3); line-height: 1.4; margin-top: 2px; }
+    .mini-diff b { color: var(--ink-2); font-weight: 600; }
     .mini-eyebrow { display: block; font-size: 11.5px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; margin: 10px 0 4px; }
 
     @media (max-width: 720px) {
@@ -73,7 +121,7 @@
         <span></span><span></span><span></span>
       </button>
       <nav class="nav-menu" aria-label="站点导航">
-        <a href="#lab">作品</a>
+        <a href="/log.html">LOG <span style="font-size:10.5px;color:var(--signal);font-weight:700;letter-spacing:.06em;margin-left:4px;">实验日志</span></a>
         <a href="/archive">档案</a>
         <a href="/principles">原则</a>
         <a href="/assets">资产库</a>
@@ -115,17 +163,25 @@
           </div>
           <div class="mini-list">
             <a class="mini-item" data-color="speak" href="/solospeak/">
-              <img class="mini-img" src="/assets/roles/solospeak.thumb.png?v=20260817a" alt="SoloSpeak" loading="lazy" />
+              <img class="mini-img" data-magnetic src="/assets/roles/solospeak.thumb.png?v=20260817a" alt="SoloSpeak" loading="lazy" />
               <span class="mini-text">
-                <span class="mini-name">SoloSpeak</span>
+                <span class="mini-head">
+                  <span class="mini-name">SoloSpeak</span>
+                  <span class="mini-badge">独处表达</span>
+                </span>
                 <span class="mini-desc">独处时的表达练习场</span>
+                <span class="mini-diff"><b>差异</b> · 录音回放 · 主题词库 · 节奏可视化</span>
               </span>
             </a>
             <a class="mini-item" data-color="emotion" href="/letout/">
-              <img class="mini-img" src="/assets/roles/letout.thumb.png?v=20260817a" alt="LetOut" loading="lazy" />
+              <img class="mini-img" data-magnetic src="/assets/roles/letout.thumb.png?v=20260817a" alt="LetOut" loading="lazy" />
               <span class="mini-text">
-                <span class="mini-name">LetOut</span>
+                <span class="mini-head">
+                  <span class="mini-name">LetOut</span>
+                  <span class="mini-badge">情绪释放</span>
+                </span>
                 <span class="mini-desc">情绪释放与记录</span>
+                <span class="mini-diff"><b>差异</b> · 私密空间 · 不被打扰 · 释放而非练习</span>
               </span>
             </a>
           </div>
@@ -139,18 +195,26 @@
           </div>
           <div class="mini-list">
             <a class="mini-item" data-color="exam" href="https://exam.955827.xyz" target="_blank" rel="noopener">
-              <img class="mini-img" src="/assets/roles/exam.thumb.png?v=20260817b" alt="Exam Hub" loading="lazy" />
+              <img class="mini-img" data-magnetic src="/assets/roles/exam.thumb.png?v=20260817b" alt="Exam Hub" loading="lazy" />
               <span class="mini-text">
-                <span class="mini-name">Exam Hub</span>
+                <span class="mini-head">
+                  <span class="mini-name">Exam Hub</span>
+                  <span class="mini-badge">考试训练</span>
+                </span>
                 <span class="mini-desc">结构化面试 · 辅警真题 · 消防结构化</span>
+                <span class="mini-diff"><b>差异</b> · 真题库 · 答题录音 · 即时复盘</span>
               </span>
             </a>
             <span class="mini-eyebrow">匹配与筛选工具</span>
             <a class="mini-item" data-color="connect" href="https://facetalk.955827.xyz" target="_blank" rel="noopener">
-              <img class="mini-img" src="/assets/roles/facetalk.thumb.png?v=20260814r1" alt="FaceTalk" loading="lazy" />
+              <img class="mini-img" data-magnetic src="/assets/roles/facetalk.thumb.png?v=20260814r1" alt="FaceTalk" loading="lazy" />
               <span class="mini-text">
-                <span class="mini-name">FaceTalk</span>
+                <span class="mini-head">
+                  <span class="mini-name">FaceTalk</span>
+                  <span class="mini-badge">面试连接</span>
+                </span>
                 <span class="mini-desc">通过一次真实表达，找到合适的练习搭子</span>
+                <span class="mini-diff"><b>差异</b> · 双向筛选 · 真实语音 · 陌生人匹配</span>
               </span>
             </a>
           </div>
@@ -161,6 +225,19 @@
       </div>
     </section>
   </main>
+
+  <!-- ============== CLOSING SCENE ============== -->
+  <section class="closing reveal" aria-label="收尾">
+    <div class="container">
+      <p class="closing-eyebrow">END OF MANIFEST</p>
+      <p class="closing-line">把想法做成顺手的小工具。<br />做到的，就摆在这里。</p>
+      <p class="closing-sub">没有路线图，没有承诺，只有正在跑的代码和正在修的 bug。<br />想看接下来在做什么，可以翻一下 LOG。</p>
+      <div class="closing-mark">
+        <span class="dot"></span>
+        <span>RCJ LAB · STILL BUILDING</span>
+      </div>
+    </div>
+  </section>
 
   <!-- ============== FOOTER ============== -->
   <footer class="site-footer">
@@ -190,9 +267,9 @@
       M.entrance('.hero-inner .eyebrow', { y: 22, duration: 0.7, ease: 'power3.out', delay: 0.08 });
       // Layer 1b · Hero 随滚动淡出（scrub：滚动条即时间线）
       M.parallax('.hero-inner', { yPercent: -26, opacity: 0.1, trigger: '.hero' });
-      // Layer 2 · 区块 / 条目滚动浮现（位移 + 透明 + 轻微模糊）
-      M.revealOnScroll('.reveal');
-      // Layer 2b · 磁吸 + 按压（角色图缩略图 / Exam 入口）
+      // Layer 2 · 区块 / 条目滚动浮现（轻微不抢戏：y/blur/duration 都调小）
+      M.revealOnScroll('.reveal', { y: 20, blur: 4, duration: 0.6, ease: 'power2.out' });
+      // Layer 2b · 磁吸 + 按压（仅关键 CTA：产品卡片图标）
       M.magnetic('[data-magnetic]');
       M.press('[data-magnetic]');
       // Layer 3 · Hero 柔光随指针游走（引擎 spotlight）
