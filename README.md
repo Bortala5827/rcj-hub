@@ -67,11 +67,13 @@ RCJ 产品生态共三类：
 
 **③ Speak Series（开口表达系列）**
 
-| 产品 | 站点 | 仓库 |
-| --- | --- | --- |
-| SoloSpeak · 独声 | https://955827.xyz/solospeak | rcj-hub（子路径，无独立仓） |
-| LetOut · 大声说 | https://955827.xyz/letout | rcj-hub（子路径，无独立仓） |
-| FaceTalk · 面试搭子 | https://facetalk.955827.xyz | facetalk |
+围绕「开口」做的一系列轻量工具——不社交、不评判、把表达权还给自己。
+
+| 产品 | 是什么（一句话） | 站点 | 仓库 |
+| --- | --- | --- | --- |
+| SoloSpeak · 独声 | 给独居者的轻量语音工具：按住录音、跟自己说说话；本地优先、隐私优先、零后端，声音只存你本地。 | https://955827.xyz/solospeak | rcj-hub（子路径，无独立仓） |
+| LetOut · 大声说 | 低连接时代的情绪出口：说出来 / 喊出来 / 唱出来 / 哭出来 / 安静一下，录完即焚，不社交不治疗。 | https://955827.xyz/letout | rcj-hub（子路径，无独立仓） |
+| FaceTalk · 面试搭子 | 面试筛选器：60 秒试音、双向选择，合适了再去腾讯会议深聊；免费、匿名、免登录。 | https://facetalk.955827.xyz | facetalk |
 
 > ③ 当前统一在 Speak Series 下运营；SoloSpeak / LetOut 作为 rcj-hub 子路径部署，FaceTalk 独立成仓。若某产品（如 FaceTalk）数据跑出独立价值，可后续进一步拆分——但不是现在。
 
