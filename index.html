@@ -59,6 +59,55 @@
       .reveal { opacity: 1; }
       .marquee-track { animation: none; }
     }
+
+    /* ===== RCJ 2.0 · 实验室人格（加法，不动结构） ===== */
+    /* 呼吸声纹球：Hero 锚点 */
+    .hero-orb {
+      width: 54px; height: 54px; border-radius: 50%;
+      margin: 0 auto 18px;
+      background: radial-gradient(circle at 50% 36%, #7fb4ff, #6366f1 58%, #4338ca);
+      box-shadow: 0 0 0 0 rgba(99,102,241,.40), 0 8px 26px rgba(67,56,202,.30);
+      animation: orb-breathe 4.2s ease-in-out infinite;
+      will-change: transform, box-shadow;
+    }
+    @keyframes orb-breathe {
+      0%,100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(99,102,241,.40), 0 8px 26px rgba(67,56,202,.30); }
+      50%     { transform: scale(1.10); box-shadow: 0 0 0 14px rgba(99,102,241,0), 0 10px 40px rgba(67,56,202,.45); }
+    }
+
+    /* 产品状态徽章 */
+    .mini-name { display: inline-flex; align-items: center; }
+    .mini-badge {
+      display: inline-block; font-size: 11px; font-weight: 700; line-height: 1;
+      padding: 4px 9px; border-radius: 999px; margin-left: 8px;
+      vertical-align: middle; letter-spacing: .03em;
+    }
+    .mini-badge.live { color: #0f766e; background: #ccfbf1; }
+    .mini-badge.beta { color: #7c3aed; background: #ede9fe; }
+    .mini-badge.exp  { color: #b45309; background: #fef3c7; }
+
+    /* 实验室日志 */
+    .lablog { padding: 8px 0 52px; }
+    .lablog-head { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .lablog-head .dot { width: 8px; height: 8px; border-radius: 50%; background: #6366f1; box-shadow: 0 0 0 4px rgba(99,102,241,.18); animation: orb-breathe 4.2s ease-in-out infinite; }
+    .lablog-head h2 { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+    .lablog-head .sub { font-size: 13px; color: var(--ink-3); }
+    .lablog-list { display: grid; gap: 2px; }
+    .lablog-item { display: flex; gap: 16px; padding: 11px 4px; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .lablog-item:last-child { border-bottom: none; }
+    .lablog-date { flex: 0 0 64px; font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace; font-size: 12.5px; color: var(--ink-3); padding-top: 1px; }
+    .lablog-text { color: var(--ink-2); line-height: 1.5; }
+    .lablog-text b { color: var(--ink); font-weight: 600; }
+
+    /* 指针微涟漪 */
+    .rcj-ripple { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
+    @media (max-width: 720px) {
+      .lablog-item { flex-direction: column; gap: 2px; }
+      .lablog-date { flex: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-orb, .lablog-head .dot { animation: none; }
+    }
   </style>
 </head>
 <body class="hub">
@@ -87,6 +136,7 @@
       <div class="hero-grid"></div>
       <div class="hero-glow"></div>
       <div class="container hero-inner">
+        <div class="hero-orb" aria-hidden="true"></div>
         <p class="eyebrow">RCJ LAB · Independent AI Product Studio</p>
         <h1>把想法，<br />做成顺手的小工具</h1>
       </div>
@@ -117,14 +167,14 @@
             <a class="mini-item" data-color="speak" href="/solospeak/">
               <img class="mini-img" src="/assets/roles/solospeak.thumb.png?v=20260817a" alt="SoloSpeak" loading="lazy" />
               <span class="mini-text">
-                <span class="mini-name">SoloSpeak</span>
+                <span class="mini-name">SoloSpeak <span class="mini-badge live">Live</span></span>
                 <span class="mini-desc">独处时的表达练习场</span>
               </span>
             </a>
             <a class="mini-item" data-color="emotion" href="/letout/">
               <img class="mini-img" src="/assets/roles/letout.thumb.png?v=20260817a" alt="LetOut" loading="lazy" />
               <span class="mini-text">
-                <span class="mini-name">LetOut</span>
+                <span class="mini-name">LetOut <span class="mini-badge live">Live</span></span>
                 <span class="mini-desc">情绪释放与记录</span>
               </span>
             </a>
@@ -141,7 +191,7 @@
             <a class="mini-item" data-color="exam" href="https://exam.955827.xyz" target="_blank" rel="noopener">
               <img class="mini-img" src="/assets/roles/exam.thumb.png?v=20260817b" alt="Exam Hub" loading="lazy" />
               <span class="mini-text">
-                <span class="mini-name">Exam Hub</span>
+                <span class="mini-name">Exam Hub <span class="mini-badge live">Live</span></span>
                 <span class="mini-desc">结构化面试 · 辅警真题 · 消防结构化</span>
               </span>
             </a>
@@ -149,7 +199,7 @@
             <a class="mini-item" data-color="connect" href="https://facetalk.955827.xyz" target="_blank" rel="noopener">
               <img class="mini-img" src="/assets/roles/facetalk.thumb.png?v=20260814r1" alt="FaceTalk" loading="lazy" />
               <span class="mini-text">
-                <span class="mini-name">FaceTalk</span>
+                <span class="mini-name">FaceTalk <span class="mini-badge beta">Beta</span></span>
                 <span class="mini-desc">通过一次真实表达，找到合适的练习搭子</span>
               </span>
             </a>
@@ -160,6 +210,24 @@
         <div class="playground reveal">Playground · 正在实验的新想法</div>
       </div>
     </section>
+
+    <!-- ============== 实验室日志 ============== -->
+    <section class="lablog">
+      <div class="container">
+        <div class="lablog-head reveal">
+          <span class="dot"></span>
+          <h2>实验室日志</h2>
+          <span class="sub">这里持续有人在折腾</span>
+        </div>
+        <div class="lablog-list">
+          <div class="lablog-item reveal"><span class="lablog-date">08-18</span><span class="lablog-text">创始人手记做成<b>在线便签</b>——纯文字、存 D1、自动记时间，留给自己。</span></div>
+          <div class="lablog-item reveal"><span class="lablog-date">08-18</span><span class="lablog-text">删掉了吉祥物——<b>腿裁不掉</b>，交给别的工具去弄。</span></div>
+          <div class="lablog-item reveal"><span class="lablog-date">08-17</span><span class="lablog-text">把消防刷题站<b>合并进 Exam Hub</b>，少一个独立域名。</span></div>
+          <div class="lablog-item reveal"><span class="lablog-date">08-16</span><span class="lablog-text">给三个仓库都补了<b>中文简介</b>，方便被人搜到。</span></div>
+          <div class="lablog-item reveal"><span class="lablog-date">08-15</span><span class="lablog-text">FaceTalk 从 Speak Series <b>独立出来</b>，成了单独的面试筛选器。</span></div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- ============== FOOTER ============== -->
@@ -168,7 +236,7 @@
       <div class="footer-row">
         <a class="footer-email" href="mailto:Bortala5827@gmail.com">✉ Bortala5827@gmail.com</a>
         <span class="footer-sep">·</span>
-        <span class="footer-copy">© 2026 RCJ9527</span>
+        <span class="footer-copy">一个普通人，在认真折腾</span>
         <span class="footer-sep">·</span>
         <span class="footer-powered">Powered by Cloudflare Pages</span>
       </div>
@@ -235,5 +303,33 @@
 })();
 </script>
 <script>fetch("https://955827.xyz/api/track?site=hub",{method:"POST",mode:"no-cors"}).catch(function(){});</script>
+<canvas class="rcj-ripple" aria-hidden="true"></canvas>
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+  var c = document.querySelector('.rcj-ripple'); if(!c) return;
+  var ctx = c.getContext('2d'); var dpr = Math.min(window.devicePixelRatio||1, 2);
+  var ripples = []; var last = 0;
+  function size(){ c.width = innerWidth*dpr; c.height = innerHeight*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+  size(); addEventListener('resize', size);
+  addEventListener('pointermove', function(e){
+    var n = Date.now(); if (n - last < 90) return; last = n;   // 节流：低密度
+    ripples.push({ x:e.clientX, y:e.clientY, r:0, a:0.18 });
+    if (ripples.length > 24) ripples.shift();
+  }, { passive:true });
+  (function loop(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    for (var i=ripples.length-1;i>=0;i--){
+      var p = ripples[i]; p.r += 1.4; p.a *= 0.965;
+      if (p.a < 0.02){ ripples.splice(i,1); continue; }
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.strokeStyle = 'rgba(99,102,241,' + p.a.toFixed(3) + ')';
+      ctx.lineWidth = 1; ctx.stroke();
+    }
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
 </body>
 </html>
