@@ -154,7 +154,7 @@
       const wrap = document.getElementById('postWrap');
       const slug = new URLSearchParams(location.search).get('slug') || '';
       if (!slug) {
-        wrap.innerHTML = '<div class="blog-empty">缺少文章标识。<br><br><a class="post-back" href="index.html">返回手记列表</a></div>';
+        wrap.innerHTML = '<div class="blog-empty">缺少文章标识。<br><br><a class="post-back" href="/blog/">返回手记列表</a></div>';
         return;
       }
       try {
@@ -167,7 +167,7 @@
           ? '<div class="post-tags">' + meta.tags.map((t) => '<span class="ptag">' + esc(t) + '</span>').join('') + '</div>'
           : '';
         const html =
-          '<div class="post-back"><a href="index.html">← 创始人手记</a></div>'
+          '<div class="post-back"><a href="/blog/">← 创始人手记</a></div>'
           + '<div class="post-head">'
           + '<h1>' + esc(meta.title || slug) + '</h1>'
           + '<div class="post-meta">'
@@ -177,10 +177,10 @@
           + '</div>'
           + '<div class="post-body">' + md2html(body) + '</div>'
           // 公众号引流位：暂不启用，以后要加在这里（文字引导 / 二维码图片）
-          + '<div class="post-back" style="margin-top:40px"><a href="index.html">← 创始人手记</a></div>';
+          + '<div class="post-back" style="margin-top:40px"><a href="/blog/">← 创始人手记</a></div>';
         wrap.innerHTML = html;
       } catch (e) {
-        wrap.innerHTML = '<div class="blog-empty">加载失败：' + esc(e.message) + '<br><br><a class="post-back" href="index.html">返回手记列表</a></div>';
+        wrap.innerHTML = '<div class="blog-empty">加载失败：' + esc(e.message) + '<br><br><a class="post-back" href="/blog/">返回手记列表</a></div>';
       }
     })();
   </script>

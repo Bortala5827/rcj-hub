@@ -125,7 +125,7 @@
       Object.keys(byYear).sort().reverse().forEach((year) => {
         html += '<div class="post-year">' + esc(year) + '</div>';
         byYear[year].forEach((p) => {
-          html += '<a class="post-item" href="post.html?slug=' + encodeURIComponent(p.slug) + '">'
+          html += '<a class="post-item" href="post?slug=' + encodeURIComponent(p.slug) + '">'
             + '<div class="post-meta"><span class="post-date">' + esc(p.date) + '</span></div>'
             + '<div class="post-title">' + esc(p.title) + '</div>'
             + (p.summary ? '<div class="post-summary">' + esc(p.summary) + '</div>' : '')
