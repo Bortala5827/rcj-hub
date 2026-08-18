@@ -6,39 +6,32 @@
   <meta name="theme-color" content="#0f172a" />
   <meta name="robots" content="noindex, nofollow" />
   <title>创始人手记 · RCJ Lab</title>
-  <meta name="description" content="创始人的私人手记，记录一路走来的想法。" />
+  <meta name="description" content="创始人的私人手记，随手记下一些想法。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="/assets/hub.v2.css?v=20260812a" />
   <style>
-    .blog-hero { margin: 40px 0 24px; }
-    .blog-hero h1 { font-size: clamp(26px, 3.4vw, 34px); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 12px; }
-    .blog-hero p { font-size: 15px; color: var(--ink-2); max-width: 600px; line-height: 1.7; }
+    .note-wrap { max-width: 640px; margin: 0 auto; padding: 32px 0 60px; }
+    .note-hero { margin-bottom: 24px; }
+    .note-hero h1 { font-size: clamp(24px, 3.2vw, 30px); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 8px; }
+    .note-hero p { font-size: 14px; color: var(--ink-3); line-height: 1.7; }
 
-    /* 检索工具条 */
-    .blog-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 18px 0 6px; }
-    .blog-search { flex: 1 1 240px; max-width: 360px; }
-    .blog-search input { width: 100%; padding: 9px 14px; font-size: 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; background: var(--bg); color: var(--ink); }
-    .blog-search input:focus { border-color: var(--accent); }
-    .tag-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .tag-chip { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--ink-3); cursor: pointer; transition: .15s; }
-    .tag-chip:hover { border-color: var(--accent); color: var(--accent); }
-    .tag-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .composer { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(15,23,42,.08); margin-bottom: 28px; }
+    .composer textarea { width: 100%; min-height: 76px; border: none; outline: none; resize: vertical; font: inherit; font-size: 15px; line-height: 1.7; color: var(--ink); background: transparent; }
+    .composer .c-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .c-hint { font-size: 12px; color: var(--ink-4); }
+    .btn { padding: 8px 18px; font-size: 14px; font-weight: 600; border: none; border-radius: 9px; background: var(--accent); color: #fff; cursor: pointer; }
+    .btn:hover { background: #1565c0; }
 
-    /* 文章列表（按年份归档） */
-    .post-year { font-size: 13px; font-weight: 700; color: var(--ink-4); letter-spacing: .04em; margin: 34px 0 4px; text-transform: uppercase; }
-    .post-year:first-of-type { margin-top: 6px; }
-    .post-item { display: block; padding: 20px 4px; border-bottom: 1px solid var(--line-2); }
-    .post-item:hover { background: var(--bg-soft); }
-    .post-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin-bottom: 5px; }
-    .post-date { font-size: 12px; color: var(--ink-4); font-variant-numeric: tabular-nums; }
-    .post-title { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 5px; }
-    .post-item:hover .post-title { color: var(--accent); }
-    .post-summary { font-size: 14px; color: var(--ink-2); line-height: 1.7; }
-    .post-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .ptag { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 6px; background: var(--accent-weak); color: var(--accent); }
+    .note-list { display: flex; flex-direction: column; gap: 12px; }
+    .note-card { position: relative; background: #fff; border: 1px solid var(--line-2); border-radius: 12px; padding: 14px 16px; }
+    .note-time { font-size: 12px; color: var(--ink-4); font-variant-numeric: tabular-nums; margin-bottom: 6px; }
+    .note-text { font-size: 15px; line-height: 1.75; color: var(--ink); white-space: pre-wrap; word-break: break-word; }
+    .note-del { position: absolute; top: 10px; right: 12px; border: none; background: none; color: var(--ink-4); font-size: 16px; cursor: pointer; opacity: 0; transition: opacity .15s; padding: 2px 6px; }
+    .note-card:hover .note-del { opacity: 1; }
+    .note-del:hover { color: #dc2626; }
 
-    .blog-empty { padding: 60px 0; text-align: center; color: var(--ink-3); font-size: 14px; }
-    .blog-count { font-size: 12px; color: var(--ink-4); margin-left: auto; }
+    .note-empty { padding: 48px 0; text-align: center; color: var(--ink-3); font-size: 14px; }
+    .note-loading { padding: 48px 0; text-align: center; color: var(--ink-3); font-size: 14px; }
   </style>
 </head>
 <body class="hub">
@@ -56,21 +49,23 @@
     </div>
   </header>
 
-  <main>
-    <section class="container">
-      <div class="blog-hero">
+  <main class="container">
+    <div class="note-wrap">
+      <div class="note-hero">
         <h1>创始人手记</h1>
-        <p>一些不想放进产品里的、更私人的记录——关于为什么做、做到哪、在想什么。</p>
+        <p>随手记下一些想法，简短即可。</p>
       </div>
 
-      <div class="blog-tools">
-        <div class="blog-search"><input type="search" id="searchInput" placeholder="搜索标题、摘要或标签…" /></div>
-        <div class="tag-chips" id="tagChips"></div>
-        <span class="blog-count" id="postCount"></span>
+      <div class="composer">
+        <textarea id="input" placeholder="写点什么…（Ctrl+Enter 保存）"></textarea>
+        <div class="c-foot">
+          <span class="c-hint" id="hint"></span>
+          <button class="btn" onclick="save()">保存</button>
+        </div>
       </div>
 
-      <div id="postList"><div class="blog-empty">读取中…</div></div>
-    </section>
+      <div class="note-list" id="list"><div class="note-loading">读取中…</div></div>
+    </div>
   </main>
 
   <footer class="site-footer">
@@ -88,92 +83,92 @@
   <script>
     const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-    let POSTS = [];
-    let activeTag = null;   // 当前筛选标签（null = 全部）
-    let keyword = '';       // 当前搜索词
-
-    function filterPosts() {
-      const kw = keyword.trim().toLowerCase();
-      return POSTS.filter((p) => {
-        if (activeTag && !(p.tags || []).includes(activeTag)) return false;
-        if (!kw) return true;
-        const hay = ((p.title || '') + ' ' + (p.summary || '') + ' ' + (p.tags || []).join(' ')).toLowerCase();
-        return hay.includes(kw);
-      });
-    }
-
-    function render() {
-      const list = filterPosts();
-      const el = document.getElementById('postList');
-      document.getElementById('postCount').textContent = list.length + ' 篇';
-
-      if (!list.length) {
-        el.innerHTML = '<div class="blog-empty">' + (POSTS.length ? '没有匹配的文章。' : '还没有文章。') + '</div>';
-        return;
-      }
-
-      // 按 date 倒序
-      const sorted = list.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
-      // 按年份分组
-      const byYear = {};
-      sorted.forEach((p) => {
-        const y = String(p.date).slice(0, 4) || '—';
-        (byYear[y] = byYear[y] || []).push(p);
-      });
-
-      let html = '';
-      Object.keys(byYear).sort().reverse().forEach((year) => {
-        html += '<div class="post-year">' + esc(year) + '</div>';
-        byYear[year].forEach((p) => {
-          html += '<a class="post-item" href="post?slug=' + encodeURIComponent(p.slug) + '">'
-            + '<div class="post-meta"><span class="post-date">' + esc(p.date) + '</span></div>'
-            + '<div class="post-title">' + esc(p.title) + '</div>'
-            + (p.summary ? '<div class="post-summary">' + esc(p.summary) + '</div>' : '')
-            + ((p.tags && p.tags.length) ? '<div class="post-tags">' + p.tags.map((t) => '<span class="ptag">' + esc(t) + '</span>').join('') + '</div>' : '')
-            + '</a>';
-        });
-      });
-      el.innerHTML = html;
-    }
-
-    function renderTags() {
-      const set = new Set();
-      POSTS.forEach((p) => (p.tags || []).forEach((t) => set.add(t)));
-      const chips = document.getElementById('tagChips');
-      chips.innerHTML = '';
-      if (!set.size) return;
-      // 「全部」按钮
-      const all = document.createElement('span');
-      all.className = 'tag-chip' + (activeTag === null ? ' active' : '');
-      all.textContent = '全部';
-      all.onclick = () => { activeTag = null; renderTags(); render(); };
-      chips.appendChild(all);
-      Array.from(set).sort().forEach((t) => {
-        const c = document.createElement('span');
-        c.className = 'tag-chip' + (activeTag === t ? ' active' : '');
-        c.textContent = t;
-        c.onclick = () => { activeTag = (activeTag === t ? null : t); renderTags(); render(); };
-        chips.appendChild(c);
-      });
-    }
-
-    (async function () {
+    async function api(method, path, body) {
       try {
-        const res = await fetch('posts.json', { cache: 'no-store' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        POSTS = await res.json();
+        const res = await fetch(path, {
+          method,
+          headers: body ? { 'Content-Type': 'application/json' } : undefined,
+          body: body ? JSON.stringify(body) : undefined,
+          cache: 'no-store',
+        });
+        let data = null;
+        try { data = await res.json(); } catch (_) {}
+        return { ok: res.ok, status: res.status, data };
       } catch (e) {
-        document.getElementById('postList').innerHTML = '<div class="blog-empty">加载失败：' + esc(e.message) + '</div>';
+        return { ok: false, status: 0, data: { error: '网络错误' } };
+      }
+    }
+
+    async function requireLogin() {
+      const pw = prompt('请输入密码');
+      if (pw == null) return false;
+      const r = await api('POST', '/api/admin/login', { password: pw });
+      if (!r.ok || !r.data || !r.data.ok) { alert('密码错误'); return false; }
+      return true;
+    }
+
+    function fmtTime(iso) {
+      const d = new Date(iso);
+      if (isNaN(d)) return '';
+      const now = new Date();
+      const pad = (n) => (n < 10 ? '0' + n : '' + n);
+      const sameDay = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+      if (sameDay) return '今天 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+      const sameYear = d.getFullYear() === now.getFullYear();
+      return (sameYear ? '' : d.getFullYear() + '年') + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+
+    async function load() {
+      const el = document.getElementById('list');
+      el.innerHTML = '<div class="note-loading">读取中…</div>';
+      const r = await api('GET', '/api/notes');
+      if (!r.ok || !r.data || !r.data.ok) {
+        el.innerHTML = '<div class="note-empty">加载失败：' + esc((r.data && r.data.error) || '未知错误') + '</div>';
         return;
       }
-      renderTags();
-      render();
-    })();
+      const notes = r.data.notes || [];
+      if (!notes.length) { el.innerHTML = '<div class="note-empty">还没有手记，写第一条吧。</div>'; return; }
+      el.innerHTML = notes.map((n) =>
+        '<div class="note-card">'
+        + '<button class="note-del" title="删除" data-id="' + n.id + '">×</button>'
+        + '<div class="note-time">' + esc(fmtTime(n.created_at)) + '</div>'
+        + '<div class="note-text">' + esc(n.text) + '</div>'
+        + '</div>'
+      ).join('');
+      el.querySelectorAll('.note-del').forEach((b) => {
+        b.addEventListener('click', () => del(b.dataset.id));
+      });
+    }
 
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      keyword = e.target.value;
-      render();
+    async function save() {
+      const ta = document.getElementById('input');
+      const text = ta.value.trim();
+      if (!text) return;
+      let r = await api('POST', '/api/notes', { text });
+      if (r.status === 401) {
+        if (!(await requireLogin())) return;
+        r = await api('POST', '/api/notes', { text });
+      }
+      if (r.ok && r.data && r.data.ok) { ta.value = ''; document.getElementById('hint').textContent = ''; load(); }
+      else { document.getElementById('hint').textContent = (r.data && r.data.error) || '保存失败'; }
+    }
+
+    async function del(id) {
+      if (!confirm('删除这条手记？')) return;
+      let r = await api('DELETE', '/api/notes?id=' + encodeURIComponent(id));
+      if (r.status === 401) {
+        if (!(await requireLogin())) return;
+        r = await api('DELETE', '/api/notes?id=' + encodeURIComponent(id));
+      }
+      if (r.ok && r.data && r.data.ok) load();
+      else alert((r.data && r.data.error) || '删除失败');
+    }
+
+    document.getElementById('input').addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') save();
     });
+
+    load();
   </script>
 </body>
 </html>
