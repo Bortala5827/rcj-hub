@@ -102,6 +102,8 @@ export async function onRequestGet({ request, env }) {
       Promise.resolve(null),
       // [6] analytics: 趋势 + 汇总（合并为一次——按 site 聚合 day + total/u/d 一起算）
       d1(env, DBS.analytics, "SELECT site, day, SUM(n) s, 0 as total, 0 as u, 0 as d FROM visits GROUP BY site, day UNION ALL SELECT site, '' as day, SUM(n) as s, SUM(n) as total, COUNT(DISTINCT ip) as u, COUNT(DISTINCT day) as d FROM visits GROUP BY site ORDER BY site, day"),
+      // [7] analytics: 最近 7 天访问明细（site/day/ip/n，供概览「最近访问」表）
+      d1(env, DBS.analytics, "SELECT site, day, ip, n FROM visits WHERE day >= date('now','-6 day') ORDER BY day DESC, site, n DESC LIMIT 60"),
     ]);
 
     const v = (i) => results[i].status === 'fulfilled' ? results[i].value : null;
@@ -113,6 +115,7 @@ export async function onRequestGet({ request, env }) {
     const ftPairsRecent= v(2);
     const ftWallRecent = v(3);
     const uniAll       = v(6); // 合并的趋势+汇总
+    const recentVisits = v(7) || []; // 最近 7 天访问明细
 
     // ── 解析 facetalk 计数 ──
     const ftCounts = {};
@@ -134,7 +137,8 @@ export async function onRequestGet({ request, env }) {
     });
     const analyticsSeries = Object.keys(bySite).map(site => ({
       site,
-      points: (bySite[site].points || []).slice(-14),
+      // 保留最近 31 个有数据日，前端可切换 7/14/30 天视图
+      points: (bySite[site].points || []).slice(-31),
       total: bySite[site].total || 0,
       u: bySite[site].u || 0,
       d: bySite[site].d || 0,
@@ -172,6 +176,7 @@ export async function onRequestGet({ request, env }) {
         note: '辅警站点仅接入浏览统计（rcj-analytics-d1 · site=aux）；留言墙与信号匹配为 FaceTalk 专属功能，辅警未开通，故无互动数据。',
       },
       analytics: { allVisits, series: analyticsSeries, bySite },
+      recentVisits,
       note: '数据源：mianshi-dazi-d1（FaceTalk 互动数据）+ rcj-analytics-d1（统一浏览统计，含 site=aux 辅警站点）。aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除。',
       warns: warns.length ? warns : undefined,
     };
