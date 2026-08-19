@@ -106,7 +106,26 @@
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; }
       .marquee-track { animation: none; }
+      .hero-glow, .hero-grid { animation: none; }
+      .mini-item, .mini-item:hover, .mini-img { transform: none !important; transition: none !important; }
     }
+
+    /* ============== 灵动性增强（2026-08-19 · 纯动效层，不改逻辑） ============== */
+    /* hero 光晕缓慢呼吸：按给定规格 吸气4s→屏住4s→呼气6s（14s 整段） */
+    .hero-glow { animation: heroBreath 14s ease-in-out infinite; will-change: transform, opacity; }
+    @keyframes heroBreath {
+      0%, 100%   { opacity: .8;  transform: translateX(-50%) scale(1); }
+      28.57%     { opacity: 1;   transform: translateX(-50%) scale(1.045); } /* 吸 4s */
+      57.14%     { opacity: 1;   transform: translateX(-50%) scale(1.045); } /* 屏 4s */
+    }
+    /* hero 网格极缓慢漂移：一个单元(56px)循环，几乎不可察觉的"活着"感 */
+    .hero-grid { animation: gridDrift 90s linear infinite; will-change: background-position; }
+    @keyframes gridDrift { from { background-position: 0 0; } to { background-position: 56px 56px; } }
+    /* 产品卡 hover 轻微上浮（灵动但不抢戏） */
+    .mini-item { transition: border-color .2s ease, box-shadow .2s ease, border-left-color .2s ease, transform .25s cubic-bezier(.22,.61,.36,1); }
+    .mini-item:hover { transform: translateY(-2px); }
+    /* marquee 悬停暂停：想看某个词条时不被滚走 */
+    .marquee:hover .marquee-track { animation-play-state: paused; }
   </style>
 </head>
 <body class="hub">
