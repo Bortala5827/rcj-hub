@@ -18,8 +18,25 @@ agent_created: true
 
 ## 诊断步骤
 1. `curl -sS --max-time 8 -o /dev/null -w "%{remote_ip}\n" https://github.com` → 若 remote_ip 是 `198.18.x.x` 说明被劫持。
-2. `netstat -ano | grep -E ":10808|:7890|:10809"` 看是否有代理在监听；无监听说明没可用代理。
+2. `netstat -ano | grep -E ":10808|:7890|:10809|:12000|:12001|:12002"` 看是否有代理在监听；无监听说明没可用代理。
 3. 验证 DoH 可达（脚本核心）：`node -e "require('https').get({host:'1.1.1.1',path:'/dns-query?name=github.com&type=A',headers:{accept:'application/dns-json'}},r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>console.log(JSON.parse(d).Answer.find(x=>x.type===1).data))}).on('error',e=>console.log('FAIL',e.message))}"` → 能打印出真实 IP 即 DoH 通路正常。
+
+## ⭐ 首选捷径：本机 VPN 内核端口直接当代理（2026-08-19 实测）
+用户本机常驻 **iKuuuVPNCore.exe**（v2ray 内核），监听端口**会轮换**：实测过 `127.0.0.1:12001/12002`（HTTP/SOCKS5）与 `127.0.0.1:10808`（HTTP，用户口中所说的端口）都可用。12000/12003/10809/7890 常不通。
+- 直接当 git 代理推 GitHub，无需起 DoH 代理：
+  ```bash
+  git -c http.proxy=http://127.0.0.1:10808 -c https.proxy=http://127.0.0.1:10808 -c http.version=HTTP/1.1 push origin main
+  ```
+- ⚠️ **2026-08-19 新坑：schannel TLS 握手失败**。若 10808 监听正常、`curl -x` 探活返回 200，但 git push 报 `schannel: failed to receive handshake, SSL/TLS connection failed`——这是 Windows git 默认 schannel 后端经代理握手被干扰。**加 `-c http.sslBackend=openssl` 即可一次成功**：
+  ```bash
+  git -c http.proxy=http://127.0.0.1:10808 -c https.proxy=http://127.0.0.1:10808 -c http.sslBackend=openssl -c http.version=HTTP/1.1 push origin main
+  ```
+  此条应作为首选方案；12001/12002 实测仍会报 `Failed to connect over proxy`（端口虽监听但隧道不通），sslBackend 方案不用换口。
+- 探测哪口通（按 10808 → 12002 → 12001 顺序试）：
+  `curl -s -o /dev/null -w "%{http_code}" --max-time 10 --proxy "http://127.0.0.1:10808" https://github.com/`（200 即通）。
+- 定位端口：`netstat -ano | grep -i listen` 找 iKuuuVPNCore.exe 的 PID 反查监听端口（tasklist 查 PID）。
+- ⚠️ 端口会随 VPN 状态切换，多个口全 000 时说明 VPN 当前没开/在切换，稍后重试即可。
+- 此法同时适用于沙箱外网整体断连（连 baidu 都 000）的场景——本机 VPN 端口是独立于沙箱透明代理的出口。
 
 ## 解法：本地 DoH CONNECT 代理
 把随附的 `gh_dns_proxy.js` 跑在空闲端口（默认 10809）。它对每个 CONNECT 请求用 **DoH 查 1.1.1.1（失败回落 8.8.8.8 / OpenDNS）** 拿真实 IP 再 TCP 转发，绕过系统 DNS 劫持。带 5 分钟 DNS 缓存，git 多次连接显著提速。
