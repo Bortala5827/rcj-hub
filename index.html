@@ -7,7 +7,7 @@
   <title>RCJ Lab · 个人产品实验室</title>
   <meta name="description" content="RCJ9527 的个人产品实验室——用 AI + Vibe Coding 做考试学习、面试陪练与开口练习的小工具。" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260814g" />
+  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260820a" />
   <link rel="stylesheet" href="/assets/rcj-motion.css?v=20260814r1" />
   <style>
     /* 首页层级结构：母体 → 系列 → 子项 */
@@ -63,10 +63,18 @@
     @keyframes closing-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
     @media (prefers-reduced-motion: reduce) { .closing-mark .dot { animation: none; } }
 
-    /* marquee 滚动带 */
+    /* marquee 滚动带：产品与子项目，悬停暂停，点击跳转 */
     .marquee { overflow: hidden; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); padding: 14px 0; background: var(--bg-soft); }
     .marquee-track { display: inline-flex; white-space: nowrap; animation: marquee 30s linear infinite; }
-    .marquee-track span { font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace; font-size: 13px; font-weight: 500; letter-spacing: .14em; color: var(--ink-3); padding: 0 26px; }
+    .marquee-track a {
+      display: inline-flex; align-items: baseline; gap: 8px;
+      font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace;
+      font-size: 13px; font-weight: 500; letter-spacing: .14em; color: var(--ink-3);
+      padding: 0 26px; text-decoration: none; transition: color .2s;
+    }
+    .marquee-track a b { color: var(--ink); font-weight: 600; }
+    .marquee-track a:hover { color: var(--accent); }
+    .marquee-track .m-sep { padding: 0; color: var(--ink-4); }
     @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
     /* Speak Series 简洁列表 + 角色图缩略图 + 每项独特色彩（产品性格） */
@@ -159,11 +167,23 @@
       </div>
     </section>
 
-    <!-- marquee：同一世界的词条滚动带 -->
-    <div class="marquee" aria-hidden="true">
+    <!-- marquee：产品与子项目滚动带（悬停暂停，点击跳转） -->
+    <div class="marquee">
       <div class="marquee-track">
-        <span>RCJ LAB</span><span>SPEAK SERIES</span><span>EXAM HUB</span><span>SOLOSPEAK</span><span>LETOUT</span><span>FACETALK</span><span>同一个世界的工具</span><span>INDEPENDENT AI PRODUCT STUDIO</span>
-        <span>RCJ LAB</span><span>SPEAK SERIES</span><span>EXAM HUB</span><span>SOLOSPEAK</span><span>LETOUT</span><span>FACETALK</span><span>同一个世界的工具</span><span>INDEPENDENT AI PRODUCT STUDIO</span>
+        <a href="https://exam.955827.xyz" target="_blank" rel="noopener"><b>Exam Hub</b> 考试训练</a><span class="m-sep">·</span>
+        <a href="https://facetalk.955827.xyz" target="_blank" rel="noopener"><b>FaceTalk</b> 面试连接</a><span class="m-sep">·</span>
+        <a href="/letout/"><b>LetOut</b> 情绪释放</a><span class="m-sep">·</span>
+        <a href="/solospeak/"><b>SoloSpeak</b> 独处表达</a><span class="m-sep">·</span>
+        <a href="https://exam.955827.xyz/learn/" target="_blank" rel="noopener"><b>你懂的</b> 知识卡</a><span class="m-sep">·</span>
+        <a href="https://exam.955827.xyz/structured.html" target="_blank" rel="noopener"><b>结构化面试</b> 开口练</a><span class="m-sep">·</span>
+        <a href="https://exam.955827.xyz/guides/" target="_blank" rel="noopener"><b>建站教学</b> guides</a><span class="m-sep">·</span>
+        <a href="https://exam.955827.xyz" target="_blank" rel="noopener"><b>Exam Hub</b> 考试训练</a><span class="m-sep">·</span>
+        <a href="https://facetalk.955827.xyz" target="_blank" rel="noopener"><b>FaceTalk</b> 面试连接</a><span class="m-sep">·</span>
+        <a href="/letout/"><b>LetOut</b> 情绪释放</a><span class="m-sep">·</span>
+        <a href="/solospeak/"><b>SoloSpeak</b> 独处表达</a><span class="m-sep">·</span>
+        <a href="https://exam.955827.xyz/learn/" target="_blank" rel="noopener"><b>你懂的</b> 知识卡</a><span class="m-sep">·</span>
+        <a href="https://exam.955827.xyz/structured.html" target="_blank" rel="noopener"><b>结构化面试</b> 开口练</a><span class="m-sep">·</span>
+        <a href="https://exam.955827.xyz/guides/" target="_blank" rel="noopener"><b>建站教学</b> guides</a><span class="m-sep">·</span>
       </div>
     </div>
 
