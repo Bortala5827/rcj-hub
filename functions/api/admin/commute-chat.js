@@ -36,7 +36,7 @@ async function verifyCookie(request, env) {
 function d1(env, dbId, sql) {
   const acct = env.CF_ACCOUNT_ID, tok = env.CF_API_TOKEN;
   if (!acct || !tok) return Promise.resolve({ error: 'NO_CRED' });
-  return fetch(`https://api.cloudflare.com/v4/accounts/${acct}/d1/database/${dbId}/query`, {
+  return fetch(`https://api.cloudflare.com/client/v4/accounts/${acct}/d1/database/${dbId}/query`, {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${tok}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ sql })
