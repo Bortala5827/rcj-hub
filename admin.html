@@ -534,16 +534,19 @@ async function renderCommute(){
 }
 function loadCommute(){ renderCommute(); }
 async function clearCommute(){
-  const key=prompt('输入 admin 口令以清空 commute 全部记录：');
-  if(!key) return;
+  if(!confirm('确认清空 commute 全部记录？此操作不可恢复。')) return;
   const msg=document.getElementById('commuteMsg');
   if(msg){ msg.textContent='处理中…'; msg.style.color='var(--muted)'; }
   try{
-    const r=await fetch('/api/moment?clear=commute&admin='+encodeURIComponent(key.trim()),{method:'GET'});
+    // 后台已登录（带 rcj_admin cookie），直接清空；无需手动填 key
+    const r=await fetch('/api/moment?clear=commute',{method:'GET',credentials:'same-origin'});
     const j=await r.json().catch(()=>({}));
     if(r.ok && j.ok){
       if(msg){ msg.textContent='✓ 已清空'; msg.style.color='var(--ok)'; }
       renderCommute();
+    } else if(r.status===403){
+      if(msg){ msg.textContent='✗ 未登录，请先在后台登录'; msg.style.color='var(--danger)'; }
+      showLogin();
     } else {
       if(msg){ msg.textContent='✗ '+(j.error||('HTTP '+r.status)); msg.style.color='var(--danger)'; }
     }

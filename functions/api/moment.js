@@ -152,13 +152,14 @@ export async function onRequestGet({ request, env }) {
   if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) {
     return bad('服务端未配置 CF_API_TOKEN / CF_ACCOUNT_ID', 500);
   }
-  // 管理端点：清空 commute 场景的全部记录（需 ADMIN_KEY，CF 环境变量）
+  // 管理端点：清空 commute 场景的全部记录
+  // 鉴权：后台登录 cookie（rcj_admin，与 /api/admin 同源）或明文 ADMIN_KEY 任一通过即可
   const url = new URL(request.url);
   const clearTarget = url.searchParams.get('clear');
   if (clearTarget === SCENE) {
     const admin = url.searchParams.get('admin') || '';
-    const ok = String(admin).trim() === String(env.ADMIN_KEY || '').trim() && !!env.ADMIN_KEY;
-    if (!ok) return bad('需要 admin 口令', 403);
+    const ok = await commuteAdminOk(request, env, admin);
+    if (!ok) return bad('需要后台登录或 admin 口令', 403);
     try {
       await ensureTable(env);
       await d1(env, `DELETE FROM moments WHERE scene='${SCENE}'`);
@@ -196,6 +197,37 @@ function isOpenLocal(env) {
   if (testMode(env)) return true; // 测试期：始终开放
   const h = localHour();
   return (h >= 6 && h < 10) || (h >= 18 && h < 22);
+}
+
+// ── commute 清空鉴权：后台 cookie（rcj_admin）或明文 ADMIN_KEY 任一通过 ──
+async function commuteAdminOk(request, env, adminParam) {
+  // 优先：后台登录 cookie（与 /api/admin 同源，ADMIN_PASSWORD 校验）
+  if (env.ADMIN_PASSWORD && verifyCookie(request, env.ADMIN_PASSWORD)) return true;
+  // 兜底：明文 ADMIN_KEY（CF 环境变量）
+  if (env.ADMIN_KEY && String(adminParam || '').trim() === String(env.ADMIN_KEY).trim()) return true;
+  return false;
+}
+function getCookie(req, name) {
+  const c = req.headers.get('Cookie') || '';
+  const m = c.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : '';
+}
+function verifyCookie(request, secret) {
+  const cookie = getCookie(request, 'rcj_admin');
+  if (!cookie) return false;
+  const [p, s] = cookie.split('.');
+  if (!p || !s) return false;
+  // 复用登录端点的 HMAC 算法（SHA-256）
+  return safeHmac(p, secret).then((sig) => sig === s).catch(() => false);
+}
+async function safeHmac(value, secret) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const buf = await crypto.subtle.sign('HMAC', key, enc.encode(value));
+  const b = new Uint8Array(buf);
+  let s = '';
+  for (const x of b) s += String.fromCharCode(x);
+  return btoa(s);
 }
 
 function randId() {
