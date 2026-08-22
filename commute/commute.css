@@ -151,6 +151,58 @@
 .reveal { opacity: 0; transform: translateY(8px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .reveal.is-in { opacity: 1; transform: none; }
 
+/* ══ 轻聊天窗口 ══ */
+.moment-chat {
+  margin-top: 20px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.m-chat-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--line);
+  background: var(--bg-soft);
+}
+.m-chat-ttl { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: 0.02em; }
+.m-chat-badge {
+  font-size: 11px; color: var(--ink-4);
+  border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
+}
+.m-chat-window {
+  height: 200px; overflow-y: auto;
+  padding: 12px 16px; display: flex; flex-direction: column; gap: 8px;
+  scrollbar-width: thin; scrollbar-color: var(--line-2) transparent;
+}
+.m-chat-window::-webkit-scrollbar { width: 5px; }
+.m-chat-window::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 999px; }
+.m-chat-empty, .m-chat-closed {
+  color: var(--ink-4); font-size: 13px; text-align: center; margin: auto;
+  line-height: 1.6;
+}
+.m-chat-row { display: flex; gap: 8px; align-items: baseline; font-size: 14px; line-height: 1.5; }
+.m-chat-time { color: var(--ink-4); font-size: 11px; flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+.m-chat-text {
+  color: var(--ink); word-break: break-word; white-space: pre-wrap;
+  background: var(--bg-soft); border-radius: 10px; padding: 4px 10px;
+}
+.m-chat-form { padding: 10px 16px 14px; border-top: 1px solid var(--line); }
+.m-chat-quota { display: block; font-size: 12px; color: #b91c1c; margin-bottom: 6px; min-height: 14px; }
+.m-chat-input-row { display: flex; gap: 8px; }
+.m-chat-input {
+  flex: 1; min-width: 0; font: inherit; font-size: 14px;
+  padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--bg); color: var(--ink); outline: none;
+}
+.m-chat-input:focus { border-color: var(--ink-4); }
+.m-chat-send {
+  appearance: none; border: 0; cursor: pointer; font: inherit; font-weight: 700;
+  padding: 0 18px; border-radius: 10px; background: var(--ink); color: #fff;
+  transition: opacity 0.15s ease;
+}
+.m-chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+.m-chat-count { text-align: right; font-size: 11px; color: var(--ink-4); margin-top: 4px; font-variant-numeric: tabular-nums; }
+
 /* 手机适配 */
 @media (max-width: 540px) {
   .moment-main { padding: 32px 0 56px; }
@@ -159,4 +211,5 @@
   .m-stat-num { font-size: 54px; }
   .m-cities-grid { grid-template-columns: repeat(4, 1fr); }
   .m-btn { min-width: 180px; }
+  .m-chat-window { height: 180px; }
 }

@@ -7,7 +7,7 @@
   <meta name="description" content="此刻，有多少人和我一起在通勤？一个轻量的天涯共此时实验。" />
   <meta name="robots" content="noindex,nofollow" />
   <link rel="stylesheet" href="/assets/hub.v2.css?v=20260822a" />
-  <link rel="stylesheet" href="./commute.css?v=20260822d" />
+  <link rel="stylesheet" href="./commute.css?v=20260822e" />
 </head>
 <body class="hub moment">
   <header class="site-header">
@@ -96,7 +96,27 @@
         <button class="m-btn-text" id="mBtnCancel" type="button">点错了（撤销）</button>
       </div>
 
-      <p class="m-hint" id="mHint">未结束的记录将在 2 小时后自动结束。</p>
+      <p class="m-hint" id="mHint">开放时段：早 6–10 点、晚 6–10 点；未结束的记录 2 小时后自动结束。</p>
+    </section>
+
+    <!-- 轻聊天：可上下滑的小窗口，当日自动清除 -->
+    <section class="moment-chat reveal" id="mChat" aria-label="通勤闲聊">
+      <div class="m-chat-head">
+        <span class="m-chat-ttl">🚌 此刻同行</span>
+        <span class="m-chat-badge" id="mChatBadge">当日清除</span>
+      </div>
+      <div class="m-chat-window" id="mChatWindow" aria-live="polite">
+        <div class="m-chat-empty" id="mChatEmpty">加载中…</div>
+      </div>
+      <div class="m-chat-form" id="mChatForm">
+        <span class="m-chat-quota" id="mChatQuota" hidden></span>
+        <div class="m-chat-input-row">
+          <input type="text" id="mChatInput" class="m-chat-input" maxlength="50"
+                 placeholder="说点什么（50 字内）" autocomplete="off" />
+          <button type="button" class="m-chat-send" id="mChatSend">发</button>
+        </div>
+        <div class="m-chat-count"><span id="mChatLen">0</span>/50</div>
+      </div>
     </section>
 
     <p class="m-foot reveal">
@@ -104,6 +124,6 @@
     </p>
   </main>
 
-  <script src="./commute.js?v=20260822d" defer></script>
+  <script src="./commute.js?v=20260822e" defer></script>
 </body>
 </html>

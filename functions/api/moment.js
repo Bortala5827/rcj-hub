@@ -20,7 +20,10 @@ const DB = 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828'; // rcj-analytics-d1
 const SCENE = 'commute';
 const AUTO_END_HOURS = 2;
 const ACTIVE_DAYS = AUTO_END_HOURS / 24;
-const ACTIVE_FILTER = `(status='active' AND (julianday('now') - julianday(started_at)) < ${ACTIVE_DAYS})`;
+// 注意：started_at 存的是 UTC（toISOString），必须用 localtime 对齐，否则东八区会把 2h 算成 10h 才失效
+const ACTIVE_FILTER = `(status='active' AND (julianday('now','localtime') - julianday(started_at,'localtime')) < ${ACTIVE_DAYS})`;
+// 防连点：同一 clientId 在 2 小时内只要有任意一条记录（active 或刚 arrived）就不允许再新建
+const RECENT_FILTER = `((julianday('now','localtime') - julianday(started_at,'localtime')) < ${ACTIVE_DAYS})`;
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -103,6 +106,14 @@ async function snapshot(env) {
   return { active };
 }
 
+// 该 clientId 在 2h 内是否已有记录（active 或刚 arrived）→ 用于防刷/防连点
+async function recentByClient(env, clientId) {
+  const r = await d1(env,
+    `SELECT id, status FROM moments WHERE scene='${SCENE}' AND client_id='${esc(clientId)}' AND ${RECENT_FILTER} ORDER BY started_at DESC LIMIT 1`);
+  const hit = (r[0] && r[0].results && r[0].results[0]) || null;
+  return hit;
+}
+
 // 今日已完成（arrived）的通勤统计：次数 / 最短 / 最长 / 平均时长
 async function statsToday(env) {
   const res = await d1(env,
@@ -128,10 +139,28 @@ export async function onRequestGet({ env }) {
     await ensureTable(env);
     const { active } = await snapshot(env);
     const stats = await statsToday(env);
-    return json({ ok: true, scene: SCENE, active, stats, autoEndHours: AUTO_END_HOURS });
+    return json({ ok: true, scene: SCENE, active, stats, autoEndHours: AUTO_END_HOURS, open: isOpenNow() });
   } catch (e) {
     return bad('查询失败：' + e.message, 500);
   }
+}
+
+// 时段门禁：仅早高峰 6–10、晚高峰 18–22 开放（东八区 localtime）
+function isOpenNow() {
+  const h = new Date().getHours(); // 本地时区（CF 运行时为 UTC，但我们用 'localtime' 语义由前端传，这里仅作兜底展示用）
+  return (h >= 6 && h < 10) || (h >= 18 && h < 22);
+}
+// 注意：CF Worker 运行时 getHours() 返回的是 UTC 小时，不是东八区。
+// 真正的时段判定放在前端（用户浏览器时区），后端 isOpenNow 仅作 GET 展示字段参考，
+// 提交门禁以后端 ensureTable 同级校验：用 localtime 小时。
+function localHour() {
+  // 用 toISOString 转东八区
+  const now = new Date(Date.now() + 8 * 3600 * 1000);
+  return now.getUTCHours();
+}
+function isOpenLocal() {
+  const h = localHour();
+  return (h >= 6 && h < 10) || (h >= 18 && h < 22);
 }
 
 function randId() {
@@ -151,7 +180,12 @@ export async function onRequestPost({ request, env }) {
   try { body = await request.json(); } catch { return bad('JSON 解析失败'); }
   const action = String(body.action || '');
 
-  try {
+  // 时段门禁：仅在早 6–10 / 晚 18–22 开放提交（东八区）。其余时间拒绝 start。
+  if (action === 'start' && !isOpenLocal()) {
+    return json({ ok: false, error: '现在不是通勤时段啦～开放时间：早 6–10 点、晚 6–10 点。', code: 'CLOSED', open: false }, 403);
+  }
+
+ try {
     await ensureTable(env);
 
     if (action === 'start') {
@@ -169,14 +203,17 @@ export async function onRequestPost({ request, env }) {
         }
       }
 
-      // 2) 防刷：同一 clientId 在 2h 内已有 active 记录，则拒绝新建（web 端软唯一性）
+      // 2) 防刷 + 防连点：同一 clientId 在 2h 内已有任意记录（active 或刚 arrived），拒绝新建。
+      //    这能拦住"到了之后又点我出发了"以及"狂点提交"，每天早/晚高峰各只计一次。
       if (clientId) {
-        const dup = await d1(env,
-          `SELECT id FROM moments WHERE scene='${SCENE}' AND client_id='${esc(clientId)}' AND ${ACTIVE_FILTER} LIMIT 1`);
-        const hit = (dup[0] && dup[0].results && dup[0].results[0]) || null;
-        if (hit) {
+        const recent = await recentByClient(env, clientId);
+        if (recent) {
           const snap = await snapshot(env);
-          return json({ ok: true, id: hit.id, restored: true, ...snap });
+          // 若是仍在进行中则恢复；否则提示稍后再发（已记录过本次通勤）
+          if (recent.status === 'active') {
+            return json({ ok: true, id: recent.id, restored: true, ...snap });
+          }
+          return json({ ok: false, error: '你最近 2 小时内已经记录过一次通勤啦，稍后再来～', code: 'RECENT_EXISTS' }, 409);
         }
       }
 
