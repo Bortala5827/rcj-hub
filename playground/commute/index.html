@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>此刻通勤 · 天涯共此时 · RCJ Lab</title>
+  <meta name="description" content="此刻，有多少人和我一起在通勤？一个轻量的天涯共此时实验。" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="stylesheet" href="/assets/hub.v2.css?v=20260822a" />
+  <link rel="stylesheet" href="./commute.css?v=20260822a" />
+</head>
+<body class="hub moment">
+  <header class="site-header">
+    <div class="container nav">
+      <a class="wordmark" href="/" aria-label="返回 RCJ Lab 首页">
+        <span class="mark">R</span>
+        <span class="wm-text">RCJ Lab</span>
+      </a>
+      <button class="nav-hamburger" aria-label="菜单" aria-expanded="false" id="navBurger">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav-menu" aria-label="站点导航" id="navMenu">
+        <a href="/log.html">LOG</a>
+        <a href="/playground/commute/" aria-current="page">此刻</a>
+        <a href="/solospeak/">SoloSpeak</a>
+        <a href="/letout/">LetOut</a>
+        <a href="https://facetalk.955827.xyz" target="_blank" rel="noopener">FaceTalk</a>
+        <a href="https://exam.955827.xyz" target="_blank" rel="noopener">Exam Hub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container moment-main">
+    <section class="moment-hero reveal" aria-labelledby="mTitle">
+      <p class="eyebrow">PLAYGROUND · 天涯共此时</p>
+      <h1 id="mTitle" class="m-title">此刻，谁和我一起在通勤？</h1>
+      <p class="m-sub">天涯共此时。</p>
+    </section>
+
+    <section class="moment-card reveal" aria-live="polite">
+      <div class="m-stat">
+        <div class="m-stat-label">此刻正在通勤</div>
+        <div class="m-stat-num" id="mNum">—</div>
+        <div class="m-stat-foot">最近 2 小时内未结束的记录</div>
+      </div>
+
+      <div class="m-cities" id="mCities" hidden>
+        <span class="m-cities-label">其中</span>
+        <span class="m-cities-list" id="mCitiesList"></span>
+      </div>
+
+      <!-- 状态 A：未在通勤 -->
+      <div class="m-action" id="mActionIdle">
+        <button class="m-btn m-btn-primary" id="mBtnStart" type="button">
+          <span class="m-btn-label">我出发了</span>
+        </button>
+        <button class="m-btn-text" id="mBtnCity" type="button">选个城市（可选）</button>
+      </div>
+
+      <!-- 状态 B：在通勤中 -->
+      <div class="m-action m-action-on" id="mActionOn" hidden>
+        <div class="m-on-meta" id="mOnMeta">通勤中 · <span id="mOnCity">未选城市</span></div>
+        <div class="m-timer" id="mTimer" aria-live="off">00:00</div>
+        <button class="m-btn m-btn-success" id="mBtnArrive" type="button">
+          <span class="m-btn-label">我到了</span>
+        </button>
+        <button class="m-btn-text" id="mBtnCancel" type="button">点错了（撤销）</button>
+      </div>
+
+      <p class="m-hint" id="mHint">未结束的记录将在 2 小时后自动结束。</p>
+    </section>
+
+    <p class="m-foot reveal">
+      RCJ Lab · 一个持续小实验的场地 ·
+      <a href="/">回到首页</a>
+    </p>
+  </main>
+
+  <!-- 城市选择 sheet -->
+  <div class="m-sheet" id="mSheet" hidden aria-modal="true" role="dialog" aria-labelledby="mSheetTitle">
+    <div class="m-sheet-mask" data-close></div>
+    <div class="m-sheet-card">
+      <div class="m-sheet-head">
+        <h2 id="mSheetTitle">你在哪座城市？</h2>
+        <p>选一次就行，会记在本地。也可以跳过。</p>
+      </div>
+      <div class="m-cities-grid" id="mCitiesGrid">
+        <!-- JS 注入 -->
+      </div>
+      <div class="m-sheet-foot">
+        <button class="m-btn-text" id="mSheetSkip" type="button">跳过</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./commute.js?v=20260822a" defer></script>
+</body>
+</html>

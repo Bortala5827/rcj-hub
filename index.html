@@ -26,6 +26,11 @@
     .exam-cta { font-size: 14px; font-weight: 600; color: var(--accent); white-space: nowrap; }
 
     .playground { display: block; text-align: center; padding: 18px; border: 1px dashed var(--ink-4); border-radius: var(--radius); color: var(--ink-3); font-size: 14px; }
+    .playground-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 26px 18px; border-style: solid; border-color: var(--line); background: var(--bg-soft); color: var(--ink); transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease; }
+    .playground-card:hover { border-color: var(--ink-4); background: var(--bg); transform: translateY(-1px); }
+    .playground-eyebrow { font-size: 12px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; }
+    .playground-title { font-size: 18px; font-weight: 700; color: var(--ink); }
+    .playground-sub { font-size: 13px; color: var(--ink-3); }
 
     /* 滚动进入视口逐块浮现（由 RCJMotion.revealOnScroll 接管 opacity 动画；
        clearProps 完成后不回退；无 JS 时引擎内部 showAll 设 inline opacity:1 兜底） */
@@ -259,8 +264,12 @@
           </div>
         </div>
 
-        <!-- Playground -->
-        <div class="playground reveal">Playground · 正在实验的新想法</div>
+        <!-- Playground · 此刻通勤（天涯共此时·第一站） -->
+        <a class="playground playground-card reveal" href="/playground/commute/" aria-label="此刻，谁和我一起在通勤？天涯共此时。">
+          <span class="playground-eyebrow">Playground · 正在实验</span>
+          <span class="playground-title">此刻，谁和我一起在通勤？</span>
+          <span class="playground-sub">天涯共此时。一个极简的轻量实验。</span>
+        </a>
       </div>
     </section>
   </main>
