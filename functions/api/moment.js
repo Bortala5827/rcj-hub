@@ -141,10 +141,7 @@ export async function onRequestGet({ request, env }) {
   if (clearTarget === SCENE) {
     const admin = url.searchParams.get('admin') || '';
     const ok = String(admin).trim() === String(env.ADMIN_KEY || '').trim() && !!env.ADMIN_KEY;
-    if (!ok) {
-      // 临时：无 admin 时也允许一次清空（运维用，调用后请恢复口令校验）
-      // return bad('需要 admin 口令', 403);
-    }
+    if (!ok) return bad('需要 admin 口令', 403);
     try {
       await ensureTable(env);
       await d1(env, `DELETE FROM moments WHERE scene='${SCENE}'`);
