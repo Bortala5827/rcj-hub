@@ -78,6 +78,33 @@
       padding: 14px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--surface);
     }
     .back { display: block; text-align: center; margin-top: 22px; font-size: 13px; color: var(--primary); text-decoration: none; }
+
+    /* 测试连通性 */
+    details.probe { margin-top: 12px; border-top: 1px dashed var(--line); padding-top: 12px; }
+    details.probe > summary {
+      font-size: 13px; font-weight: 600; color: var(--primary); cursor: pointer;
+      list-style: none; user-select: none;
+    }
+    details.probe > summary::-webkit-details-marker { display: none; }
+    details.probe > summary::before { content: "▸ "; opacity: .6; }
+    details.probe[open] > summary::before { content: "▾ "; }
+    .probe-box { margin-top: 10px; display: grid; gap: 8px; }
+    .probe-box label { font-size: 11.5px; color: var(--ink-2); display: block; margin-bottom: 3px; }
+    .probe-box input {
+      width: 100%; box-sizing: border-box; font-size: 13px; padding: 8px 10px;
+      border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink);
+      font-family: inherit;
+    }
+    .probe-box input:focus { outline: none; border-color: var(--primary); }
+    .probe-btn {
+      margin-top: 2px; font-size: 13px; font-weight: 700; color: #fff; background: var(--primary);
+      border: none; border-radius: 999px; padding: 9px 16px; cursor: pointer; justify-self: start;
+    }
+    .probe-btn:disabled { opacity: .55; cursor: default; }
+    .probe-res { font-size: 12.5px; margin-top: 4px; line-height: 1.55; word-break: break-all; }
+    .probe-res.ok { color: #065f46; }
+    .probe-res.err { color: #b91c1c; }
+    .probe-res code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11.5px; background: #f1f5f9; padding: 1px 4px; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -89,7 +116,7 @@
     <p class="updated">最后核对：<b>2026-08-22</b> · 免费额度变动极快，以官网为准</p>
 
     <!-- 小红书 dots -->
-    <div class="card">
+    <div class="card" data-base="https://api.dots.ai/v1" data-model="dots3-note-prev">
       <div class="card-top">
         <span class="card-name">小红书 dots（dots.ai）</span>
         <span class="badge free">有免费层</span>
@@ -110,10 +137,17 @@
         <a href="https://dots.ai/platform/apikeys" target="_blank" rel="noopener">API Key 管理</a>
         <a href="https://dots.ai/platform/docs" target="_blank" rel="noopener">开发文档</a>
       </div>
+      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.dots.ai/v1"></div>
+        <div><label>模型名</label><input class="p-model" type="text" placeholder="dots3-note-prev"></div>
+        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+        <button class="probe-btn" type="button">测试</button>
+        <div class="probe-res" hidden></div>
+      </div></details>
     </div>
 
     <!-- b.ai -->
-    <div class="card">
+    <div class="card" data-base="https://api.b.ai/v1" data-model="deepseek-v4-flash">
       <div class="card-top">
         <span class="card-name">b.ai</span>
         <span class="badge free">有免费模型</span>
@@ -132,10 +166,17 @@
       <div class="links">
         <a href="https://api.b.ai" target="_blank" rel="noopener">b.ai 平台</a>
       </div>
+      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.b.ai/v1"></div>
+        <div><label>模型名</label><input class="p-model" type="text" placeholder="deepseek-v4-flash"></div>
+        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+        <button class="probe-btn" type="button">测试</button>
+        <div class="probe-res" hidden></div>
+      </div></details>
     </div>
 
     <!-- 硅基流动 -->
-    <div class="card">
+    <div class="card" data-base="https://api.siliconflow.cn/v1" data-model="deepseek-ai/DeepSeek-V3">
       <div class="card-top">
         <span class="card-name">硅基流动 SiliconFlow</span>
         <span class="badge free">有免费模型</span>
@@ -155,10 +196,17 @@
         <a href="https://siliconflow.cn" target="_blank" rel="noopener">硅基流动官网</a>
         <a href="https://docs.siliconflow.cn" target="_blank" rel="noopener">开发文档</a>
       </div>
+      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.siliconflow.cn/v1"></div>
+        <div><label>模型名</label><input class="p-model" type="text" placeholder="deepseek-ai/DeepSeek-V3"></div>
+        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+        <button class="probe-btn" type="button">测试</button>
+        <div class="probe-res" hidden></div>
+      </div></details>
     </div>
 
     <!-- 商汤日日新 -->
-    <div class="card">
+    <div class="card" data-base="https://api.sensenova.cn/v1" data-model="SenseNova-6.8-Flash-Lite-Preview">
       <div class="card-top">
         <span class="card-name">商汤日日新 SenseNova</span>
         <span class="badge free">限时免费</span>
@@ -178,10 +226,17 @@
         <a href="https://www.sensenova.cn/" target="_blank" rel="noopener">商汤开放平台</a>
         <a href="https://www.sensenova.cn/token-plan" target="_blank" rel="noopener">Token Plan</a>
       </div>
+      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.sensenova.cn/v1"></div>
+        <div><label>模型名</label><input class="p-model" type="text" placeholder="SenseNova-6.8-Flash-Lite-Preview"></div>
+        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+        <button class="probe-btn" type="button">测试</button>
+        <div class="probe-res" hidden></div>
+      </div></details>
     </div>
 
     <!-- Google Gemini -->
-    <div class="card">
+    <div class="card" data-base="https://generativelanguage.googleapis.com/v1beta/openai" data-model="gemini-2.0-flash">
       <div class="card-top">
         <span class="card-name">Google Gemini</span>
         <span class="badge free">有免费层</span>
@@ -201,6 +256,13 @@
       <div class="links">
         <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">申请 API Key</a>
       </div>
+      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://generativelanguage.googleapis.com/v1beta/openai"></div>
+        <div><label>模型名</label><input class="p-model" type="text" placeholder="gemini-2.0-flash"></div>
+        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+        <button class="probe-btn" type="button">测试</button>
+        <div class="probe-res" hidden></div>
+      </div></details>
     </div>
 
     <p class="note">
@@ -211,5 +273,65 @@
 
     <a class="back" href="https://955827.xyz">← 回到 RCJ Lab 主站</a>
   </div>
+
+  <script>
+  (function () {
+    // 展开时按卡片 data-base / data-model 预填，避免用户重复手填
+    document.querySelectorAll("details.probe").forEach(function (d) {
+      d.addEventListener("toggle", function () {
+        if (!d.open) return;
+        var card = d.closest(".card");
+        var base = card && card.getAttribute("data-base") || "";
+        var model = card && card.getAttribute("data-model") || "";
+        var bInput = d.querySelector(".p-base");
+        var mInput = d.querySelector(".p-model");
+        if (bInput && !bInput.value) bInput.value = base;
+        if (mInput && !mInput.value) mInput.value = model;
+      });
+    });
+
+    document.querySelectorAll(".probe-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var box = btn.closest(".probe-box");
+        var base = box.querySelector(".p-base").value.trim();
+        var model = box.querySelector(".p-model").value.trim();
+        var key = box.querySelector(".p-key").value.trim();
+        var res = box.querySelector(".probe-res");
+        res.hidden = false;
+        res.className = "probe-res";
+        if (!base || !model || !key) {
+          res.classList.add("err");
+          res.textContent = "接口地址、模型名、API Key 三项都要填。";
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = "测试中…";
+        res.textContent = "请求中…";
+        fetch("/api/probe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ baseUrl: base, model: model, apiKey: key })
+        }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (o) {
+            var j = o.j;
+            if (j.ok) {
+              res.classList.add("ok");
+              res.innerHTML = "✓ 连通正常 · 模型 <code>" + (j.model || model) + "</code><br>实际请求：<code>" + j.url + "</code>";
+            } else {
+              res.classList.add("err");
+              var msg = j.error || ("HTTP " + (o.ok ? "" : "错误"));
+              res.innerHTML = "✗ " + msg + (j.url ? "<br>实际请求：<code>" + j.url + "</code>" : "");
+            }
+          }).catch(function (e) {
+            res.classList.add("err");
+            res.textContent = "✗ 请求失败：" + e.message;
+          }).finally(function () {
+            btn.disabled = false;
+            btn.textContent = "测试";
+          });
+      });
+    });
+  })();
+  </script>
 </body>
 </html>
