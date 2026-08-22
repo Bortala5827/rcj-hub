@@ -126,12 +126,6 @@ function randId() {
 
 export async function onRequestGet({ request, env }) {
   if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) return bad('服务端未配置', 500);
-  // 临时清空聊天表（测试期运维用，调后删除）
-  const u = new URL(request.url);
-  if (u.searchParams.get('clear') === '1') {
-    try { await ensureTable(env); await d1(env, `DELETE FROM commute_chat`); return json({ ok: true, cleared: true }); }
-    catch (e) { return bad('清空失败：' + e.message, 500); }
-  }
   const open = testMode(env) ? true : isOpenLocal();
   try {
     await ensureTable(env);
