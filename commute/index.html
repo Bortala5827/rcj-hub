@@ -7,7 +7,7 @@
   <meta name="description" content="此刻，有多少人和我一起在通勤？一个轻量的天涯共此时实验。" />
   <meta name="robots" content="noindex,nofollow" />
   <link rel="stylesheet" href="/assets/hub.v2.css?v=20260822a" />
-  <link rel="stylesheet" href="./commute.css?v=20260822c" />
+  <link rel="stylesheet" href="./commute.css?v=20260822d" />
 </head>
 <body class="hub moment">
   <header class="site-header">
@@ -20,12 +20,7 @@
         <span></span><span></span><span></span>
       </button>
       <nav class="nav-menu" aria-label="站点导航" id="navMenu">
-        <a href="/log.html">LOG</a>
-        <a href="/playground/commute/" aria-current="page">此刻</a>
-        <a href="/solospeak/">SoloSpeak</a>
-        <a href="/letout/">LetOut</a>
-        <a href="https://facetalk.955827.xyz" target="_blank" rel="noopener">FaceTalk</a>
-        <a href="https://exam.955827.xyz" target="_blank" rel="noopener">Exam Hub</a>
+        <a href="/" aria-current="page">此刻通勤</a>
       </nav>
     </div>
   </header>
@@ -44,9 +39,24 @@
         <div class="m-stat-foot">最近 2 小时内未结束的记录</div>
       </div>
 
-      <div class="m-cities" id="mCities" hidden>
-        <span class="m-cities-label">其中</span>
-        <span class="m-cities-list" id="mCitiesList"></span>
+      <!-- 统计：极简，只放数字 -->
+      <div class="m-stats" id="mStats">
+        <div class="m-stat-cell">
+          <div class="m-stat-cell-num" id="mStatDone">0</div>
+          <div class="m-stat-cell-label">今日完成</div>
+        </div>
+        <div class="m-stat-cell">
+          <div class="m-stat-cell-num" id="mStatMin">—</div>
+          <div class="m-stat-cell-label">最短</div>
+        </div>
+        <div class="m-stat-cell">
+          <div class="m-stat-cell-num" id="mStatMax">—</div>
+          <div class="m-stat-cell-label">最长</div>
+        </div>
+        <div class="m-stat-cell">
+          <div class="m-stat-cell-num" id="mStatAvg">—</div>
+          <div class="m-stat-cell-label">平均</div>
+        </div>
       </div>
 
       <!-- 状态 A：未在通勤 -->
@@ -74,12 +84,11 @@
         <button class="m-btn m-btn-primary" id="mBtnStart" type="button">
           <span class="m-btn-label">我出发了</span>
         </button>
-        <button class="m-btn-text" id="mBtnCity" type="button">选个城市（可选）</button>
       </div>
 
       <!-- 状态 B：在通勤中 -->
       <div class="m-action m-action-on" id="mActionOn" hidden>
-        <div class="m-on-meta" id="mOnMeta">通勤中 · <span id="mOnCity">未选城市</span></div>
+        <div class="m-on-meta" id="mOnMeta">通勤中</div>
         <div class="m-timer" id="mTimer" aria-live="off">00:00</div>
         <button class="m-btn m-btn-success" id="mBtnArrive" type="button">
           <span class="m-btn-label">我到了</span>
@@ -91,28 +100,10 @@
     </section>
 
     <p class="m-foot reveal">
-      RCJ Lab · 一个持续小实验的场地 ·
-      <a href="/">回到首页</a>
+      <a href="/">RCJ Lab</a>
     </p>
   </main>
 
-  <!-- 城市选择 sheet -->
-  <div class="m-sheet" id="mSheet" hidden aria-modal="true" role="dialog" aria-labelledby="mSheetTitle">
-    <div class="m-sheet-mask" data-close></div>
-    <div class="m-sheet-card">
-      <div class="m-sheet-head">
-        <h2 id="mSheetTitle">你在哪座城市？</h2>
-        <p>选一次就行，会记在本地。也可以跳过。</p>
-      </div>
-      <div class="m-cities-grid" id="mCitiesGrid">
-        <!-- JS 注入 -->
-      </div>
-      <div class="m-sheet-foot">
-        <button class="m-btn-text" id="mSheetSkip" type="button">跳过</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="./commute.js?v=20260822c" defer></script>
+  <script src="./commute.js?v=20260822d" defer></script>
 </body>
 </html>

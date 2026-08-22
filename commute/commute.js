@@ -4,16 +4,32 @@
   'use strict';
 
   const API = '/api/moment';
-  const LS_CITY = 'rcj_moment_city_v1';
-  const LS_SESSION = 'rcj_moment_session_v1'; // {id, startedAt, city}
+  const LS_SESSION = 'rcj_moment_session_v1'; // {id, startedAt, mode, traffic}
+  const LS_CLIENT = 'rcj_moment_client_v1';
 
-  // 第一版 16 个城市（克制起步，不堆）
-  const CITIES = ['北京', '上海', '广州', '深圳', '杭州', '成都', '南京', '苏州',
-                  '武汉', '西安', '重庆', '长沙', '厦门', '青岛', '天津', '其他'];
+  // clientId：浏览器本地生成，用于 web 端软唯一性（防同一浏览器刷量）
+  function getClientId() {
+    let id = localStorage.getItem(LS_CLIENT);
+    if (!id) {
+      const b = new Uint8Array(12);
+      crypto.getRandomValues(b);
+      id = Array.from(b).map((x) => x.toString(36)).join('').slice(0, 16);
+      localStorage.setItem(LS_CLIENT, id);
+    }
+    return id;
+  }
 
   // ── 工具 ──
   const $ = (id) => document.getElementById(id);
   const fmt = (n) => Number(n).toLocaleString('zh-CN');
+  const fmtDur = (sec) => {
+    if (!sec) return '—';
+    if (sec < 60) return sec + '″';
+    const m = Math.floor(sec / 60);
+    if (m < 60) return m + '′';
+    const h = Math.floor(m / 60);
+    return h + 'h' + (m % 60) + '′';
+  };
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   function loadSession() {
@@ -25,22 +41,15 @@
     else localStorage.removeItem(LS_SESSION);
   }
 
-  // ── 视图：数字 / 城市行 / 按钮态切换 ──
+  // ── 视图：数字 / 统计 / 按钮态切换 ──
   function renderCount(snap) {
     const n = (snap && Number(snap.active)) || 0;
     $('mNum').textContent = n > 0 ? fmt(n) : '0';
-    const cities = (snap && snap.byCity) || {};
-    const keys = Object.keys(cities).filter((k) => cities[k] > 0);
-    if (keys.length === 0) {
-      $('mCities').hidden = true;
-    } else {
-      $('mCities').hidden = false;
-      keys.sort((a, b) => cities[b] - cities[a]);
-      const top = keys.slice(0, 4);
-      $('mCitiesList').innerHTML = top
-        .map((k) => `<span class="m-city-chip"><b>${k}</b>${fmt(cities[k])}</span>`)
-        .join('');
-    }
+    const s = (snap && snap.stats) || {};
+    $('mStatDone').textContent = s.doneToday || 0;
+    $('mStatMin').textContent = fmtDur(s.minSec);
+    $('mStatMax').textContent = fmtDur(s.maxSec);
+    $('mStatAvg').textContent = fmtDur(s.avgSec);
   }
 
   function showIdle() {
@@ -50,7 +59,6 @@
   function showOn(session) {
     $('mActionIdle').hidden = true;
     $('mActionOn').hidden = false;
-    $('mOnCity').textContent = session.city || '未选城市';
   }
 
   function setBtnLoading(btn, loading, label) {
@@ -97,34 +105,6 @@
   }
   function stopTimer() { if (timerHandle) { clearInterval(timerHandle); timerHandle = null; } }
 
-  // ── 城市 sheet ──
-  function openSheet() {
-    const grid = $('mCitiesGrid');
-    const cur = localStorage.getItem(LS_CITY) || '';
-    grid.innerHTML = CITIES.map((c) =>
-      `<button type="button" data-c="${c}" aria-pressed="${c === cur ? 'true' : 'false'}">${c}</button>`
-    ).join('');
-    const sheet = $('mSheet');
-    sheet.hidden = false;          // 兜底，避免某些浏览器 display 处理差异
-    sheet.classList.add('is-open');
-    grid.querySelectorAll('button').forEach((b) => {
-      b.addEventListener('click', () => {
-        const c = b.dataset.c;
-        localStorage.setItem(LS_CITY, c);
-        const sess = loadSession();
-        if (sess) saveSession({ ...sess, city: c });
-        closeSheet();
-        // 如果当前在通勤中，立刻刷新城市显示
-        if (sess) $('mOnCity').textContent = c;
-      });
-    });
-  }
-  function closeSheet() {
-    const sheet = $('mSheet');
-    sheet.classList.remove('is-open');
-    sheet.hidden = true;
-  }
-
   // ── chip 单选（方式/路况）──
   let pickedMode = '';
   let pickedTraffic = '';
@@ -152,9 +132,8 @@
     const btn = $('mBtnStart');
     setBtnLoading(btn, true, '正在加入…');
     try {
-      const city = localStorage.getItem(LS_CITY) || '';
-      const j = await postAction({ action: 'start', city, mode: pickedMode, traffic: pickedTraffic });
-      const session = { id: j.id, startedAt: j.startedAt || new Date().toISOString(), city, mode: pickedMode, traffic: pickedTraffic };
+      const j = await postAction({ action: 'start', clientId: getClientId(), mode: pickedMode, traffic: pickedTraffic });
+      const session = { id: j.id, startedAt: j.startedAt || new Date().toISOString(), mode: pickedMode, traffic: pickedTraffic };
       saveSession(session);
       renderCount(j);
       showOn(session);
@@ -238,9 +217,6 @@
     $('mBtnStart').addEventListener('click', onStart);
     $('mBtnArrive').addEventListener('click', onArrive);
     $('mBtnCancel').addEventListener('click', onCancel);
-    $('mBtnCity').addEventListener('click', openSheet);
-    document.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', closeSheet));
-    $('mSheetSkip').addEventListener('click', closeSheet);
     // chip 单选绑定
     bindChips('mModeChips', 'pickedMode', (b) => b.dataset.mode);
     bindChips('mTrafficChips', 'pickedTraffic', (b) => b.dataset.traffic);
@@ -255,11 +231,11 @@
     if (sess) {
       // 用服务端活跃列表确认会话还活着
       try {
-        const live = await postAction({ action: 'start', id: sess.id, city: sess.city || '' });
+        const live = await postAction({ action: 'start', id: sess.id });
         // 命中恢复
         pickedMode = sess.mode || '';
         pickedTraffic = sess.traffic || '';
-        saveSession({ id: sess.id, startedAt: sess.startedAt, city: sess.city || '', mode: pickedMode, traffic: pickedTraffic });
+        saveSession({ id: sess.id, startedAt: sess.startedAt, mode: pickedMode, traffic: pickedTraffic });
         showOn(sess);
         startTimer(sess.startedAt);
         renderCount(live);

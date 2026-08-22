@@ -57,6 +57,19 @@
 }
 .m-cities-list .m-city-chip b { font-weight: 600; color: var(--ink); margin-right: 2px; }
 
+/* 统计块：极简四格 */
+.m-stats {
+  margin: 20px auto 0; padding-top: 18px;
+  border-top: 1px dashed var(--line);
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+.m-stat-cell { text-align: center; }
+.m-stat-cell-num {
+  font-size: 22px; font-weight: 700; color: var(--ink);
+  font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+}
+.m-stat-cell-label { color: var(--ink-4); font-size: 11px; margin-top: 2px; }
+
 /* 按钮区 */
 .m-action { margin-top: 28px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .m-btn {
@@ -133,39 +146,6 @@
 .m-err {
   margin-top: 10px; color: #b91c1c; font-size: 12px; min-height: 16px;
 }
-
-/* 城市 sheet */
-.m-sheet {
-  position: fixed; inset: 0; z-index: 100;
-  display: none; align-items: flex-end; justify-content: center;
-}
-.m-sheet.is-open { display: flex; }
-.m-sheet-mask {
-  position: absolute; inset: 0; background: rgba(15, 23, 42, 0.32);
-  backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
-}
-.m-sheet-card {
-  position: relative; width: 100%; max-width: 480px;
-  background: var(--bg); border-radius: 20px 20px 0 0;
-  padding: 24px 24px 32px; box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.12);
-  animation: mSheetUp 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-@keyframes mSheetUp { from { transform: translateY(20%); opacity: 0.6; } to { transform: none; opacity: 1; } }
-.m-sheet-head h2 { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
-.m-sheet-head p { color: var(--ink-3); font-size: 13px; margin-bottom: 16px; }
-.m-cities-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-}
-.m-cities-grid button {
-  appearance: none; border: 1px solid var(--line); background: var(--bg);
-  border-radius: 12px; padding: 10px 6px; font: inherit; font-size: 13px;
-  color: var(--ink); cursor: pointer; transition: all 0.15s ease;
-}
-.m-cities-grid button:hover { border-color: var(--ink); background: var(--bg-soft); }
-.m-cities-grid button[aria-pressed="true"] {
-  background: var(--ink); color: #fff; border-color: var(--ink);
-}
-.m-sheet-foot { display: flex; justify-content: center; margin-top: 16px; }
 
 /* reveal 简单淡入：与主站 reveal 行为一致 */
 .reveal { opacity: 0; transform: translateY(8px); transition: opacity 0.6s ease, transform 0.6s ease; }

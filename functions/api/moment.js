@@ -3,14 +3,18 @@
 // 第一版场景固定：commute（通勤）
 //
 // 接口：
-//   GET  /api/moment                       -> { ok, scene, active, byCity:{city:n}, totalToday }
-//   POST /api/moment  {action:'start',city} -> { ok, id, startedAt, active, byCity }
-//   POST /api/moment  {action:'arrive',id}  -> { ok, durationSec, active, byCity }
-//   POST /api/moment  {action:'leave',id}   -> 兜底：用户手动结束（不计入到达）
+//   GET  /api/moment                  -> { ok, scene, active, stats:{doneToday,minSec,maxSec,avgSec} }
+//   POST /api/moment  {action:'start', clientId, mode?, traffic?}
+//                                       -> { ok, id, startedAt, active } 或 { ok:false, error:'已有进行中的记录' }
+//   POST /api/moment  {action:'arrive', id}   -> { ok, durationSec, active }
+//   POST /api/moment  {action:'leave', id}    -> 兜底：用户手动结束（不计入到达）
 //
 // 自动超时：active 定义为 (status='active' AND started_at 在 2 小时内)
 // 用 SQL 的 (julianday('now')-julianday(started_at)) < 2/24 过滤——
 // 不依赖独立 cron，用户离开页面也不影响实时计数准确性。
+//
+// 防刷：web 端无微信 openid，用 clientId（浏览器 localStorage 生成）做软唯一性——
+// 同一 clientId 在 2h 内只能有 1 条 active 记录，避免单浏览器无限刷「我出发了」。
 
 const DB = 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828'; // rcj-analytics-d1
 const SCENE = 'commute';
@@ -75,12 +79,14 @@ async function ensureTable(env) {
       created_at TEXT NOT NULL
     )`);
     await d1(env, `CREATE INDEX IF NOT EXISTS idx_moments_active ON moments(scene, status, started_at)`);
-    // 兼容旧表（v1 上线时无 mode/traffic 列）：探测后幂等补加
+    // 兼容旧表（v1 上线时无 mode/traffic/client_id 列）：探测后幂等补加
     try {
       const info = await d1(env, `PRAGMA table_info(moments)`);
       const cols = (info[0] && info[0].results || []).map((r) => r.name);
       if (!cols.includes('mode')) await d1(env, `ALTER TABLE moments ADD COLUMN mode TEXT`);
       if (!cols.includes('traffic')) await d1(env, `ALTER TABLE moments ADD COLUMN traffic TEXT`);
+      if (!cols.includes('client_id')) await d1(env, `ALTER TABLE moments ADD COLUMN client_id TEXT`);
+      if (!cols.includes('duration_sec')) await d1(env, `ALTER TABLE moments ADD COLUMN duration_sec INTEGER`);
     } catch { /* PRAGMA 不支持时忽略，新表已有列 */ }
   })();
   return _ready;
@@ -91,16 +97,27 @@ function esc(s) { return String(s).replace(/'/g, "''").slice(0, 64); }
 
 async function snapshot(env) {
   const res = await d1(env,
-    `SELECT city, COUNT(*) c FROM moments WHERE scene='${SCENE}' AND ${ACTIVE_FILTER} GROUP BY city`);
+    `SELECT COUNT(*) c FROM moments WHERE scene='${SCENE}' AND ${ACTIVE_FILTER}`);
   const rows = (res[0] && res[0].results) || [];
-  const byCity = {};
-  let active = 0;
-  for (const r of rows) {
-    const n = Number(r.c) || 0;
-    byCity[r.city || '未填'] = n;
-    active += n;
-  }
-  return { active, byCity };
+  const active = Number(rows[0] && rows[0].c) || 0;
+  return { active };
+}
+
+// 今日已完成（arrived）的通勤统计：次数 / 最短 / 最长 / 平均时长
+async function statsToday(env) {
+  const res = await d1(env,
+    `SELECT COUNT(*) n, MIN(duration_sec) mn, MAX(duration_sec) mx, AVG(duration_sec) av
+     FROM moments
+     WHERE scene='${SCENE}' AND status='arrived'
+       AND date(ended_at, 'localtime') = date('now', 'localtime')`);
+  const r = (res[0] && res[0].results && res[0].results[0]) || {};
+  const n = Number(r.n) || 0;
+  return {
+    doneToday: n,
+    minSec: n ? Number(r.mn) : 0,
+    maxSec: n ? Number(r.mx) : 0,
+    avgSec: n ? Math.round(Number(r.av)) : 0,
+  };
 }
 
 export async function onRequestGet({ env }) {
@@ -109,8 +126,9 @@ export async function onRequestGet({ env }) {
   }
   try {
     await ensureTable(env);
-    const { active, byCity } = await snapshot(env);
-    return json({ ok: true, scene: SCENE, active, byCity, autoEndHours: AUTO_END_HOURS });
+    const { active } = await snapshot(env);
+    const stats = await statsToday(env);
+    return json({ ok: true, scene: SCENE, active, stats, autoEndHours: AUTO_END_HOURS });
   } catch (e) {
     return bad('查询失败：' + e.message, 500);
   }
@@ -137,6 +155,8 @@ export async function onRequestPost({ request, env }) {
     await ensureTable(env);
 
     if (action === 'start') {
+      const clientId = String(body.clientId || '').slice(0, 64);
+
       // 1) 同 session 已有未结束？直接恢复（idempotent），避免重复计数
       const existingId = String(body.id || '').slice(0, 64);
       if (existingId) {
@@ -148,13 +168,24 @@ export async function onRequestPost({ request, env }) {
           return json({ ok: true, id: hit.id, restored: true, ...snap });
         }
       }
+
+      // 2) 防刷：同一 clientId 在 2h 内已有 active 记录，则拒绝新建（web 端软唯一性）
+      if (clientId) {
+        const dup = await d1(env,
+          `SELECT id FROM moments WHERE scene='${SCENE}' AND client_id='${esc(clientId)}' AND ${ACTIVE_FILTER} LIMIT 1`);
+        const hit = (dup[0] && dup[0].results && dup[0].results[0]) || null;
+        if (hit) {
+          const snap = await snapshot(env);
+          return json({ ok: true, id: hit.id, restored: true, ...snap });
+        }
+      }
+
       const id = randId();
-      const city = body.city ? esc(String(body.city).slice(0, 16)) : '';
       const mode = body.mode ? esc(String(body.mode).slice(0, 16)) : '';
       const traffic = body.traffic ? esc(String(body.traffic).slice(0, 16)) : '';
       const now = new Date().toISOString();
       await d1(env,
-        `INSERT INTO moments(id, scene, city, mode, traffic, status, started_at, created_at) VALUES('${id}','${SCENE}','${city}','${mode}','${traffic}','active','${now}','${now}')`);
+        `INSERT INTO moments(id, scene, client_id, mode, traffic, status, started_at, created_at) VALUES('${id}','${SCENE}','${esc(clientId)}','${mode}','${traffic}','active','${now}','${now}')`);
       const snap = await snapshot(env);
       return json({ ok: true, id, startedAt: now, ...snap });
     }
@@ -175,7 +206,7 @@ export async function onRequestPost({ request, env }) {
       const startedAt = row.started_at;
       const durationSec = Math.max(0, Math.round((new Date(now) - new Date(startedAt)) / 1000));
       await d1(env,
-        `UPDATE moments SET status='arrived', ended_at='${now}' WHERE id='${id}' AND scene='${SCENE}'`);
+        `UPDATE moments SET status='arrived', ended_at='${now}', duration_sec=${durationSec} WHERE id='${id}' AND scene='${SCENE}'`);
       const snap = await snapshot(env);
       return json({ ok: true, durationSec, ...snap });
     }
