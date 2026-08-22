@@ -6,27 +6,31 @@
 //   GET  /api/admin/commute-chat?delAll=1         清空所有聊天（含 commute_chat_rl 限流表）
 const DB = 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828'; // rcj-analytics-d1
 
-function hmacHex(key, msg) {
+// HMAC-SHA256 → base64（与 login.js / health.js / data.js 保持一致；
+// 历史曾用 hex 验签，导致 login 写 base64 cookie 后这两个接口 401，已统一为 base64）
+async function hmac(value, secret) {
   const enc = new TextEncoder();
-  return crypto.subtle.importKey('raw', enc.encode(key), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
-    .then(kh => crypto.subtle.sign('HMAC', kh, enc.encode(msg)))
-    .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const buf = await crypto.subtle.sign('HMAC', key, enc.encode(value));
+  const b = new Uint8Array(buf);
+  let s = '';
+  for (const x of b) s += String.fromCharCode(x);
+  return btoa(s);
 }
-
+function getCookie(req, name) {
+  const c = req.headers.get('Cookie') || '';
+  const m = c.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : null;
+}
 async function verifyCookie(request, env) {
   const pw = env.ADMIN_PASSWORD || env.ADMIN_KEY || '';
   if (!pw) return false;
-  const ck = request.headers.get('Cookie') || '';
-  const m = ck.match(/rcj_admin=([^;]+)/);
-  if (!m) return false;
-  const [ts, sig] = m[1].split('.');
+  const cookie = getCookie(request, 'rcj_admin');
+  if (!cookie) return false;
+  const [ts, sig] = cookie.split('.');
   if (!ts || !sig) return false;
-  if (Date.now() / 1000 - Number(ts) > 60 * 60 * 24 * 7) return false;
-  const expect = await hmacHex(pw, ts);
-  if (expect.length !== sig.length) return false;
-  let ok = 1;
-  for (let i = 0; i < expect.length; i++) ok &= (expect.charCodeAt(i) === sig.charCodeAt(i));
-  return ok === 1;
+  if (Date.now() / 1000 - Number(ts) > 60 * 60 * 24 * 7) return false; // 7 天过期
+  return (await hmac(ts, pw)) === sig;
 }
 
 function d1(env, dbId, sql) {

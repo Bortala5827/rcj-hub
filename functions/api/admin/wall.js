@@ -6,31 +6,33 @@
 //   POST /api/admin/wall  body: {del:<id>} | {delIp:<ip>}
 const FACETALK_DB = 'f93a89d7-a3d1-4f4c-9f5a-3b8e9c7d2a1f'; // mianshi-dazi-d1
 
-function hmacHex(key, msg) {
+// HMAC-SHA256 → base64（与 login.js / health.js / data.js 保持一致；
+// 历史曾用 hex 验签，导致 login 写 base64 cookie 后这两个接口 401，已统一为 base64）
+function hmac(key, msg) {
   const enc = new TextEncoder();
-  const k = enc.encode(key);
-  const m = enc.encode(msg);
-  // 简易 HMAC-SHA256（Web Crypto）
-  return crypto.subtle.importKey('raw', k, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
-    .then(kh => crypto.subtle.sign('HMAC', kh, m))
-    .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+  return crypto.subtle.importKey('raw', enc.encode(key), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+    .then(kh => crypto.subtle.sign('HMAC', kh, enc.encode(msg)))
+    .then(buf => {
+      const b = new Uint8Array(buf);
+      let s = '';
+      for (const x of b) s += String.fromCharCode(x);
+      return btoa(s);
+    });
 }
-
+function getCookie(req, name) {
+  const c = req.headers.get('Cookie') || '';
+  const m = c.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : null;
+}
 async function verifyCookie(request, env) {
   const pw = env.ADMIN_PASSWORD || env.ADMIN_KEY || '';
   if (!pw) return false;
-  const ck = request.headers.get('Cookie') || '';
-  const m = ck.match(/rcj_admin=([^;]+)/);
-  if (!m) return false;
-  const [ts, sig] = m[1].split('.');
+  const cookie = getCookie(request, 'rcj_admin');
+  if (!cookie) return false;
+  const [ts, sig] = cookie.split('.');
   if (!ts || !sig) return false;
   if (Date.now() / 1000 - Number(ts) > 60 * 60 * 24 * 7) return false; // 7 天过期
-  const expect = await hmacHex(pw, ts);
-  // 定长比较防时序攻击
-  if (expect.length !== sig.length) return false;
-  let ok = 1;
-  for (let i = 0; i < expect.length; i++) ok &= (expect.charCodeAt(i) === sig.charCodeAt(i));
-  return ok === 1;
+  return (await hmac(pw, ts)) === sig;
 }
 
 function adminOk(request, env) {
