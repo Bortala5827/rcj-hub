@@ -237,7 +237,7 @@
 }
 .m-yk-track.is-scrolling {
   width: max-content;
-  animation: yk-scroll 60s linear infinite;
+  animation: yk-scroll 110s linear infinite;
 }
 .m-yk-track.is-scrolling:hover { animation-play-state: paused; }
 @keyframes yk-scroll {
@@ -259,7 +259,6 @@
   padding: 1px 7px; border-radius: 999px; font-weight: 600;
 }
 .m-yk-text { overflow: hidden; text-overflow: ellipsis; }
-.m-yk-foot { margin: 10px 2px 0; font-size: 11.5px; color: var(--ink-4); }
 .m-yk-loading { color: var(--ink-4); font-size: 13px; padding: 4px 2px; }
 
 /* 手机适配 */
