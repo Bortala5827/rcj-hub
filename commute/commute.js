@@ -298,6 +298,7 @@
       if (!r.ok || !j.ok) {
         if (j.code === 'CLOSED') { chatShowClosed(); return; }
         if (j.code === 'RATE_LIMIT') { showChatQuota(`请 ${j.left} 秒后再发`); return; }
+        if (j.code === 'BURST_LIMIT') { showChatQuota(`一分钟发言太多，请 ${j.left} 秒后再发`); return; }
         if (j.code === 'DAILY_LIMIT') { showChatQuota('今日发言已达上限'); return; }
         showChatQuota(j.error || '发送失败');
         return;

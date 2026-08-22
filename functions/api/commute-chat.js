@@ -2,8 +2,11 @@
 // 复用 rcj-analytics-d1（与 moment / track / notes 同一库、同一套 CF_API_TOKEN+CF_ACCOUNT_ID 直连）
 //
 // 设计约束（用户要求，克制优先）：
-//   - 单条文本 ≤ 50 字
-//   - 防狂刷：单 IP 发言间隔 ≥ 8 秒，单 IP 单日 ≤ 30 条
+//   - 单条文本 ≤ 40 字
+//   - 防狂刷（单 IP 三道闸，任意一道命中即拒）：
+//       1) 发言间隔 ≥ 15 秒（相邻两条最小间隔）
+//       2) 每分钟突发 ≤ 5 条（匀速脚本也刷不动）
+//       3) 单日累计 ≤ 15 条
 //   - 当日即自动清除：用 date(created_at,'localtime')=date('now','localtime') 过滤，跨过本地 0 点旧数据自然不返回
 //   - 实时：前端轮询（CF Pages Functions 无 WebSocket 常驻能力，轮询最克制）
 //
@@ -12,7 +15,7 @@
 //   POST /api/commute-chat  { text }  -> { ok, item } | { ok:false, error, code, left? }
 
 const DB = 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828'; // rcj-analytics-d1
-const MAX_LEN = 50;
+const MAX_LEN = 40;
 const RATE_SEC = 8;
 const DAILY_IP_LIMIT = 30;
 const MAX_ITEMS = 100;
@@ -81,6 +84,11 @@ async function d1(env, sql, ms = 6000) {
   } finally { clearTimeout(t); }
 }
 
+// 限流配置（单 IP 三道闸）
+const RATE_SEC = 15;        // 相邻发言最小间隔（秒）
+const BURST_PER_MIN = 5;    // 单 IP 每分钟最多 5 条（滑动窗口）
+const DAILY_IP_LIMIT = 15;  // 单 IP 单日累计上限
+
 let _ready = null;
 async function ensureTable(env) {
   if (_ready) return _ready;
@@ -95,6 +103,8 @@ async function ensureTable(env) {
     await d1(env, `CREATE TABLE IF NOT EXISTS commute_chat_rl (
       ip TEXT PRIMARY KEY,
       last_ts INTEGER NOT NULL,
+      min_ts INTEGER NOT NULL DEFAULT 0,
+      min_n INTEGER NOT NULL DEFAULT 0,
       day TEXT NOT NULL,
       n INTEGER DEFAULT 0
     )`);
@@ -157,29 +167,33 @@ export async function onRequestPost({ request, env }) {
   const nowSec = Math.floor(Date.now() / 1000);
   const today = now.slice(0, 10);
 
-  // 频率：单 IP ≥ 8s（测试模式跳过）
+  // 频率：单 IP 三道闸（测试模式跳过）
   if (!tm) {
     try {
-      const r = await d1(env, `SELECT last_ts, day, n FROM commute_chat_rl WHERE ip='${esc(ip)}' LIMIT 1`);
+      const r = await d1(env, `SELECT last_ts, min_ts, min_n, day, n FROM commute_chat_rl WHERE ip='${esc(ip)}' LIMIT 1`);
       const row = (r[0] && r[0].results && r[0].results[0]) || null;
       if (row) {
         const last = Number(row.last_ts) || 0;
+        const min_ts = Number(row.min_ts) || 0;
+        const min_n = Number(row.min_n) || 0;
+        const dayCount = row.day === today ? (Number(row.n) || 0) : 0;
+
+        // 闸 1：相邻发言最小间隔
         if (nowSec - last < RATE_SEC) {
           const left = RATE_SEC - (nowSec - last);
           return bad(`说得太快啦，请 ${left} 秒后再发`, 'RATE_LIMIT', { left });
         }
+        // 闸 2：每分钟突发上限（滑动窗口，跨分钟自动重置）
+        if (nowSec - min_ts < 60 && min_n >= BURST_PER_MIN) {
+          const left = 60 - (nowSec - min_ts);
+          return bad(`一分钟发言太多啦，请 ${left} 秒后再发`, 'BURST_LIMIT', { left });
+        }
+        // 闸 3：单日累计上限
+        if (dayCount >= DAILY_IP_LIMIT) {
+          return bad(`你今天发言已达上限（${DAILY_IP_LIMIT} 条），明日再来～`, 'DAILY_LIMIT', { resetIn: secToLocalMidnight() });
+        }
       }
     } catch { /* 限速失败不阻断 */ }
-
-    // 单日配额：单 IP ≤ 30（测试模式跳过）
-    try {
-      const r = await d1(env, `SELECT n FROM commute_chat_rl WHERE ip='${esc(ip)}' AND day='${today}' LIMIT 1`);
-      const row = (r[0] && r[0].results && r[0].results[0]) || null;
-      const dayCount = row ? Number(row.n) || 0 : 0;
-      if (dayCount >= DAILY_IP_LIMIT) {
-        return bad('你今天发言已达上限（30 条），明日再来～', 'DAILY_LIMIT', { resetIn: secToLocalMidnight() });
-      }
-    } catch { /* 计数失败不阻断 */ }
   }
 
   // 内容校验
@@ -193,10 +207,21 @@ export async function onRequestPost({ request, env }) {
   try {
     await d1(env,
       `INSERT INTO commute_chat(id, text, client_id, created_at) VALUES('${id}','${esc(text)}','${esc(clientId)}','${now}')`);
-    // 更新限速表（upsert：同日 +1，跨日重置）
+    // 更新限速表（upsert）：
+    // - last_ts 永远刷新（闸1）
+    // - 同一分钟内 min_ts 不变、min_n+1；跨分钟则 min_ts=now、min_n=1（闸2 滑动窗口）
+    // - 同日 n+1，跨日重置为 1（闸3）
+    const inSameMin = `CASE WHEN ${nowSec} - min_ts < 60 THEN min_n + 1 ELSE 1 END`;
+    const newMinTs = `CASE WHEN ${nowSec} - min_ts < 60 THEN min_ts ELSE ${nowSec} END`;
     await d1(env,
-      `INSERT INTO commute_chat_rl(ip, last_ts, day, n) VALUES('${esc(ip)}', ${nowSec}, '${today}', 1)
-       ON CONFLICT(ip) DO UPDATE SET last_ts=${nowSec}, day='${today}', n = CASE WHEN day='${today}' THEN n+1 ELSE 1 END`);
+      `INSERT INTO commute_chat_rl(ip, last_ts, min_ts, min_n, day, n)
+         VALUES('${esc(ip)}', ${nowSec}, ${nowSec}, 1, '${today}', 1)
+       ON CONFLICT(ip) DO UPDATE SET
+         last_ts=${nowSec},
+         min_ts=${newMinTs},
+         min_n=${inSameMin},
+         day='${today}',
+         n = CASE WHEN day='${today}' THEN n+1 ELSE 1 END`);
   } catch (e) {
     return bad('写入失败：' + e.message, 500);
   }
