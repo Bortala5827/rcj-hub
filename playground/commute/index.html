@@ -7,7 +7,7 @@
   <meta name="description" content="此刻，有多少人和我一起在通勤？一个轻量的天涯共此时实验。" />
   <meta name="robots" content="noindex,nofollow" />
   <link rel="stylesheet" href="/assets/hub.v2.css?v=20260822a" />
-  <link rel="stylesheet" href="./commute.css?v=20260822a" />
+  <link rel="stylesheet" href="./commute.css?v=20260822b" />
 </head>
 <body class="hub moment">
   <header class="site-header">
@@ -51,6 +51,26 @@
 
       <!-- 状态 A：未在通勤 -->
       <div class="m-action" id="mActionIdle">
+        <div class="m-fields">
+          <div class="m-field">
+            <div class="m-field-label">通勤方式（可选）</div>
+            <div class="m-chips" id="mModeChips" role="radiogroup" aria-label="通勤方式">
+              <button type="button" class="m-chip" data-mode="地铁" aria-pressed="false"><span class="m-dot m-dot-subway"></span>地铁</button>
+              <button type="button" class="m-chip" data-mode="公交" aria-pressed="false"><span class="m-dot m-dot-bus"></span>公交</button>
+              <button type="button" class="m-chip" data-mode="自驾" aria-pressed="false"><span class="m-dot m-dot-car"></span>自驾</button>
+              <button type="button" class="m-chip" data-mode="小电驴" aria-pressed="false"><span class="m-dot m-dot-ebike"></span>小电驴</button>
+              <button type="button" class="m-chip" data-mode="步行" aria-pressed="false"><span class="m-dot m-dot-walk"></span>步行</button>
+            </div>
+          </div>
+          <div class="m-field">
+            <div class="m-field-label">今日路况（可选）</div>
+            <div class="m-chips" id="mTrafficChips" role="radiogroup" aria-label="路况">
+              <button type="button" class="m-chip" data-traffic="畅通" aria-pressed="false">🛣️ 一路畅通</button>
+              <button type="button" class="m-chip" data-traffic="走走停停" aria-pressed="false">🚦 走走停停</button>
+              <button type="button" class="m-chip" data-traffic="寸步难行" aria-pressed="false">🚧 寸步难行</button>
+            </div>
+          </div>
+        </div>
         <button class="m-btn m-btn-primary" id="mBtnStart" type="button">
           <span class="m-btn-label">我出发了</span>
         </button>
@@ -93,6 +113,6 @@
     </div>
   </div>
 
-  <script src="./commute.js?v=20260822a" defer></script>
+  <script src="./commute.js?v=20260822b" defer></script>
 </body>
 </html>

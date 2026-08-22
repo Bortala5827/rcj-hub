@@ -67,12 +67,21 @@ async function ensureTable(env) {
       id TEXT PRIMARY KEY,
       scene TEXT NOT NULL,
       city TEXT,
+      mode TEXT,
+      traffic TEXT,
       status TEXT NOT NULL,
       started_at TEXT NOT NULL,
       ended_at TEXT,
       created_at TEXT NOT NULL
     )`);
     await d1(env, `CREATE INDEX IF NOT EXISTS idx_moments_active ON moments(scene, status, started_at)`);
+    // 兼容旧表（v1 上线时无 mode/traffic 列）：探测后幂等补加
+    try {
+      const info = await d1(env, `PRAGMA table_info(moments)`);
+      const cols = (info[0] && info[0].results || []).map((r) => r.name);
+      if (!cols.includes('mode')) await d1(env, `ALTER TABLE moments ADD COLUMN mode TEXT`);
+      if (!cols.includes('traffic')) await d1(env, `ALTER TABLE moments ADD COLUMN traffic TEXT`);
+    } catch { /* PRAGMA 不支持时忽略，新表已有列 */ }
   })();
   return _ready;
 }
@@ -141,9 +150,11 @@ export async function onRequestPost({ request, env }) {
       }
       const id = randId();
       const city = body.city ? esc(String(body.city).slice(0, 16)) : '';
+      const mode = body.mode ? esc(String(body.mode).slice(0, 16)) : '';
+      const traffic = body.traffic ? esc(String(body.traffic).slice(0, 16)) : '';
       const now = new Date().toISOString();
       await d1(env,
-        `INSERT INTO moments(id, scene, city, status, started_at, created_at) VALUES('${id}','${SCENE}','${city}','active','${now}','${now}')`);
+        `INSERT INTO moments(id, scene, city, mode, traffic, status, started_at, created_at) VALUES('${id}','${SCENE}','${city}','${mode}','${traffic}','active','${now}','${now}')`);
       const snap = await snapshot(env);
       return json({ ok: true, id, startedAt: now, ...snap });
     }

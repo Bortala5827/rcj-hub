@@ -119,14 +119,36 @@
   }
   function closeSheet() { $('mSheet').hidden = true; }
 
+  // ── chip 单选（方式/路况）──
+  let pickedMode = '';
+  let pickedTraffic = '';
+  function bindChips(containerId, key, getVal) {
+    const box = $(containerId);
+    if (!box) return;
+    box.querySelectorAll('.m-chip').forEach((b) => {
+      b.addEventListener('click', () => {
+        const on = b.getAttribute('aria-pressed') === 'true';
+        box.querySelectorAll('.m-chip').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+        if (!on) { b.setAttribute('aria-pressed', 'true'); window[key] = getVal(b); }
+        else { window[key] = ''; }
+      });
+    });
+  }
+  function resetChips() {
+    ['mModeChips', 'mTrafficChips'].forEach((id) => {
+      const box = $(id); if (box) box.querySelectorAll('.m-chip').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+    });
+    pickedMode = ''; pickedTraffic = '';
+  }
+
   // ── 主流程 ──
   async function onStart() {
     const btn = $('mBtnStart');
     setBtnLoading(btn, true, '正在加入…');
     try {
       const city = localStorage.getItem(LS_CITY) || '';
-      const j = await postAction({ action: 'start', city });
-      const session = { id: j.id, startedAt: j.startedAt || new Date().toISOString(), city };
+      const j = await postAction({ action: 'start', city, mode: pickedMode, traffic: pickedTraffic });
+      const session = { id: j.id, startedAt: j.startedAt || new Date().toISOString(), city, mode: pickedMode, traffic: pickedTraffic };
       saveSession(session);
       renderCount(j);
       showOn(session);
@@ -213,6 +235,9 @@
     $('mBtnCity').addEventListener('click', openSheet);
     document.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', closeSheet));
     $('mSheetSkip').addEventListener('click', closeSheet);
+    // chip 单选绑定
+    bindChips('mModeChips', 'pickedMode', (b) => b.dataset.mode);
+    bindChips('mTrafficChips', 'pickedTraffic', (b) => b.dataset.traffic);
 
     // 拉快照（先静默一次）
     let snap = null;
@@ -226,7 +251,9 @@
       try {
         const live = await postAction({ action: 'start', id: sess.id, city: sess.city || '' });
         // 命中恢复
-        saveSession({ id: sess.id, startedAt: sess.startedAt, city: sess.city || '' });
+        pickedMode = sess.mode || '';
+        pickedTraffic = sess.traffic || '';
+        saveSession({ id: sess.id, startedAt: sess.startedAt, city: sess.city || '', mode: pickedMode, traffic: pickedTraffic });
         showOn(sess);
         startTimer(sess.startedAt);
         renderCount(live);
@@ -236,6 +263,7 @@
         saveSession(null);
       }
     }
+    resetChips();
     showIdle();
   }
 
