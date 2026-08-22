@@ -33,6 +33,13 @@ function secToLocalMidnight() {
   return Math.max(1, Math.round((end.getTime() - now.getTime()) / 1000));
 }
 
+// 测试模式：TEST_MODE=on（CF 环境变量，默认 on）时，放开时段门禁与限流，方便测功能。
+// 关闭方法：把 TEST_MODE 设为 off（或不设），自动恢复早 6–10 / 晚 18–22 门禁 + 限流。
+function testMode(env) {
+  const v = String(env.TEST_MODE || 'on').trim().toLowerCase();
+  return v === 'on' || v === '1' || v === 'true';
+}
+
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -119,6 +126,7 @@ function randId() {
 
 export async function onRequestGet({ env }) {
   if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) return bad('服务端未配置', 500);
+  const open = testMode(env) ? true : isOpenLocal();
   try {
     await ensureTable(env);
     const res = await d1(env,
@@ -129,7 +137,7 @@ export async function onRequestGet({ env }) {
     const items = rows
       .map((r) => ({ id: r.id, text: r.text, clientId: r.client_id, createdAt: r.created_at }))
       .reverse(); // 旧→新，前端顺序展示
-    return json({ ok: true, open: isOpenLocal(), items, resetIn: secToLocalMidnight() });
+    return json({ ok: true, open, testMode: testMode(env), items, resetIn: secToLocalMidnight() });
   } catch (e) {
     return bad('读取失败：' + e.message, 500);
   }
@@ -137,7 +145,8 @@ export async function onRequestGet({ env }) {
 
 export async function onRequestPost({ request, env }) {
   if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) return bad('服务端未配置', 500);
-  if (!isOpenLocal()) {
+  const tm = testMode(env);
+  if (!tm && !isOpenLocal()) {
     return bad('现在不是通勤时段啦～开放时间：早 6–10 点、晚 6–10 点。', 'CLOSED', { open: false });
   }
   let body = {};
@@ -148,28 +157,30 @@ export async function onRequestPost({ request, env }) {
   const nowSec = Math.floor(Date.now() / 1000);
   const today = now.slice(0, 10);
 
-  // 频率：单 IP ≥ 8s
-  try {
-    const r = await d1(env, `SELECT last_ts, day, n FROM commute_chat_rl WHERE ip='${esc(ip)}' LIMIT 1`);
-    const row = (r[0] && r[0].results && r[0].results[0]) || null;
-    if (row) {
-      const last = Number(row.last_ts) || 0;
-      if (nowSec - last < RATE_SEC) {
-        const left = RATE_SEC - (nowSec - last);
-        return bad(`说得太快啦，请 ${left} 秒后再发`, 'RATE_LIMIT', { left });
+  // 频率：单 IP ≥ 8s（测试模式跳过）
+  if (!tm) {
+    try {
+      const r = await d1(env, `SELECT last_ts, day, n FROM commute_chat_rl WHERE ip='${esc(ip)}' LIMIT 1`);
+      const row = (r[0] && r[0].results && r[0].results[0]) || null;
+      if (row) {
+        const last = Number(row.last_ts) || 0;
+        if (nowSec - last < RATE_SEC) {
+          const left = RATE_SEC - (nowSec - last);
+          return bad(`说得太快啦，请 ${left} 秒后再发`, 'RATE_LIMIT', { left });
+        }
       }
-    }
-  } catch { /* 限速失败不阻断 */ }
+    } catch { /* 限速失败不阻断 */ }
 
-  // 单日配额：单 IP ≤ 30
-  try {
-    const r = await d1(env, `SELECT n FROM commute_chat_rl WHERE ip='${esc(ip)}' AND day='${today}' LIMIT 1`);
-    const row = (r[0] && r[0].results && r[0].results[0]) || null;
-    const dayCount = row ? Number(row.n) || 0 : 0;
-    if (dayCount >= DAILY_IP_LIMIT) {
-      return bad('你今天发言已达上限（30 条），明日再来～', 'DAILY_LIMIT', { resetIn: secToLocalMidnight() });
-    }
-  } catch { /* 计数失败不阻断 */ }
+    // 单日配额：单 IP ≤ 30（测试模式跳过）
+    try {
+      const r = await d1(env, `SELECT n FROM commute_chat_rl WHERE ip='${esc(ip)}' AND day='${today}' LIMIT 1`);
+      const row = (r[0] && r[0].results && r[0].results[0]) || null;
+      const dayCount = row ? Number(row.n) || 0 : 0;
+      if (dayCount >= DAILY_IP_LIMIT) {
+        return bad('你今天发言已达上限（30 条），明日再来～', 'DAILY_LIMIT', { resetIn: secToLocalMidnight() });
+      }
+    } catch { /* 计数失败不阻断 */ }
+  }
 
   // 内容校验
   const text = sanitize(body.text, MAX_LEN);

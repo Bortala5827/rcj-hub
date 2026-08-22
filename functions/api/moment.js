@@ -154,34 +154,6 @@ export async function onRequestGet({ request, env }) {
   }
   // 管理端点：清空 commute 场景的全部记录（需 ADMIN_KEY，CF 环境变量）
   const url = new URL(request.url);
-  // 临时探测：回显 CF_ACCOUNT_ID（非 secret，仅用于自助加变量时定位 account）
-  if (url.searchParams.get('probe') === '1') {
-    return json({ ok: true, accountId: env.CF_ACCOUNT_ID, hasToken: !!env.CF_API_TOKEN });
-  }
-  // 临时自举：用运行时 token 给 rcj-hub 的 production 加/改环境变量（合并写回，不覆盖已有）
-  // 用法：?selfset=TEST_MODE&val=on  （仅单次运维用，调后删除此分支）
-  if (url.searchParams.get('selfset')) {
-    const key = String(url.searchParams.get('selfset')).slice(0, 64);
-    const val = String(url.searchParams.get('val') || '').slice(0, 256);
-    try {
-      const base = `https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/pages/projects/rcj-hub`;
-      const getR = await fetch(base, { headers: { Authorization: `Bearer ${env.CF_API_TOKEN}` } });
-      const getJ = await getR.json();
-      if (!getJ.success) return json({ ok: false, step: 'get', err: getJ.errors }, 500);
-      const prodVars = (getJ.result.deployment_configs && getJ.result.deployment_configs.production && getJ.result.deployment_configs.production.env_vars) || {};
-      // 合并：保留已有变量，写入/覆盖目标 key
-      const merged = { ...prodVars, [key]: { type: 'plain_text', value: val } };
-      const patchR = await fetch(base, {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${env.CF_API_TOKEN}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ deployment_configs: { production: { env_vars: merged } } }),
-      });
-      const patchJ = await patchR.json();
-      return json({ ok: patchJ.success, step: 'patch', key, val, result: patchJ.success ? 'done' : patchJ.errors });
-    } catch (e) {
-      return json({ ok: false, step: 'exception', err: e.message }, 500);
-    }
-  }
   const clearTarget = url.searchParams.get('clear');
   if (clearTarget === SCENE) {
     const admin = url.searchParams.get('admin') || '';

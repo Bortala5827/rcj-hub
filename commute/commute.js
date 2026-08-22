@@ -299,6 +299,7 @@
         return;
       }
       if (j.open === false) { chatShowClosed(); return; }
+      chat.testMode = !!j.testMode;
       chat.items = j.items || [];
       renderChat(true);
     } catch { /* 静默 */ }
@@ -336,7 +337,7 @@
       }
       input.value = '';
       $('mChatLen').textContent = '0';
-      if (typeof j.remaining === 'number') showChatQuota(`今日还可发 ${j.remaining} 条`);
+      if (!chat.testMode && typeof j.remaining === 'number') showChatQuota(`今日还可发 ${j.remaining} 条`);
       // 立即拉一次，确保自己的消息出现在窗口
       await loadChat();
     } catch {
