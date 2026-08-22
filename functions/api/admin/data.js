@@ -94,8 +94,8 @@ export async function onRequestGet({ request, env }) {
       d1(env, DBS.facetalk, "SELECT 'intents' AS k, COUNT(*) c FROM intents UNION ALL SELECT 'applications', COUNT(*) FROM applications UNION ALL SELECT 'wall', COUNT(*) FROM wall UNION ALL SELECT 'reports', COUNT(*) FROM reports UNION ALL SELECT 'ratings', COUNT(*) FROM ratings UNION ALL SELECT 'messages', COUNT(*) FROM messages"),
       // [2] facetalk: 近期 pairs
       d1(env, DBS.facetalk, "SELECT a, b, mode, status, created FROM pairs ORDER BY created DESC LIMIT 6"),
-      // [3] facetalk: 近期 wall
-      d1(env, DBS.facetalk, "SELECT name, text, created_at FROM wall ORDER BY created_at DESC LIMIT 6"),
+      // [3] facetalk: 近期 wall（含 ip 便于后台区分来源）
+      d1(env, DBS.facetalk, "SELECT name, text, created_at, COALESCE(ip,'') AS ip FROM wall ORDER BY created_at DESC LIMIT 6"),
       // [4][5] 辅警库已删除（2026-08-17 并入 exam 后下线），停止对其 D1 的查询；
       //         辅警站点浏览统计仍由 rcj-analytics-d1 的 site='aux' 承接（见下方 auxUni）。
       Promise.resolve(null),

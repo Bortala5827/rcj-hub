@@ -419,7 +419,8 @@ function renderFaceTalk(){
   else{
     html+='<div style="display:flex;flex-direction:column;gap:10px">';
     F.recentWall.forEach(w=>{
-      html+='<div style="border-bottom:1px dashed var(--line);padding-bottom:9px"><div class="small"><b>'+esc(w.name)+'</b> <span class="muted">'+fmtTime(w.created_at)+'</span></div><div class="small">'+esc(w.text)+'</div></div>';
+      const ipTag = w.ip ? ' <span class="muted" style="font-family:monospace">🌐'+esc(w.ip)+'</span>' : '';
+      html+='<div style="border-bottom:1px dashed var(--line);padding-bottom:9px"><div class="small"><b>'+esc(w.name)+'</b>'+ipTag+' <span class="muted">'+fmtTime(w.created_at)+'</span></div><div class="small">'+esc(w.text)+'</div></div>';
     });
     html+='</div>';
   }
