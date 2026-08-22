@@ -44,6 +44,14 @@
 }
 .m-stat-foot { color: var(--ink-4); font-size: 12px; }
 
+/* 折线图：今日各小时完成通勤人数（克制） */
+.m-spark {
+  margin: 18px auto 0; padding-top: 16px;
+  border-top: 1px dashed var(--line);
+  max-width: 320px;
+}
+.m-spark svg { display: block; }
+
 .m-cities {
   margin: 18px auto 0; padding-top: 14px;
   border-top: 1px dashed var(--line);

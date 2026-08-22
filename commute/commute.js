@@ -8,11 +8,9 @@
   const LS_SESSION = 'rcj_moment_session_v1'; // {id, startedAt, mode, traffic}
   const LS_CLIENT = 'rcj_moment_client_v1';
 
-  // ── 时段门禁（前端兜底，东八区）──
-  function isOpenLocal() {
-    const h = new Date().getHours(); // 浏览器本地时区
-    return (h >= 6 && h < 10) || (h >= 18 && h < 22);
-  }
+  // 时段是否开放：以**后端返回**为准（后端已含 TEST_MODE 测试开关逻辑）。
+  // 前端不再用本地时间硬判，避免和后端不一致。
+  let serverOpen = true;
 
   // clientId：浏览器本地生成，用于 web 端软唯一性（防同一浏览器刷量）
   function getClientId() {
@@ -57,6 +55,35 @@
     $('mStatMin').textContent = fmtDur(s.minSec);
     $('mStatMax').textContent = fmtDur(s.maxSec);
     $('mStatAvg').textContent = fmtDur(s.avgSec);
+    if (snap && Array.isArray(snap.hourly)) renderSparkline(snap.hourly);
+    if (typeof snap.open === 'boolean') serverOpen = snap.open;
+  }
+
+  // 极简折线图：今日各小时完成通勤人数（24 点）
+  function renderSparkline(data) {
+    const wrap = $('mSpark');
+    if (!wrap) return;
+    const W = 280, H = 64, pad = 6;
+    const max = Math.max(1, ...data);
+    const step = (W - pad * 2) / 23;
+    const pts = data.map((v, i) => {
+      const x = pad + i * step;
+      const y = H - pad - (v / max) * (H - pad * 2);
+      return [x, y];
+    });
+    const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+    const area = `M${pad} ${H - pad} ` + pts.map((p) => 'L' + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ') + ` L${W - pad} ${H - pad} Z`;
+    // 高亮当前小时
+    const cur = new Date(Date.now() + 8 * 3600 * 1000).getUTCHours();
+    const dot = pts[cur];
+    wrap.innerHTML =
+      `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" aria-hidden="true">
+        <path d="${area}" fill="var(--signal-weak)" opacity="0.7"/>
+        <path d="${line}" fill="none" stroke="var(--signal)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        ${dot ? `<circle cx="${dot[0].toFixed(1)}" cy="${dot[1].toFixed(1)}" r="3.2" fill="var(--signal)" stroke="var(--bg)" stroke-width="1.5"/>` : ''}
+      </svg>`;
+    const peak = data.indexOf(max);
+    wrap.setAttribute('title', `今日各小时完成人数 · 高峰 ${String(peak).padStart(2, '0')}:00（${max} 人）`);
   }
 
   function showIdle() {
@@ -141,21 +168,28 @@
   // ── 主流程 ──
   async function onStart() {
     const btn = $('mBtnStart');
-    // 前端时段门禁（后端也拦）
-    if (!isOpenLocal()) { showErr('现在不是通勤时段（开放：早 6–10、晚 6–10）'); return; }
+    // 时段门禁以**后端返回**为准（含 TEST_MODE 测试开关）
+    if (!serverOpen) { showErr('现在不是通勤时段（开放：早 6–10、晚 6–10）'); return; }
     setBtnLoading(btn, true, '正在加入…');
+    // 立即本地起表：用本地时间起算，不等后端回包，消除点击后不计时的问题
+    const localStart = Date.now();
+    const session = { id: '', startedAt: new Date(localStart).toISOString(), mode: pickedMode, traffic: pickedTraffic };
+    showOn(session);
+    startTimer(localStart);
     try {
       const j = await postAction({ action: 'start', clientId: getClientId(), mode: pickedMode, traffic: pickedTraffic });
-      const session = { id: j.id, startedAt: j.startedAt || new Date().toISOString(), mode: pickedMode, traffic: pickedTraffic };
+      session.id = j.id || session.id;
+      // 若后端有更准的 startedAt 且差距不大，以本地为准（避免秒级跳动）
       saveSession(session);
       renderCount(j);
-      showOn(session);
-      startTimer(session.startedAt);
     } catch (e) {
       if (e.code === 'RECENT_EXISTS') {
-        // 2h 内已记录过：直接复位按钮，提示稍后
-        resetChips(); showIdle();
+        // 2h 内已记录过：复位按钮
+        stopTimer(); showIdle(); resetChips(); showErr('你最近 2 小时内已经记录过一次通勤啦，稍后再来～');
+        return;
       }
+      // 其他错误：回退到 idle（但不清计时，已显示 on 状态；保守起见复位）
+      stopTimer(); showIdle();
       showErr(e.message);
     } finally {
       setBtnLoading(btn, false, '我出发了');
@@ -356,15 +390,14 @@
     bindChips('mTrafficChips', 'pickedTraffic', (b) => b.dataset.traffic);
     bindChat();
 
-    // 时段门禁：非开放时段，禁用「我出发了」
-    if (!isOpenLocal()) {
-      const sb = $('mBtnStart');
-      if (sb) { sb.disabled = true; sb.querySelector('.m-btn-label').textContent = '非通勤时段'; }
-    }
-
     let snap = null;
     try { snap = await fetchSnap(); renderCount(snap); }
     catch (e) { /* 静默首屏失败，UI 仍可点 */ }
+    // 非开放时段（且非测试模式）：禁用「我出发了」
+    if (snap && snap.open === false) {
+      const sb = $('mBtnStart');
+      if (sb) { sb.disabled = true; sb.querySelector('.m-btn-label').textContent = '非通勤时段'; }
+    }
 
     const sess = loadSession();
     if (sess) {
@@ -374,7 +407,7 @@
         pickedTraffic = sess.traffic || '';
         saveSession({ id: sess.id, startedAt: sess.startedAt, mode: pickedMode, traffic: pickedTraffic });
         showOn(sess);
-        startTimer(sess.startedAt);
+        startTimer(new Date(sess.startedAt).getTime());
         renderCount(live);
         return;
       } catch (e) {
@@ -384,7 +417,7 @@
     resetChips();
     showIdle();
 
-    // 聊天：首屏加载 + 5s 轮询
+    // 聊天：首屏加载 + 5s 轮询（测试期全开放，非时段才关闭）
     await loadChat();
     setInterval(loadChat, 5000);
   }

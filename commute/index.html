@@ -7,7 +7,7 @@
   <meta name="description" content="此刻，有多少人和我一起在通勤？一个轻量的天涯共此时实验。" />
   <meta name="robots" content="noindex,nofollow" />
   <link rel="stylesheet" href="/assets/hub.v2.css?v=20260822a" />
-  <link rel="stylesheet" href="./commute.css?v=20260822e" />
+  <link rel="stylesheet" href="./commute.css?v=20260822f" />
 </head>
 <body class="hub moment">
   <header class="site-header">
@@ -27,9 +27,8 @@
 
   <main class="container moment-main">
     <section class="moment-hero reveal" aria-labelledby="mTitle">
-      <p class="eyebrow">PLAYGROUND · 天涯共此时</p>
-      <h1 id="mTitle" class="m-title">此刻，谁和我一起在通勤？</h1>
-      <p class="m-sub">天涯共此时。</p>
+      <p class="eyebrow">天涯共此时</p>
+      <h1 id="mTitle" class="m-title">此刻，谁在通勤？</h1>
     </section>
 
     <section class="moment-card reveal" aria-live="polite">
@@ -38,6 +37,9 @@
         <div class="m-stat-num" id="mNum">—</div>
         <div class="m-stat-foot">最近 2 小时内未结束的记录</div>
       </div>
+
+      <!-- 折线图：今日各小时完成通勤人数 -->
+      <div class="m-spark" id="mSpark" aria-label="今日通勤人数折线图"></div>
 
       <!-- 统计：极简，只放数字 -->
       <div class="m-stats" id="mStats">
@@ -96,7 +98,7 @@
         <button class="m-btn-text" id="mBtnCancel" type="button">点错了（撤销）</button>
       </div>
 
-      <p class="m-hint" id="mHint">开放时段：早 6–10 点、晚 6–10 点；未结束的记录 2 小时后自动结束。</p>
+      <p class="m-hint" id="mHint">未结束的记录 2 小时后自动结束。正式时段：早 6–10 点、晚 6–10 点（当前为测试期，全天开放）。</p>
     </section>
 
     <!-- 轻聊天：可上下滑的小窗口，当日自动清除 -->
@@ -124,6 +126,6 @@
     </p>
   </main>
 
-  <script src="./commute.js?v=20260822e" defer></script>
+  <script src="./commute.js?v=20260822f" defer></script>
 </body>
 </html>

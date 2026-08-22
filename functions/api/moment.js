@@ -131,6 +131,23 @@ async function statsToday(env) {
   };
 }
 
+// 今日按小时统计「完成通勤人数」（东八区小时 0-23），用于折线图
+async function hourlyToday(env) {
+  const res = await d1(env,
+    `SELECT CAST(strftime('%H', ended_at, 'localtime') AS INTEGER) h, COUNT(*) c
+     FROM moments
+     WHERE scene='${SCENE}' AND status='arrived'
+       AND date(ended_at, 'localtime') = date('now', 'localtime')
+     GROUP BY h`);
+  const rows = (res[0] && res[0].results) || [];
+  const arr = new Array(24).fill(0);
+  for (const r of rows) {
+    const h = Number(r.h);
+    if (h >= 0 && h < 24) arr[h] = Number(r.c) || 0;
+  }
+  return arr;
+}
+
 export async function onRequestGet({ request, env }) {
   if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) {
     return bad('服务端未配置 CF_API_TOKEN / CF_ACCOUNT_ID', 500);
@@ -154,26 +171,29 @@ export async function onRequestGet({ request, env }) {
     await ensureTable(env);
     const { active } = await snapshot(env);
     const stats = await statsToday(env);
-    return json({ ok: true, scene: SCENE, active, stats, autoEndHours: AUTO_END_HOURS, open: isOpenNow() });
+    const hourly = await hourlyToday(env);
+    const open = isOpenLocal(env);
+    return json({
+      ok: true, scene: SCENE, active, stats, hourly,
+      autoEndHours: AUTO_END_HOURS, open, testMode: testMode(env),
+    });
   } catch (e) {
     return bad('查询失败：' + e.message, 500);
   }
 }
 
 // 时段门禁：仅早高峰 6–10、晚高峰 18–22 开放（东八区 localtime）
-function isOpenNow() {
-  const h = new Date().getHours(); // 本地时区（CF 运行时为 UTC，但我们用 'localtime' 语义由前端传，这里仅作兜底展示用）
-  return (h >= 6 && h < 10) || (h >= 18 && h < 22);
+// TEST_MODE=on 时全时段开放（开发/测试期；用的人多了再关闭，自动回到门禁）。
+function testMode(env) {
+  return String(env.TEST_MODE || 'on').trim().toLowerCase() === 'on';
 }
-// 注意：CF Worker 运行时 getHours() 返回的是 UTC 小时，不是东八区。
-// 真正的时段判定放在前端（用户浏览器时区），后端 isOpenNow 仅作 GET 展示字段参考，
-// 提交门禁以后端 ensureTable 同级校验：用 localtime 小时。
 function localHour() {
-  // 用 toISOString 转东八区
+  // CF 运行时为 UTC，手动加 8h 取东八区小时
   const now = new Date(Date.now() + 8 * 3600 * 1000);
   return now.getUTCHours();
 }
-function isOpenLocal() {
+function isOpenLocal(env) {
+  if (testMode(env)) return true; // 测试期：始终开放
   const h = localHour();
   return (h >= 6 && h < 10) || (h >= 18 && h < 22);
 }
@@ -195,8 +215,8 @@ export async function onRequestPost({ request, env }) {
   try { body = await request.json(); } catch { return bad('JSON 解析失败'); }
   const action = String(body.action || '');
 
-  // 时段门禁：仅在早 6–10 / 晚 18–22 开放提交（东八区）。其余时间拒绝 start。
-  if (action === 'start' && !isOpenLocal()) {
+  // 时段门禁：测试期全开放；否则仅早 6–10 / 晚 18–22 开放提交（东八区）。
+  if (action === 'start' && !isOpenLocal(env)) {
     return json({ ok: false, error: '现在不是通勤时段啦～开放时间：早 6–10 点、晚 6–10 点。', code: 'CLOSED', open: false }, 403);
   }
 
