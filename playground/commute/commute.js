@@ -104,7 +104,9 @@
     grid.innerHTML = CITIES.map((c) =>
       `<button type="button" data-c="${c}" aria-pressed="${c === cur ? 'true' : 'false'}">${c}</button>`
     ).join('');
-    $('mSheet').hidden = false;
+    const sheet = $('mSheet');
+    sheet.hidden = false;          // 兜底，避免某些浏览器 display 处理差异
+    sheet.classList.add('is-open');
     grid.querySelectorAll('button').forEach((b) => {
       b.addEventListener('click', () => {
         const c = b.dataset.c;
@@ -117,7 +119,11 @@
       });
     });
   }
-  function closeSheet() { $('mSheet').hidden = true; }
+  function closeSheet() {
+    const sheet = $('mSheet');
+    sheet.classList.remove('is-open');
+    sheet.hidden = true;
+  }
 
   // ── chip 单选（方式/路况）──
   let pickedMode = '';

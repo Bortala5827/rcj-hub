@@ -137,8 +137,9 @@
 /* 城市 sheet */
 .m-sheet {
   position: fixed; inset: 0; z-index: 100;
-  display: flex; align-items: flex-end; justify-content: center;
+  display: none; align-items: flex-end; justify-content: center;
 }
+.m-sheet.is-open { display: flex; }
 .m-sheet-mask {
   position: absolute; inset: 0; background: rgba(15, 23, 42, 0.32);
   backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
