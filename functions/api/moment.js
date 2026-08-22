@@ -183,8 +183,15 @@ export async function onRequestGet({ request, env }) {
     if (!ok) return bad('需要后台登录或 admin 口令', 403);
     try {
       await ensureTable(env);
-      await d1(env, `DELETE FROM moments WHERE scene='${SCENE}'`);
-      return json({ ok: true, cleared: true, scene: SCENE });
+      const r1 = await d1(env, `DELETE FROM moments WHERE scene='${SCENE}'`);
+      // 同步清掉 commute 配套表（聊天消息 + 限流计数），否则清空后聊天里旧数据仍在
+      const r2 = await d1(env, `DELETE FROM commute_chat`);
+      const r3 = await d1(env, `DELETE FROM commute_chat_rl`);
+      const c = (a) => (a && a[0] && a[0].meta && a[0].meta.changes) || 0;
+      return json({
+        ok: true, cleared: true, scene: SCENE,
+        deleted: { moments: c(r1), chat: c(r2), chat_rl: c(r3) },
+      });
     } catch (e) {
       return bad('清空失败：' + e.message, 500);
     }
