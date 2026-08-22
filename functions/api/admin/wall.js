@@ -1,0 +1,100 @@
+// 留言管理端点（FaceTalk wall 表，存在 mianshi-dazi-d1）
+// 鉴权：后台登录 cookie（rcj_admin，HMAC-SHA256）或明文 ADMIN_KEY 任一通过
+// 用法：
+//   GET  /api/admin/wall?del=<id>       删除单条
+//   GET  /api/admin/wall?delIp=<ip>     删除该 IP 的全部留言
+//   POST /api/admin/wall  body: {del:<id>} | {delIp:<ip>}
+const FACETALK_DB = 'f93a89d7-a3d1-4f4c-9f5a-3b8e9c7d2a1f'; // mianshi-dazi-d1
+
+function hmacHex(key, msg) {
+  const enc = new TextEncoder();
+  const k = enc.encode(key);
+  const m = enc.encode(msg);
+  // 简易 HMAC-SHA256（Web Crypto）
+  return crypto.subtle.importKey('raw', k, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+    .then(kh => crypto.subtle.sign('HMAC', kh, m))
+    .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+}
+
+async function verifyCookie(request, env) {
+  const pw = env.ADMIN_PASSWORD || env.ADMIN_KEY || '';
+  if (!pw) return false;
+  const ck = request.headers.get('Cookie') || '';
+  const m = ck.match(/rcj_admin=([^;]+)/);
+  if (!m) return false;
+  const [ts, sig] = m[1].split('.');
+  if (!ts || !sig) return false;
+  if (Date.now() / 1000 - Number(ts) > 60 * 60 * 24 * 7) return false; // 7 天过期
+  const expect = await hmacHex(pw, ts);
+  // 定长比较防时序攻击
+  if (expect.length !== sig.length) return false;
+  let ok = 1;
+  for (let i = 0; i < expect.length; i++) ok &= (expect.charCodeAt(i) === sig.charCodeAt(i));
+  return ok === 1;
+}
+
+function adminOk(request, env) {
+  const url = new URL(request.url);
+  const key = url.searchParams.get('admin') || '';
+  const envKey = String(env.ADMIN_KEY || '').trim();
+  const byKey = !!envKey && String(key).trim() === envKey;
+  return byKey; // cookie 校验异步，外部 await verifyCookie 合并
+}
+
+function d1(env, dbId, sql) {
+  const acct = env.CF_ACCOUNT_ID, tok = env.CF_API_TOKEN;
+  if (!acct || !tok) return Promise.resolve({ error: 'NO_CRED' });
+  const url = `https://api.cloudflare.com/v4/accounts/${acct}/d1/database/${dbId}/query`;
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${tok}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sql })
+  }).then(r => r.json()).then(j => j.success ? (j.result || []) : { error: (j.errors && j.errors[0] && j.errors[0].message) || 'D1_FAIL' });
+}
+
+function json(o, status) {
+  return new Response(JSON.stringify(o), { status: status || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
+}
+
+function bad(msg, status) { return json({ ok: false, error: msg }, status || 400); }
+
+export async function onRequest(context) {
+  const { request, env } = context;
+  // 鉴权：cookie 或明文 key
+  const cookieOk = await verifyCookie(request, env);
+  const keyOk = adminOk(request, env);
+  if (!cookieOk && !keyOk) return bad('未授权（请先登录后台）', 401);
+
+  const url = new URL(request.url);
+  let delId = url.searchParams.get('del');
+  let delIp = url.searchParams.get('delIp');
+  if (request.method === 'POST') {
+    try {
+      const b = await request.json().catch(() => ({}));
+      if (b.del) delId = b.del;
+      if (b.delIp) delIp = b.delIp;
+    } catch (e) {}
+  }
+
+  if (!delId && !delIp) {
+    return bad('缺少参数：del=<id> 或 delIp=<ip>', 400);
+  }
+
+  try {
+    let sql;
+    let label;
+    if (delId) {
+      sql = `DELETE FROM wall WHERE id='${String(delId).replace(/'/g, "''")}'`;
+      label = `id=${delId}`;
+    } else {
+      sql = `DELETE FROM wall WHERE ip='${String(delIp).replace(/'/g, "''")}'`;
+      label = `ip=${delIp}`;
+    }
+    const res = await d1(env, FACETALK_DB, sql);
+    if (res && res.error) return bad('删除失败：' + res.error, 500);
+    const changes = (res && res[0] && res[0].meta && res[0].meta.changes) || 0;
+    return json({ ok: true, deleted: changes, target: label });
+  } catch (e) {
+    return bad('删除异常：' + e.message, 500);
+  }
+}

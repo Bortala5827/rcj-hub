@@ -186,6 +186,7 @@
       <div class="sb-item" data-page="aux"><span class="ico">🛡️</span>辅警题库</div>
       <div class="sb-item" data-page="sites"><span class="ico">🌐</span>站点导航</div>
       <div class="sb-item" data-page="commute"><span class="ico">🚇</span>此刻通勤</div>
+      <div class="sb-item" data-page="wall"><span class="ico">💬</span>留言管理</div>
     </nav>
     <div class="sb-foot">
       <div id="genTime">—</div>
@@ -293,6 +294,7 @@ function renderPage(p){
   else if(p==='aux') renderAux();
   else if(p==='sites') renderSites();
   else if(p==='commute') renderCommute();
+  else if(p==='wall') renderWallMgmt();
 }
 
 // ---------- 概览 ----------
@@ -547,6 +549,81 @@ async function clearCommute(){
       renderCommute();
     } else if(r.status===403){
       if(msg){ msg.textContent='✗ 未登录，请先在后台登录'; msg.style.color='var(--danger)'; }
+      showLogin();
+    } else {
+      if(msg){ msg.textContent='✗ '+(j.error||('HTTP '+r.status)); msg.style.color='var(--danger)'; }
+    }
+  }catch(e){
+    if(msg){ msg.textContent='✗ 网络错误'; msg.style.color='var(--danger)'; }
+  }
+}
+
+// ---------- 留言管理（FaceTalk wall 表） ----------
+function renderWallMgmt(){
+  const c=document.getElementById('content');
+  const F=DATA.facetalk||{};
+  const list=(F.recentWall||[]).slice(); // 已由 data.js 返回最近 200 条，含 id/ip/name/text/created_at
+  let html='<div class="panel"><h3>💬 留言管理</h3>'
+    +'<p class="small muted">数据来自 FaceTalk 独立库（mianshi-dazi-d1 · wall 表），共 '+list.length+' 条（最近 200）。每条带来源 IP，便于区分谁发的。</p>'
+    +'<div style="margin:14px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap">'
+    +'<input id="wallIpInput" placeholder="输入 IP 批量删（如 1.2.3.4）" style="padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)"/>'
+    +'<button class="btn" onclick="delWallIp()">🗑 按 IP 删除</button>'
+    +'<span class="small muted" id="wallMsg"></span>'
+    +'</div>';
+  if(!list.length){
+    html+='<div class="empty">暂无留言</div></div>';
+    c.innerHTML=html; return;
+  }
+  html+='<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">';
+  html+='<div style="display:grid;grid-template-columns:1fr auto;gap:0">';
+  list.forEach(w=>{
+    const ip=(w.ip||'').trim();
+    html+='<div style="padding:12px 14px;border-bottom:1px solid var(--line)">'
+      +'<div class="small"><b>'+esc(w.name||'匿名')+'</b>'
+      +'<span class="muted" style="margin-left:8px;font-family:ui-monospace,monospace">🌐 '+(ip||'未知IP')+'</span>'
+      +'<span class="muted" style="margin-left:8px">'+fmtTime(w.created_at)+'</span></div>'
+      +'<div class="small" style="margin-top:4px;white-space:pre-wrap">'+esc(w.text||'')+'</div></div>';
+    html+='<div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center">'
+      +'<button class="btn small" onclick="delWall(\''+esc(w.id)+'\')">删除</button></div>';
+  });
+  html+='</div></div></div>';
+  c.innerHTML=html;
+}
+async function delWall(id){
+  if(!id) return;
+  if(!confirm('确认删除这条留言？不可恢复。')) return;
+  const msg=document.getElementById('wallMsg');
+  if(msg){ msg.textContent='处理中…'; msg.style.color='var(--muted)'; }
+  try{
+    const r=await fetch('/api/admin/wall?del='+encodeURIComponent(id),{method:'GET',credentials:'same-origin'});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok && j.ok){
+      if(msg){ msg.textContent='✓ 已删除 '+j.deleted+' 条'; msg.style.color='var(--ok)'; }
+      loadData(); // 重新拉数据刷新列表
+    } else if(r.status===401){
+      if(msg){ msg.textContent='✗ 未登录'; msg.style.color='var(--danger)'; }
+      showLogin();
+    } else {
+      if(msg){ msg.textContent='✗ '+(j.error||('HTTP '+r.status)); msg.style.color='var(--danger)'; }
+    }
+  }catch(e){
+    if(msg){ msg.textContent='✗ 网络错误'; msg.style.color='var(--danger)'; }
+  }
+}
+async function delWallIp(){
+  const ip=document.getElementById('wallIpInput').value.trim();
+  if(!ip) return;
+  if(!confirm('确认删除 IP '+ip+' 的全部留言？不可恢复。')) return;
+  const msg=document.getElementById('wallMsg');
+  if(msg){ msg.textContent='处理中…'; msg.style.color='var(--muted)'; }
+  try{
+    const r=await fetch('/api/admin/wall?delIp='+encodeURIComponent(ip),{method:'GET',credentials:'same-origin'});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok && j.ok){
+      if(msg){ msg.textContent='✓ 已删除 '+j.deleted+' 条'; msg.style.color='var(--ok)'; }
+      loadData();
+    } else if(r.status===401){
+      if(msg){ msg.textContent='✗ 未登录'; msg.style.color='var(--danger)'; }
       showLogin();
     } else {
       if(msg){ msg.textContent='✗ '+(j.error||('HTTP '+r.status)); msg.style.color='var(--danger)'; }
