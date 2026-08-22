@@ -131,9 +131,24 @@ async function statsToday(env) {
   };
 }
 
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ request, env }) {
   if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) {
     return bad('服务端未配置 CF_API_TOKEN / CF_ACCOUNT_ID', 500);
+  }
+  // 管理端点：清空 commute 场景的全部记录（需 ADMIN_KEY，CF 环境变量）
+  const url = new URL(request.url);
+  const clearTarget = url.searchParams.get('clear');
+  if (clearTarget === SCENE) {
+    const admin = url.searchParams.get('admin') || '';
+    const ok = String(admin).trim() === String(env.ADMIN_KEY || '').trim() && !!env.ADMIN_KEY;
+    if (!ok) return bad('需要 admin 口令', 403);
+    try {
+      await ensureTable(env);
+      await d1(env, `DELETE FROM moments WHERE scene='${SCENE}'`);
+      return json({ ok: true, cleared: true, scene: SCENE });
+    } catch (e) {
+      return bad('清空失败：' + e.message, 500);
+    }
   }
   try {
     await ensureTable(env);
