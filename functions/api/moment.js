@@ -154,6 +154,10 @@ export async function onRequestGet({ request, env }) {
   }
   // 管理端点：清空 commute 场景的全部记录（需 ADMIN_KEY，CF 环境变量）
   const url = new URL(request.url);
+  // 临时探测：回显 CF_ACCOUNT_ID（非 secret，仅用于自助加变量时定位 account）
+  if (url.searchParams.get('probe') === '1') {
+    return json({ ok: true, accountId: env.CF_ACCOUNT_ID, hasToken: !!env.CF_API_TOKEN });
+  }
   const clearTarget = url.searchParams.get('clear');
   if (clearTarget === SCENE) {
     const admin = url.searchParams.get('admin') || '';
