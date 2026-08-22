@@ -31,6 +31,9 @@
     .playground-eyebrow { font-size: 12px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; }
     .playground-title { font-size: 18px; font-weight: 700; color: var(--ink); }
     .playground-sub { font-size: 13px; color: var(--ink-3); }
+    /* 极简 playground：只放「此刻」两字，小而克制 */
+    a.playground-card { max-width: 180px; margin: 0 auto; padding: 14px 18px; }
+    a.playground-card .playground-title { font-size: 15px; }
 
     /* 滚动进入视口逐块浮现（由 RCJMotion.revealOnScroll 接管 opacity 动画；
        clearProps 完成后不回退；无 JS 时引擎内部 showAll 设 inline opacity:1 兜底） */
@@ -263,6 +266,15 @@
             </a>
           </div>
         </di        </div>
+      </div>
+    </section>
+
+    <!-- ============== Playground ============== -->
+    <section class="directions">
+      <div class="container">
+        <a class="playground-card reveal" href="/commute/" aria-label="此刻 · 通勤实验">
+          <span class="playground-title">此刻</span>
+        </a>
       </div>
     </section>
   </main>
