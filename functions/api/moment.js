@@ -67,6 +67,7 @@ async function d1(env, sql, ms = 6000) {
 }
 
 let _ready = null;
+let _lastPurge = 0; // 清理节流时间戳（ms）
 async function ensureTable(env) {
   if (_ready) return _ready;
   _ready = (async () => {
@@ -148,6 +149,26 @@ async function hourlyToday(env) {
   return arr;
 }
 
+// 隐患清理：物理删除两类无用记录，释放 D1 空间（不依赖 cron，查询时顺手清）
+//   1) 孤儿 active：started_at 超过 2h 仍未结束（用户离开页面/未点到达，永远卡住）
+//   2) 老数据：status='arrived' 且 ended_at 超过 30 天（已完成，分析价值低）
+// 保留：近 30 天已完成记录（供趋势分析）+ 2h 内进行中记录（实时计数准确性）
+async function purgeStale(env) {
+  try {
+    const sql = `DELETE FROM moments WHERE scene='${SCENE}' AND (
+        (status='active' AND (julianday('now','localtime') - julianday(started_at,'localtime')) >= ${ACTIVE_DAYS})
+        OR (status='arrived' AND (julianday('now','localtime') - julianday(ended_at,'localtime')) >= 30)
+      )`;
+    const res = await d1(env, sql);
+    const changes = (res[0] && res[0].meta && res[0].meta.changes) || 0;
+    return changes;
+  } catch (e) {
+    // 清理失败不影响主查询，仅记录
+    console.error('purgeStale failed:', e.message);
+    return 0;
+  }
+}
+
 export async function onRequestGet({ request, env }) {
   if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) {
     return bad('服务端未配置 CF_API_TOKEN / CF_ACCOUNT_ID', 500);
@@ -170,6 +191,13 @@ export async function onRequestGet({ request, env }) {
   }
   try {
     await ensureTable(env);
+    // 隐患清理：顺手物理删除孤儿 active + 30 天前的老数据（节流 60s，避免每次查询都写）
+    let purged = 0;
+    const now = Date.now();
+    if (!_lastPurge || now - _lastPurge > 60000) {
+      _lastPurge = now;
+      purged = await purgeStale(env);
+    }
     const { active } = await snapshot(env);
     const stats = await statsToday(env);
     const hourly = await hourlyToday(env);
@@ -177,6 +205,7 @@ export async function onRequestGet({ request, env }) {
     return json({
       ok: true, scene: SCENE, active, stats, hourly,
       autoEndHours: AUTO_END_HOURS, open, testMode: testMode(env),
+      purged,
     });
   } catch (e) {
     return bad('查询失败：' + e.message, 500);
