@@ -421,6 +421,74 @@
     // 聊天：首屏加载 + 5s 轮询（测试期全开放，非时段才关闭）
     await loadChat();
     setInterval(loadChat, 5000);
+
+    // 你懂的 · 底部左右滚动知识带（复用 exam Learn 卡 hook）
+    loadYouKnow();
+  }
+
+  // ── 你懂的：复用 exam Learn 卡的 hook 字段，左右滚动，可关闭 ──
+  const YK_SRC = 'https://exam.955827.xyz/learn/cards.js'; // exam Pages 的 Learn 数据
+  const YK_DETAIL = 'https://exam.955827.xyz/learn/';
+  function loadYouKnow() {
+    // 本地已收起则不再显示
+    try { if (localStorage.getItem('rcj_youknow_closed') === '1') return; } catch {}
+    const section = $('mYouKnow');
+    const track = $('mYkTrack');
+    if (!section || !track) return;
+
+    const render = (cards) => {
+      const list = (cards || []).filter((c) => c && c.hook).map((c) => ({
+        id: c.id || '',
+        hook: String(c.hook).slice(0, 40),
+        tags: (c.tags || []).slice(0, 2),
+      }));
+      if (!list.length) { section.hidden = true; return; }
+      track.innerHTML = '';
+      // 复制一份做无缝滚动
+      const frag = document.createDocumentFragment();
+      list.concat(list).forEach((it) => {
+        const a = document.createElement('a');
+        a.className = 'm-yk-item';
+        a.href = YK_DETAIL + '?card=' + encodeURIComponent(it.id);
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.title = it.hook;
+        const tag = it.tags.length ? `<span class="m-yk-tag">${escapeHtml(it.tags[0])}</span>` : '';
+        a.innerHTML = `${tag}<span class="m-yk-text">${escapeHtml(it.hook)}</span>`;
+        frag.appendChild(a);
+      });
+      track.appendChild(frag);
+      section.hidden = false;
+      // 自动滚动（CSS 动画在 CSS 里定义，这里只确保 hover 暂停的 class）
+      track.classList.add('is-scrolling');
+    };
+
+    // 动态注入 exam 的 cards.js（跨域 script 引入，无 CORS 限制）
+    const fail = () => { section.hidden = true; };
+    const prev = window.LEARN_CARDS;
+    const s = document.createElement('script');
+    s.src = YK_SRC + '?v=' + Date.now();
+    s.async = true;
+    s.onload = () => {
+      const cards = window.LEARN_CARDS;
+      if (Array.isArray(cards) && cards.length) render(cards);
+      else fail();
+    };
+    s.onerror = fail;
+    document.head.appendChild(s);
+    // 兜底超时：3s 内未就绪则隐藏
+    setTimeout(() => { if (section.hidden === false && !track.querySelector('.m-yk-item')) fail(); }, 3000);
+
+    // 关闭按钮
+    const closeBtn = $('mYkClose');
+    if (closeBtn) closeBtn.addEventListener('click', () => {
+      section.hidden = true;
+      try { localStorage.setItem('rcj_youknow_closed', '1'); } catch {}
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   }
 
   // 轮询刷新：每 15s 拉一次快照
