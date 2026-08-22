@@ -185,6 +185,7 @@
       <div class="sb-item" data-page="facetalk"><span class="ico">💬</span>FaceTalk</div>
       <div class="sb-item" data-page="aux"><span class="ico">🛡️</span>辅警题库</div>
       <div class="sb-item" data-page="sites"><span class="ico">🌐</span>站点导航</div>
+      <div class="sb-item" data-page="commute"><span class="ico">🚇</span>此刻通勤</div>
     </nav>
     <div class="sb-foot">
       <div id="genTime">—</div>
@@ -291,6 +292,7 @@ function renderPage(p){
   else if(p==='facetalk') renderFaceTalk();
   else if(p==='aux') renderAux();
   else if(p==='sites') renderSites();
+  else if(p==='commute') renderCommute();
 }
 
 // ---------- 概览 ----------
@@ -497,6 +499,59 @@ function renderSites(){
   document.getElementById('content').innerHTML=html;
 }
 
+// ---------- 此刻通勤（commute 场景管理）----------
+async function renderCommute(){
+  const c=document.getElementById('content');
+  c.innerHTML='<div class="loading">读取中…</div>';
+  let snap=null;
+  try{
+    const r=await fetch('/api/moment',{method:'GET',headers:{Accept:'application/json'}});
+    const j=await r.json();
+    if(j.ok) snap=j;
+  }catch(_){}
+  const st=snap&&snap.stats?snap.stats:{};
+  const active=snap?Number(snap.active)||0:0;
+  const cards=[
+    ['hub',active,'此刻正在通勤','最近 2h 内未结束'],
+    ['hub',st.doneToday||0,'今日完成',''],
+    ['hub',fmtDur(st.minSec),'最短',''],
+    ['hub',fmtDur(st.maxSec),'最长',''],
+    ['hub',fmtDur(st.avgSec),'平均',''],
+  ];
+  let html='<div class="stats">';
+  cards.forEach(x=>html+='<div class="stat '+x[0]+'"><div class="stat-num">'+x[1]+'</div><div class="stat-label">'+x[2]+'</div>'+(x[3]?'<div class="stat-sub">'+x[3]+'</div>':'')+'</div>');
+  html+='</div>';
+
+  html+='<div class="panel"><h3>🚇 此刻通勤 · 数据管理</h3>'
+    +'<p class="small muted">场景名为 <code>commute</code>，数据存在 rcj-analytics-d1 的 <code>moments</code> 表。清空为不可逆操作。</p>'
+    +'<div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">'
+    +'<button class="btn" onclick="loadCommute()">↻ 刷新</button>'
+    +'<button class="btn primary" onclick="clearCommute()">🗑 清空全部记录</button>'
+    +'<span class="small muted" id="commuteMsg"></span>'
+    +'</div></div>';
+
+  c.innerHTML=html;
+}
+function loadCommute(){ renderCommute(); }
+async function clearCommute(){
+  const key=prompt('输入 admin 口令以清空 commute 全部记录：');
+  if(!key) return;
+  const msg=document.getElementById('commuteMsg');
+  if(msg){ msg.textContent='处理中…'; msg.style.color='var(--muted)'; }
+  try{
+    const r=await fetch('/api/moment?clear=commute&admin='+encodeURIComponent(key.trim()),{method:'GET'});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok && j.ok){
+      if(msg){ msg.textContent='✓ 已清空'; msg.style.color='var(--ok)'; }
+      renderCommute();
+    } else {
+      if(msg){ msg.textContent='✗ '+(j.error||('HTTP '+r.status)); msg.style.color='var(--danger)'; }
+    }
+  }catch(e){
+    if(msg){ msg.textContent='✗ 网络错误'; msg.style.color='var(--danger)'; }
+  }
+}
+
 // ---------- SVG 折线图 ----------
 function lineChart(data){
   if(!data||!data.length) return '<div class="empty">暂无浏览数据</div>';
@@ -550,6 +605,14 @@ function multiLineChart(series, days = 14){
 }
 
 // ---------- 工具 ----------
+function fmtDur(sec){
+  if(!sec) return '—';
+  if(sec<60) return sec+'″';
+  const m=Math.floor(sec/60);
+  if(m<60) return m+'′';
+  const h=Math.floor(m/60);
+  return h+'h'+(m%60)+'′';
+}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function fmtTime(ts){ if(!ts)return '—'; let d; if(String(ts).length>12) d=new Date(Number(ts)); else d=new Date(Number(ts)*1000); if(isNaN(d))return '—'; const p=n=>n<10?'0'+n:''+n; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
 

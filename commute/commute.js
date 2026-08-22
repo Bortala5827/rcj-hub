@@ -50,40 +50,7 @@
   function renderCount(snap) {
     const n = (snap && Number(snap.active)) || 0;
     $('mNum').textContent = n > 0 ? fmt(n) : '0';
-    const s = (snap && snap.stats) || {};
-    $('mStatDone').textContent = s.doneToday || 0;
-    $('mStatMin').textContent = fmtDur(s.minSec);
-    $('mStatMax').textContent = fmtDur(s.maxSec);
-    $('mStatAvg').textContent = fmtDur(s.avgSec);
-    if (snap && Array.isArray(snap.hourly)) renderSparkline(snap.hourly);
     if (typeof snap.open === 'boolean') serverOpen = snap.open;
-  }
-
-  // 极简折线图：今日各小时完成通勤人数（24 点）
-  function renderSparkline(data) {
-    const wrap = $('mSpark');
-    if (!wrap) return;
-    const W = 280, H = 64, pad = 6;
-    const max = Math.max(1, ...data);
-    const step = (W - pad * 2) / 23;
-    const pts = data.map((v, i) => {
-      const x = pad + i * step;
-      const y = H - pad - (v / max) * (H - pad * 2);
-      return [x, y];
-    });
-    const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
-    const area = `M${pad} ${H - pad} ` + pts.map((p) => 'L' + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ') + ` L${W - pad} ${H - pad} Z`;
-    // 高亮当前小时
-    const cur = new Date(Date.now() + 8 * 3600 * 1000).getUTCHours();
-    const dot = pts[cur];
-    wrap.innerHTML =
-      `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" aria-hidden="true">
-        <path d="${area}" fill="var(--signal-weak)" opacity="0.7"/>
-        <path d="${line}" fill="none" stroke="var(--signal)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        ${dot ? `<circle cx="${dot[0].toFixed(1)}" cy="${dot[1].toFixed(1)}" r="3.2" fill="var(--signal)" stroke="var(--bg)" stroke-width="1.5"/>` : ''}
-      </svg>`;
-    const peak = data.indexOf(max);
-    wrap.setAttribute('title', `今日各小时完成人数 · 高峰 ${String(peak).padStart(2, '0')}:00（${max} 人）`);
   }
 
   function showIdle() {
