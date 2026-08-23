@@ -16,8 +16,6 @@
 
 const DB = 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828'; // rcj-analytics-d1
 const MAX_LEN = 40;
-const RATE_SEC = 8;
-const DAILY_IP_LIMIT = 30;
 const MAX_ITEMS = 100;
 
 // 时段门禁（东八区）：早 6–10 / 晚 18–22
