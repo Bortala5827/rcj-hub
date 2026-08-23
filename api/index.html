@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>免费 API 薅羊毛 · RCJ Lab</title>
-  <meta name="description" content="国内外可免费薅的大模型 API 汇总：小红书 dots、b.ai、硅基流动、商汤日日新、Google Gemini。注册入口、免费额度、OpenAI 兼容性一文看清。" />
+  <meta name="description" content="国内外可免费薅的大模型 API 汇总：小红书 dots、商汤日日新、b.ai、Google Gemini。国内可用优先排前，注册入口、免费额度、OpenAI 兼容性一文看清。" />
   <meta name="theme-color" content="#0f172a" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3EA%3C/text%3E%3C/svg%3E" />
   <style>
@@ -51,6 +51,8 @@
       white-space: nowrap;
     }
     .badge.free { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+    .badge.region { background: #ecfeff; color: #0e7490; border-color: #a5f3fc; }
+    .badge.region-os { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
     .card-desc { font-size: 13.5px; color: var(--ink-2); margin: 0 0 12px; }
     .rows { display: grid; gap: 7px; margin-bottom: 12px; }
     .row { display: flex; gap: 8px; font-size: 13px; align-items: baseline; }
@@ -113,12 +115,13 @@
       <h1>免费大模型 API · 薅羊毛汇总</h1>
       <p class="lede">把国内外还能免费用的大模型 API 列出来。注册入口、免费额度、OpenAI 兼容性，一文看清。填到「你懂的」自定义 AI 模型里就能直接用。</p>
     </header>
-    <p class="updated">最后核对：<b>2026-08-22</b> · 免费额度变动极快，以官网为准</p>
+    <p class="updated">最后核对：<b>2026-08-23</b> · 免费额度变动极快，以官网为准</p>
 
     <!-- 小红书 dots -->
     <div class="card" data-base="https://note3-prev-api.askdiandian.com/v1" data-model="dots3-note-prev">
       <div class="card-top">
         <span class="card-name">小红书 dots（dots.ai）</span>
+        <span class="badge region">国内可用</span>
         <span class="badge free">有免费层</span>
       </div>
       <p class="card-desc">小红书 dots studio 的开放平台，模型偏中文生活场景理解，后端默认源就是它。</p>
@@ -146,69 +149,11 @@
       </div></details>
     </div>
 
-    <!-- b.ai -->
-    <div class="card" data-base="https://api.b.ai/v1" data-model="deepseek-v4-flash">
-      <div class="card-top">
-        <span class="card-name">b.ai</span>
-        <span class="badge free">有免费模型</span>
-      </div>
-      <p class="card-desc">聚合多家模型的中立网关，免费档可用 DeepSeek 系。本站在「DeepSeek（b.ai）」源走的就是它。</p>
-      <div class="rows">
-        <div class="row"><span class="k">免费额度</span><span class="v"><code>deepseek-v4-flash</code> 免费；也可 hy3</span></div>
-        <div class="row"><span class="k">兼容</span><span class="v">OpenAI 兼容 chat/completions</span></div>
-        <div class="row"><span class="k">鉴权</span><span class="v"><code>Bearer</code> 你的 API Key</span></div>
-        <div class="row"><span class="k">模型</span><span class="v"><code>deepseek-v4-flash</code> / <code>hy3</code></span></div>
-      </div>
-      <div class="fill">
-        <span class="ft">填到「你懂的」自定义 AI 模型：</span>
-        接口地址 = <code>https://api.b.ai/v1</code> · 模型名 = <code>deepseek-v4-flash</code> · Key = 平台申请的 Key（Bearer）
-      </div>
-      <div class="links">
-        <a href="https://api.b.ai" target="_blank" rel="noopener">b.ai 平台</a>
-      </div>
-      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.b.ai/v1"></div>
-        <div><label>模型名</label><input class="p-model" type="text" placeholder="deepseek-v4-flash"></div>
-        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-        <button class="probe-btn" type="button">测试</button>
-        <div class="probe-res" hidden></div>
-      </div></details>
-    </div>
-
-    <!-- 硅基流动 -->
-    <div class="card" data-base="https://api.siliconflow.cn/v1" data-model="deepseek-ai/DeepSeek-V3">
-      <div class="card-top">
-        <span class="card-name">硅基流动 SiliconFlow</span>
-        <span class="badge free">有免费模型</span>
-      </div>
-      <p class="card-desc">国内聚合网关，DeepSeek / Qwen 等开源模型有永久免费档，注册送额度。</p>
-      <div class="rows">
-        <div class="row"><span class="k">免费额度</span><span class="v">注册送 2000 万 Tokens；多款模型标「免费」</span></div>
-        <div class="row"><span class="k">兼容</span><span class="v">OpenAI 兼容 chat/completions</span></div>
-        <div class="row"><span class="k">鉴权</span><span class="v"><code>Bearer</code> 你的 API Key</span></div>
-        <div class="row"><span class="k">模型</span><span class="v"><code>deepseek-ai/DeepSeek-V3</code> / <code>Qwen/Qwen2.5-7B-Instruct</code> 等</span></div>
-      </div>
-      <div class="fill">
-        <span class="ft">填到「你懂的」自定义 AI 模型：</span>
-        接口地址 = <code>https://api.siliconflow.cn/v1</code> · 模型名 = <code>deepseek-ai/DeepSeek-V3</code> · Key = 平台申请的 Key（Bearer）
-      </div>
-      <div class="links">
-        <a href="https://siliconflow.cn" target="_blank" rel="noopener">硅基流动官网</a>
-        <a href="https://docs.siliconflow.cn" target="_blank" rel="noopener">开发文档</a>
-      </div>
-      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.siliconflow.cn/v1"></div>
-        <div><label>模型名</label><input class="p-model" type="text" placeholder="deepseek-ai/DeepSeek-V3"></div>
-        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-        <button class="probe-btn" type="button">测试</button>
-        <div class="probe-res" hidden></div>
-      </div></details>
-    </div>
-
     <!-- 商汤日日新 -->
     <div class="card" data-base="https://api.sensenova.cn/v1" data-model="SenseNova-6.8-Flash-Lite-Preview">
       <div class="card-top">
         <span class="card-name">商汤日日新 SenseNova</span>
+        <span class="badge region">国内可用</span>
         <span class="badge free">限时免费</span>
       </div>
       <p class="card-desc">商汤大模型开放平台，Token Plan 限时免费，每 5 小时 1500 次调用。一个 API 接入多模态模型。</p>
@@ -235,10 +180,41 @@
       </div></details>
     </div>
 
+    <!-- b.ai -->
+    <div class="card" data-base="https://api.b.ai/v1" data-model="deepseek-v4-flash">
+      <div class="card-top">
+        <span class="card-name">b.ai</span>
+        <span class="badge region">国内可用</span>
+        <span class="badge free">有免费模型</span>
+      </div>
+      <p class="card-desc">聚合多家模型的中立网关，免费档可用 DeepSeek 系。本站在「DeepSeek（b.ai）」源走的就是它。</p>
+      <div class="rows">
+        <div class="row"><span class="k">免费额度</span><span class="v"><code>deepseek-v4-flash</code> 免费；也可 hy3</span></div>
+        <div class="row"><span class="k">兼容</span><span class="v">OpenAI 兼容 chat/completions</span></div>
+        <div class="row"><span class="k">鉴权</span><span class="v"><code>Bearer</code> 你的 API Key</span></div>
+        <div class="row"><span class="k">模型</span><span class="v"><code>deepseek-v4-flash</code> / <code>hy3</code></span></div>
+      </div>
+      <div class="fill">
+        <span class="ft">填到「你懂的」自定义 AI 模型：</span>
+        接口地址 = <code>https://api.b.ai/v1</code> · 模型名 = <code>deepseek-v4-flash</code> · Key = 平台申请的 Key（Bearer）
+      </div>
+      <div class="links">
+        <a href="https://api.b.ai" target="_blank" rel="noopener">b.ai 平台</a>
+      </div>
+      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.b.ai/v1"></div>
+        <div><label>模型名</label><input class="p-model" type="text" placeholder="deepseek-v4-flash"></div>
+        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+        <button class="probe-btn" type="button">测试</button>
+        <div class="probe-res" hidden></div>
+      </div></details>
+    </div>
+
     <!-- Google Gemini -->
     <div class="card" data-base="https://generativelanguage.googleapis.com/v1beta/openai" data-model="gemini-3.5-flash-lite">
       <div class="card-top">
         <span class="card-name">Google Gemini</span>
+        <span class="badge region-os">海外 · 需翻墙</span>
         <span class="badge free">有免费层</span>
       </div>
       <p class="card-desc">Google AI Studio 申请 Key 即用，免费档额度足够个人玩。注意要填 OpenAI 兼容端点，别填原生 generateContent。</p>
