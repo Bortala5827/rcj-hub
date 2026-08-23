@@ -32,8 +32,10 @@
     header { text-align: center; margin-bottom: 8px; }
     h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; }
     .lede { font-size: 14px; color: var(--ink-2); margin: 0 auto 4px; max-width: 560px; }
-    .updated { font-size: 12px; color: var(--ink-2); margin-bottom: 24px; text-align: center; }
+    .updated { font-size: 12px; color: var(--ink-2); margin-bottom: 6px; text-align: center; }
     .updated b { color: var(--primary); }
+    .compat { font-size: 12.5px; color: var(--ink-2); text-align: center; margin: 0 0 22px; }
+    .compat code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11.5px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; color: #b45309; }
 
     .card {
       background: var(--surface);
@@ -138,9 +140,11 @@
   <div class="wrap">
     <header>
       <h1>免费大模型 API · 薅羊毛汇总</h1>
-      <p class="lede">把国内外还能免费用的大模型 API 列出来。注册入口、免费额度、OpenAI 兼容性，一文看清。填到「你懂的」自定义 AI 模型里就能直接用。</p>
+      <p class="lede">还能免费用的大模型 API，按国内可用优先排。端点、模型名、Key 三样拿到，直接填进「你懂的」自定义模型即用。</p>
     </header>
-    <p class="updated">最后核对：<b>2026-08-23</b> · 免费额度变动极快，以官网为准</p>
+    <p class="updated">最后核对：<b>2026-08-23</b> · 额度变动极快，以官网为准</p>
+    <p class="compat">全部 OpenAI 兼容 <code>chat/completions</code>，鉴权 <code>Bearer</code> Key。<br>
+      <b>填法有差异，以你实测为准</b>：示例端点取自 WorkBuddy 已跑通配置，但「你懂的」与 WorkBuddy / Trae 的协议拼接可能不同（尤其带 <code>/chat/completions</code> 的项）。有的源只填到 <code>/v1</code>（如 b.ai、Gemini 填到 /v1beta/openai、OpenRouter），有的要把整条 <code>…/chat/completions</code> 全填（如小红书、商汤）。拿不准就用下方「测试连通性」自测，或问 AI。</p>
 
     <!-- 小红书 dots -->
     <div class="card" data-base="https://note3-prev-api.askdiandian.com/v1" data-model="dots3-note-prev">
@@ -152,18 +156,16 @@
       <p class="card-desc">小红书 dots studio 的开放平台，模型偏中文生活场景理解，后端默认源就是它。</p>
       <div class="rows">
         <div class="row"><span class="k">免费额度</span><span class="v">开放平台注册即送调用额度（以平台页面为准）</span></div>
-        <div class="row"><span class="k">兼容</span><span class="v">OpenAI 兼容 chat/completions</span></div>
-        <div class="row"><span class="k">鉴权</span><span class="v"><code>Bearer</code> 你的 API Key</span></div>
         <div class="row"><span class="k">模型</span><span class="v"><code>dots3-note</code> 系列（如 dots3-note-prev）</span></div>
       </div>
       <div class="fill">
-        <span class="ft">填到「你懂的」自定义 AI 模型：</span>
-        接口地址 = <code>https://note3-prev-api.askdiandian.com/v1</code> · 模型名 = <code>dots3-note-prev</code> · Key = 平台申请的 Key（Bearer）<br>
+        <span class="ft">填到「你懂的」自定义 AI 模型（参考值，网页填法以你实测为准）：</span>
+        接口地址 = <code>https://note3-prev-api.askdiandian.com/v1/chat/completions</code>（WorkBuddy 整条全填；「你懂的」若整条不行就退到 /v1）<br>
+        模型名 = <code>dots3-note-prev</code> · Key = 平台申请的 Key（Bearer）<br>
         <span style="opacity:.8">注：公开开放平台的接口地址即 askdiandian.com 这个域名（点点 App 后端域），非 dots.ai 官网。</span>
       </div>
       <div class="links">
         <a href="https://dots.ai/platform/apikeys" target="_blank" rel="noopener">API Key 管理</a>
-        <a href="https://dots.ai/platform/docs" target="_blank" rel="noopener">开发文档</a>
       </div>
       <details class="probe"><summary>测试连通性</summary><div class="probe-box">
         <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.dots.ai/v1"></div>
@@ -184,13 +186,12 @@
       <p class="card-desc">商汤大模型开放平台，Token Plan 限时免费，每 5 小时 1500 次调用。一个 API 接入多模态模型。</p>
       <div class="rows">
         <div class="row"><span class="k">免费额度</span><span class="v">Token Plan 限时免费，每 5 小时 1500 次调用</span></div>
-        <div class="row"><span class="k">兼容</span><span class="v">OpenAI 兼容（MaaS API）</span></div>
-        <div class="row"><span class="k">鉴权</span><span class="v"><code>Bearer</code> 你的 API Key</span></div>
-        <div class="row"><span class="k">模型</span><span class="v"><code>SenseNova-6.8-Flash-Lite-Preview</code> 等</span></div>
+        <div class="row"><span class="k">模型</span><span class="v"><code>sensenova-6.8-flash-lite</code>（实测跑通）</span></div>
       </div>
       <div class="fill">
-        <span class="ft">填到「你懂的」自定义 AI 模型：</span>
-        接口地址 = <code>https://api.sensenova.cn/v1</code> · 模型名 = <code>SenseNova-6.8-Flash-Lite-Preview</code> · Key = 平台申请的 Key（Bearer）
+        <span class="ft">填到「你懂的」自定义 AI 模型（参考值，网页填法以你实测为准）：</span>
+        接口地址 = <code>https://token.sensenova.cn/v1/chat/completions</code>（WorkBuddy 整条全填；「你懂的」若整条不行就退到 /v1）<br>
+        模型名 = <code>sensenova-6.8-flash-lite</code> · Key = 平台申请的 Key（Bearer）
       </div>
       <div class="links">
         <a href="https://www.sensenova.cn/" target="_blank" rel="noopener">商汤开放平台</a>
@@ -215,12 +216,10 @@
       <p class="card-desc">聚合多家模型的中立网关，免费档可用 DeepSeek 系。本站在「DeepSeek（b.ai）」源走的就是它。</p>
       <div class="rows">
         <div class="row"><span class="k">免费额度</span><span class="v"><code>deepseek-v4-flash</code> 免费；也可 hy3</span></div>
-        <div class="row"><span class="k">兼容</span><span class="v">OpenAI 兼容 chat/completions</span></div>
-        <div class="row"><span class="k">鉴权</span><span class="v"><code>Bearer</code> 你的 API Key</span></div>
         <div class="row"><span class="k">模型</span><span class="v"><code>deepseek-v4-flash</code> / <code>hy3</code></span></div>
       </div>
       <div class="fill">
-        <span class="ft">填到「你懂的」自定义 AI 模型：</span>
+        <span class="ft">填到「你懂的」自定义 AI 模型（只填到 /v1）：</span>
         接口地址 = <code>https://api.b.ai/v1</code> · 模型名 = <code>deepseek-v4-flash</code> · Key = 平台申请的 Key（Bearer）
       </div>
       <div class="links">
@@ -245,13 +244,12 @@
       <p class="card-desc">Google AI Studio 申请 Key 即用，免费档额度足够个人玩。注意要填 OpenAI 兼容端点，别填原生 generateContent。</p>
       <div class="rows">
         <div class="row"><span class="k">免费额度</span><span class="v">AI Studio 免费 Tier，有 RPM 限制</span></div>
-        <div class="row"><span class="k">兼容</span><span class="v">提供 OpenAI 兼容端点（见下）</span></div>
-        <div class="row"><span class="k">鉴权</span><span class="v"><code>Bearer</code> 你的 API Key</span></div>
         <div class="row"><span class="k">模型</span><span class="v"><code>gemini-3.5-flash-lite</code>（2.0/2.5 已失效，用这个）</span></div>
       </div>
       <div class="fill">
-        <span class="ft">填到「你懂的」自定义 AI 模型：</span>
-        接口地址 = <code>https://generativelanguage.googleapis.com/v1beta/openai</code> · 模型名 = <code>gemini-3.5-flash-lite</code> · Key = AI Studio 的 Key（Bearer）<br>
+        <span class="ft">填到「你懂的」自定义 AI 模型（实测跑通值，只填到 /v1）：</span>
+        接口地址 = <code>https://generativelanguage.googleapis.com/v1beta/openai</code>（填到 /v1 即可，整条全填反而用不了）<br>
+        模型名 = <code>gemini-3.5-flash-lite</code> · Key = AI Studio 的 Key（Bearer）<br>
         <span style="opacity:.8">不要填原生 <code>:generateContent</code> 地址，会被拼错成 404。</span>
       </div>
       <div class="links">
@@ -268,7 +266,6 @@
 
     <p class="note">
       免费额度政策变动极快（今天免费明天收费是常态），本页为静态快照，不构成承诺。<br>
-      所有源均走 OpenAI 兼容 <code>chat/completions</code>，可直接填进「你懂的」→ 我的 → 自定义 AI 模型。<br>
       更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary)">国内大模型免费 API 获取教程</a>。
     </p>
 
