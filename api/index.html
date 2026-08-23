@@ -104,6 +104,14 @@
     details.region-section.selfhosted > summary::before { content: "▸ "; opacity: .6; }
     details.region-section.selfhosted[open] > summary::before { content: "▾ "; }
 
+    /* 连通性测试折叠 */
+    details.probe-section > summary {
+      list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    }
+    details.probe-section > summary::-webkit-details-marker { display: none; }
+    details.probe-section > summary::before { content: "▸ "; opacity: .6; }
+    details.probe-section[open] > summary::before { content: "▾ "; }
+
     .note {
       font-size: 12.5px; color: var(--ink-2); text-align: center; margin-top: 26px;
       padding: 14px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--surface);
@@ -198,13 +206,6 @@
         <div class="links">
           <a href="https://dots.ai/platform/apikeys" target="_blank" rel="noopener">API Key 管理</a>
         </div>
-        <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-          <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.dots.ai/v1"></div>
-          <div><label>模型名</label><input class="p-model" type="text" placeholder="dots3-note-prev"></div>
-          <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-          <button class="probe-btn" type="button">测试</button>
-          <div class="probe-res" hidden></div>
-        </div></details>
       </div>
 
       <!-- 商汤日日新 -->
@@ -228,13 +229,6 @@
           <a href="https://www.sensenova.cn/" target="_blank" rel="noopener">商汤开放平台</a>
           <a href="https://www.sensenova.cn/token-plan" target="_blank" rel="noopener">Token Plan</a>
         </div>
-        <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-          <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.sensenova.cn/v1"></div>
-          <div><label>模型名</label><input class="p-model" type="text" placeholder="SenseNova-6.8-Flash-Lite-Preview"></div>
-          <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-          <button class="probe-btn" type="button">测试</button>
-          <div class="probe-res" hidden></div>
-        </div></details>
       </div>
     </section>
 
@@ -261,13 +255,6 @@
         <div class="links">
           <a href="https://api.b.ai" target="_blank" rel="noopener">b.ai 平台</a>
         </div>
-        <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-          <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.b.ai/v1"></div>
-          <div><label>模型名</label><input class="p-model" type="text" placeholder="deepseek-v4-flash"></div>
-          <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-          <button class="probe-btn" type="button">测试</button>
-          <div class="probe-res" hidden></div>
-        </div></details>
       </div>
 
       <!-- Google Gemini -->
@@ -290,13 +277,6 @@
         <div class="links">
           <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">申请 API Key</a>
         </div>
-        <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-          <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://generativelanguage.googleapis.com/v1beta/openai"></div>
-          <div><label>模型名</label><input class="p-model" type="text" placeholder="gemini-2.0-flash"></div>
-          <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-          <button class="probe-btn" type="button">测试</button>
-          <div class="probe-res" hidden></div>
-        </div></details>
       </div>
 
       <!-- Agnes AI -->
@@ -318,13 +298,6 @@
         <div class="links">
           <a href="https://apihub.agnes-ai.com" target="_blank" rel="noopener">Agnes AI 平台</a>
         </div>
-        <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-          <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://apihub.agnes-ai.com/v1"></div>
-          <div><label>模型名</label><input class="p-model" type="text" placeholder="agnes-2.5-flash"></div>
-          <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-          <button class="probe-btn" type="button">测试</button>
-          <div class="probe-res" hidden></div>
-        </div></details>
       </div>
 
     </details>
@@ -407,6 +380,18 @@
 
     </details>
 
+    <!-- 连通性测试 -->
+    <details class="region-section probe-section">
+      <summary class="section-title">🔍 连通性测试 <span class="section-note">输入接口地址 / 模型名 / Key，测试是否可用</span></summary>
+      <div class="probe-box" style="margin-top:0">
+        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.example.com/v1"></div>
+        <div><label>模型名</label><input class="p-model" type="text" placeholder="gemini-2.0-flash"></div>
+        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+        <button class="probe-btn" type="button">测试</button>
+        <div class="probe-res" hidden></div>
+      </div>
+    </details>
+
     <p class="note">
       免费额度政策变动极快，本页为静态快照，以官网为准。<br>
       海外模型 🌐 在国内直连不通，请自备可用反代域名。<br>
@@ -421,20 +406,7 @@
 
   <script>
   (function () {
-    // 展开时按卡片 data-base / data-model 预填，避免用户重复手填
-    document.querySelectorAll("details.probe").forEach(function (d) {
-      d.addEventListener("toggle", function () {
-        if (!d.open) return;
-        var card = d.closest(".card");
-        var base = card && card.getAttribute("data-base") || "";
-        var model = card && card.getAttribute("data-model") || "";
-        var bInput = d.querySelector(".p-base");
-        var mInput = d.querySelector(".p-model");
-        if (bInput && !bInput.value) bInput.value = base;
-        if (mInput && !mInput.value) mInput.value = model;
-      });
-    });
-
+    // 统一连通性测试
     document.querySelectorAll(".probe-btn").forEach(function (btn) {
       btn.addEventListener("click", function () {
         var box = btn.closest(".probe-box");
