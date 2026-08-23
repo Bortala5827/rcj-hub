@@ -96,6 +96,14 @@
     details.region-section.overseas > summary::before { content: "▸ "; opacity: .6; }
     details.region-section.overseas[open] > summary::before { content: "▾ "; }
 
+    /* 自建区折叠 */
+    details.region-section.selfhosted > summary {
+      list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    }
+    details.region-section.selfhosted > summary::-webkit-details-marker { display: none; }
+    details.region-section.selfhosted > summary::before { content: "▸ "; opacity: .6; }
+    details.region-section.selfhosted[open] > summary::before { content: "▾ "; }
+
     .note {
       font-size: 12.5px; color: var(--ink-2); text-align: center; margin-top: 26px;
       padding: 14px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--surface);
@@ -321,9 +329,9 @@
 
     </details>
 
-    <!-- 自建中转站 -->
-    <section class="region-section">
-      <h2 class="section-title">自建中转站 <span class="section-note">开源项目 · 部署后国内直连</span></h2>
+    <!-- 自建中转站（默认折叠） -->
+    <details class="region-section selfhosted">
+      <summary class="section-title">自建中转站 <span class="section-note">开源项目 · 部署后国内直连 · 点击展开</span></summary>
       <p style="font-size:13px;color:var(--ink-2);margin:0 0 14px;">把海外模型统一封装成 OpenAI 兼容接口，自己部署即可国内直连调用。以下项目均为开源，按需选一个自建。</p>
 
       <!-- OmniRoute -->
@@ -397,7 +405,7 @@
         </div>
       </div>
 
-    </section>
+    </details>
 
     <p class="note">
       免费额度政策变动极快，本页为静态快照，以官网为准。<br>
