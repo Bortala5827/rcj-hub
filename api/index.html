@@ -321,6 +321,84 @@
 
     </details>
 
+    <!-- 自建中转站 -->
+    <section class="region-section">
+      <h2 class="section-title">自建中转站 <span class="section-note">开源项目 · 部署后国内直连</span></h2>
+      <p style="font-size:13px;color:var(--ink-2);margin:0 0 14px;">把海外模型统一封装成 OpenAI 兼容接口，自己部署即可国内直连调用。以下项目均为开源，按需选一个自建。</p>
+
+      <!-- OmniRoute -->
+      <div class="card" data-base="http://localhost:20128/v1" data-model="auto">
+        <div class="card-top">
+          <span class="card-name">OmniRoute</span>
+          <span class="badge free">⭐ 30k+ stars</span>
+        </div>
+        <p class="card-desc">免费开源 AI 网关，341 个 provider、90+ 免费层。一键本地部署，自动回退配额耗尽的订阅 → API Key → 免费模型。</p>
+        <div class="rows">
+          <div class="row"><span class="k">部署</span><span class="v"><code>npm install -g omniroute && omniroute</code> 或 Docker</span></div>
+          <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:20128/v1</code>（本地默认）</span></div>
+          <div class="row"><span class="k">模型示例</span><span class="v"><code>openai/gpt-5.4</code>、<code>glm/glm-5.2</code>、<code>auto</code>（自动选最优）</span></div>
+        </div>
+        <div class="fill">
+          <span class="ft">部署后填进客户端：</span>
+          接口地址 = <code>http://localhost:20128/v1</code>（或你的服务器 IP）<br>
+          模型名 = 按需填，如 <code>openai/gpt-4o</code>；用 <code>auto</code> 可自动路由<br>
+          Key = 留空或用任意值（OmniRoute 管理上游密钥）
+        </div>
+        <div class="links">
+          <a href="https://github.com/diegosouzapw/OmniRoute" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://omniroute.ai" target="_blank" rel="noopener">官网</a>
+        </div>
+      </div>
+
+      <!-- LiteLLM -->
+      <div class="card" data-base="http://localhost:4000/v1" data-model="openai/gpt-4o">
+        <div class="card-top">
+          <span class="card-name">LiteLLM</span>
+          <span class="badge free">⭐ 55k+ stars</span>
+        </div>
+        <p class="card-desc">Y Combinator 孵化，100+ provider 统一网关。Python SDK + Proxy Server 双形态，企业级预算控制、虚拟 Key、自动 fallback。</p>
+        <div class="rows">
+          <div class="row"><span class="k">部署</span><span class="v"><code>pip install 'litellm[proxy]' && litellm --model openai/gpt-4o</code> 或 Docker</span></div>
+          <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:4000/v1</code>（本地默认）</span></div>
+          <div class="row"><span class="k">模型示例</span><span class="v"><code>openai/gpt-4o</code>、<code>anthropic/claude-3-sonnet</code>、<code>google/gemini-pro</code></span></div>
+        </div>
+        <div class="fill">
+          <span class="ft">部署后填进客户端：</span>
+          接口地址 = <code>http://localhost:4000/v1</code>（或你的服务器 IP）<br>
+          模型名 = 按 LiteLLM 格式：<code>openai/gpt-4o</code>、<code>anthropic/claude-3-sonnet</code> 等<br>
+          Key = 配置在 <code>config.yaml</code> 上游密钥，客户端 Key 可填任意值
+        </div>
+        <div class="links">
+          <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://docs.litellm.ai/docs/proxy/docker_quick_start" target="_blank" rel="noopener">文档</a>
+        </div>
+      </div>
+
+      <!-- One API -->
+      <div class="card" data-base="http://localhost:3000/v1" data-model="gpt-4">
+        <div class="card-top">
+          <span class="card-name">One API</span>
+          <span class="badge free">Go 语言 · 轻量</span>
+        </div>
+        <p class="card-desc">用 Go 写的 API 管理与分发系统，"OpenRouter 的开源替代品"。支持聊天/图像/语音/嵌入多模态，约 28 家模型提供商。</p>
+        <div class="rows">
+          <div class="row"><span class="k">部署</span><span class="v">下载二进制或 Docker；配置 <code>config.json</code> 添加上游 Key</span></div>
+          <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:3000/v1</code>（默认端口）</span></div>
+          <div class="row"><span class="k">模型示例</span><span class="v"><code>gpt-4</code>、<code>claude-3-opus</code>、<code>glm-4</code>、<code>deepseek-chat</code></span></div>
+        </div>
+        <div class="fill">
+          <span class="ft">部署后填进客户端：</span>
+          接口地址 = <code>http://localhost:3000/v1</code>（或你的服务器 IP）<br>
+          模型名 = One API 配置的模型别名（如 <code>gpt-4</code>、<code>claude-3-opus</code>）<br>
+          Key = One API 分配的虚拟 Key
+        </div>
+        <div class="links">
+          <a href="https://github.com/songquanpeng/one-api" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+
+    </section>
+
     <p class="note">
       免费额度政策变动极快，本页为静态快照，以官网为准。<br>
       海外模型 🌐 在国内直连不通，请自备可用反代域名。<br>
