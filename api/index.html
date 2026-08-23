@@ -77,6 +77,25 @@
     .links a:hover { background: var(--primary-soft); }
     .links a.ghost { color: var(--ink-2); border-color: var(--line); }
 
+    /* 分区标题 */
+    .region-section { margin-bottom: 24px; }
+    .section-title {
+      font-size: 16px; font-weight: 700; color: var(--ink); margin: 0 0 14px;
+      padding-bottom: 8px; border-bottom: 2px solid var(--line);
+    }
+    .section-note { font-size: 12px; font-weight: 400; color: var(--ink-2); margin-left: 8px; }
+    .section-link { display: block; font-size: 12px; color: var(--primary); margin-bottom: 12px; }
+    .section-link a { color: var(--primary); text-decoration: none; }
+    .section-link a:hover { text-decoration: underline; }
+
+    /* 海外区折叠 */
+    details.region-section.overseas > summary {
+      list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    }
+    details.region-section.overseas > summary::-webkit-details-marker { display: none; }
+    details.region-section.overseas > summary::before { content: "▸ "; opacity: .6; }
+    details.region-section.overseas[open] > summary::before { content: "▾ "; }
+
     .note {
       font-size: 12.5px; color: var(--ink-2); text-align: center; margin-top: 26px;
       padding: 14px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--surface);
@@ -144,160 +163,170 @@
     </header>
     <p class="updated">最后核对：<b>2026-08-23</b> · 额度变动极快，以官网为准</p>
     <p class="compat">全部 OpenAI 兼容 <code>chat/completions</code>，鉴权 <code>Bearer</code> Key。<br>
-      不同客户端的填法略有差异：有的只需填到 <code>/v1</code>（如 b.ai、Gemini），有的要填整条 <code>…/chat/completions</code>（如小红书、商汤）。拿不准就用下方「测试连通性」自测。</p>
+      不同客户端的填法略有差异：有的只需填到 <code>/v1</code>（如 b.ai、Gemini、Agnes），有的要填整条 <code>…/chat/completions</code>（如小红书、商汤）。拿不准就用下方「测试连通性」自测。</p>
 
-    <!-- 小红书 dots -->
-    <div class="card" data-base="https://note3-prev-api.askdiandian.com/v1" data-model="dots3-note-prev">
-      <div class="card-top">
-        <span class="card-name">小红书 dots（dots.ai）</span>
-        <span class="badge region">国内可用</span>
-        <span class="badge free">有免费层</span>
-      </div>
-      <p class="card-desc">小红书 dots studio 的开放平台，模型偏中文生活场景理解，后端默认源就是它。</p>
-      <div class="rows">
-        <div class="row"><span class="k">免费额度</span><span class="v">开放平台注册即送调用额度（以平台页面为准）</span></div>
-        <div class="row"><span class="k">模型</span><span class="v"><code>dots3-note</code> 系列（如 dots3-note-prev）</span></div>
-      </div>
-      <div class="fill">
-        <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
-        接口地址 = <code>https://note3-prev-api.askdiandian.com/v1/chat/completions</code><br>
-        模型名 = <code>dots3-note-prev</code> · Key = 平台申请的 Key（Bearer）<br>
-        <span style="opacity:.8">注：公开开放平台的接口地址即 askdiandian.com 这个域名（点点 App 后端域），非 dots.ai 官网。</span>
-      </div>
-      <div class="links">
-        <a href="https://dots.ai/platform/apikeys" target="_blank" rel="noopener">API Key 管理</a>
-      </div>
-      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.dots.ai/v1"></div>
-        <div><label>模型名</label><input class="p-model" type="text" placeholder="dots3-note-prev"></div>
-        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-        <button class="probe-btn" type="button">测试</button>
-        <div class="probe-res" hidden></div>
-      </div></details>
-    </div>
+    <!-- 国内可用（默认展开） -->
+    <section class="region-section">
+      <h2 class="section-title">国内可用 <span class="section-note">直连即可，无需代理</span></h2>
 
-    <!-- 商汤日日新 -->
-    <div class="card" data-base="https://api.sensenova.cn/v1" data-model="SenseNova-6.8-Flash-Lite-Preview">
-      <div class="card-top">
-        <span class="card-name">商汤日日新 SenseNova</span>
-        <span class="badge region">国内可用</span>
-        <span class="badge free">限时免费</span>
+      <!-- 小红书 dots -->
+      <div class="card" data-base="https://note3-prev-api.askdiandian.com/v1" data-model="dots3-note-prev">
+        <div class="card-top">
+          <span class="card-name">小红书 dots（dots.ai）</span>
+          <span class="badge region">国内可用</span>
+          <span class="badge free">有免费层</span>
+        </div>
+        <p class="card-desc">小红书 dots studio 的开放平台，模型偏中文生活场景理解，后端默认源就是它。</p>
+        <div class="rows">
+          <div class="row"><span class="k">免费额度</span><span class="v">开放平台注册即送调用额度（以平台页面为准）</span></div>
+          <div class="row"><span class="k">模型</span><span class="v"><code>dots3-note</code> 系列（如 dots3-note-prev）</span></div>
+        </div>
+        <div class="fill">
+          <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
+          接口地址 = <code>https://note3-prev-api.askdiandian.com/v1/chat/completions</code><br>
+          模型名 = <code>dots3-note-prev</code> · Key = 平台申请的 Key（Bearer）<br>
+          <span style="opacity:.8">注：公开开放平台的接口地址即 askdiandian.com 这个域名（点点 App 后端域），非 dots.ai 官网。</span>
+        </div>
+        <div class="links">
+          <a href="https://dots.ai/platform/apikeys" target="_blank" rel="noopener">API Key 管理</a>
+        </div>
+        <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+          <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.dots.ai/v1"></div>
+          <div><label>模型名</label><input class="p-model" type="text" placeholder="dots3-note-prev"></div>
+          <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+          <button class="probe-btn" type="button">测试</button>
+          <div class="probe-res" hidden></div>
+        </div></details>
       </div>
-      <p class="card-desc">商汤大模型开放平台，Token Plan 限时免费，每 5 小时 1500 次调用。一个 API 接入多模态模型。</p>
-      <div class="rows">
-        <div class="row"><span class="k">免费额度</span><span class="v">Token Plan 限时免费，每 5 小时 1500 次调用</span></div>
-        <div class="row"><span class="k">模型</span><span class="v"><code>sensenova-6.8-flash-lite</code>（实测跑通）</span></div>
-      </div>
-      <div class="fill">
-        <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
-        接口地址 = <code>https://token.sensenova.cn/v1/chat/completions</code><br>
-        模型名 = <code>sensenova-6.8-flash-lite</code> · Key = 平台申请的 Key（Bearer）
-      </div>
-      <div class="links">
-        <a href="https://www.sensenova.cn/" target="_blank" rel="noopener">商汤开放平台</a>
-        <a href="https://www.sensenova.cn/token-plan" target="_blank" rel="noopener">Token Plan</a>
-      </div>
-      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.sensenova.cn/v1"></div>
-        <div><label>模型名</label><input class="p-model" type="text" placeholder="SenseNova-6.8-Flash-Lite-Preview"></div>
-        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-        <button class="probe-btn" type="button">测试</button>
-        <div class="probe-res" hidden></div>
-      </div></details>
-    </div>
 
-    <!-- b.ai -->
-    <div class="card" data-base="https://api.b.ai/v1" data-model="deepseek-v4-flash">
-      <div class="card-top">
-        <span class="card-name">b.ai</span>
-        <span class="badge region">国内可用</span>
-        <span class="badge free">有免费模型</span>
+      <!-- 商汤日日新 -->
+      <div class="card" data-base="https://api.sensenova.cn/v1" data-model="SenseNova-6.8-Flash-Lite-Preview">
+        <div class="card-top">
+          <span class="card-name">商汤日日新 SenseNova</span>
+          <span class="badge region">国内可用</span>
+          <span class="badge free">限时免费</span>
+        </div>
+        <p class="card-desc">商汤大模型开放平台，Token Plan 限时免费，每 5 小时 1500 次调用。一个 API 接入多模态模型。</p>
+        <div class="rows">
+          <div class="row"><span class="k">免费额度</span><span class="v">Token Plan 限时免费，每 5 小时 1500 次调用</span></div>
+          <div class="row"><span class="k">模型</span><span class="v"><code>sensenova-6.8-flash-lite</code>（实测跑通）</span></div>
+        </div>
+        <div class="fill">
+          <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
+          接口地址 = <code>https://token.sensenova.cn/v1/chat/completions</code><br>
+          模型名 = <code>sensenova-6.8-flash-lite</code> · Key = 平台申请的 Key（Bearer）
+        </div>
+        <div class="links">
+          <a href="https://www.sensenova.cn/" target="_blank" rel="noopener">商汤开放平台</a>
+          <a href="https://www.sensenova.cn/token-plan" target="_blank" rel="noopener">Token Plan</a>
+        </div>
+        <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+          <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.sensenova.cn/v1"></div>
+          <div><label>模型名</label><input class="p-model" type="text" placeholder="SenseNova-6.8-Flash-Lite-Preview"></div>
+          <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+          <button class="probe-btn" type="button">测试</button>
+          <div class="probe-res" hidden></div>
+        </div></details>
       </div>
-      <p class="card-desc">聚合多家模型的中立网关，免费档可用 DeepSeek 系。本站在「DeepSeek（b.ai）」源走的就是它。</p>
-      <div class="rows">
-        <div class="row"><span class="k">免费额度</span><span class="v"><code>deepseek-v4-flash</code> 免费；也可 hy3</span></div>
-        <div class="row"><span class="k">模型</span><span class="v"><code>deepseek-v4-flash</code> / <code>hy3</code></span></div>
-      </div>
-      <div class="fill">
-        <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
-        接口地址 = <code>https://api.b.ai/v1</code> · 模型名 = <code>deepseek-v4-flash</code> · Key = 平台申请的 Key（Bearer）
-      </div>
-      <div class="links">
-        <a href="https://api.b.ai" target="_blank" rel="noopener">b.ai 平台</a>
-      </div>
-      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.b.ai/v1"></div>
-        <div><label>模型名</label><input class="p-model" type="text" placeholder="deepseek-v4-flash"></div>
-        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-        <button class="probe-btn" type="button">测试</button>
-        <div class="probe-res" hidden></div>
-      </div></details>
-    </div>
 
-    <!-- Google Gemini -->
-    <div class="card" data-base="https://generativelanguage.googleapis.com/v1beta/openai" data-model="gemini-3.5-flash-lite">
-      <div class="card-top">
-        <span class="card-name">Google Gemini</span>
-        <span class="badge region-os">🌐 海外 · 需代理/反代</span>
-        <span class="badge free">有免费层</span>
+      <!-- b.ai -->
+      <div class="card" data-base="https://api.b.ai/v1" data-model="deepseek-v4-flash">
+        <div class="card-top">
+          <span class="card-name">b.ai</span>
+          <span class="badge region">国内可用</span>
+          <span class="badge free">有免费模型</span>
+        </div>
+        <p class="card-desc">聚合多家模型的中立网关，免费档可用 DeepSeek 系。本站在「DeepSeek（b.ai）」源走的就是它。</p>
+        <div class="rows">
+          <div class="row"><span class="k">免费额度</span><span class="v"><code>deepseek-v4-flash</code> 免费；也可 hy3</span></div>
+          <div class="row"><span class="k">模型</span><span class="v"><code>deepseek-v4-flash</code> / <code>hy3</code></span></div>
+        </div>
+        <div class="fill">
+          <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
+          接口地址 = <code>https://api.b.ai/v1</code> · 模型名 = <code>deepseek-v4-flash</code> · Key = 平台申请的 Key（Bearer）
+        </div>
+        <div class="links">
+          <a href="https://api.b.ai" target="_blank" rel="noopener">b.ai 平台</a>
+        </div>
+        <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+          <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.b.ai/v1"></div>
+          <div><label>模型名</label><input class="p-model" type="text" placeholder="deepseek-v4-flash"></div>
+          <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+          <button class="probe-btn" type="button">测试</button>
+          <div class="probe-res" hidden></div>
+        </div></details>
       </div>
-      <p class="card-desc">Google AI Studio 申请 Key 即用，免费档额度足够个人玩。注意要填 OpenAI 兼容端点，别填原生 generateContent。<b>国内调用需反代</b>：<code>generativelanguage.googleapis.com</code> 直连不通，没🪜要走反代域名。</p>
-      <div class="rows">
-        <div class="row"><span class="k">免费额度</span><span class="v">AI Studio 免费 Tier，有 RPM 限制</span></div>
-        <div class="row"><span class="k">模型</span><span class="v"><code>gemini-3.5-flash-lite</code>（2.0/2.5 已失效，用这个）</span></div>
-      </div>
-      <div class="fill">
-        <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
-        接口地址 = <code>https://generativelanguage.googleapis.com/v1beta/openai</code>（填到 /v1 即可，整条全填反而用不了）<br>
-        模型名 = <code>gemini-3.5-flash-lite</code> · Key = AI Studio 的 Key（Bearer）<br>
-        <span style="opacity:.8">不要填原生 <code>:generateContent</code> 地址，会被拼错成 404。国内直连不通时，需把该域名换成可用反代。</span>
-      </div>
-      <div class="links">
-        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">申请 API Key</a>
-      </div>
-      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://generativelanguage.googleapis.com/v1beta/openai"></div>
-        <div><label>模型名</label><input class="p-model" type="text" placeholder="gemini-2.0-flash"></div>
-        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-        <button class="probe-btn" type="button">测试</button>
-        <div class="probe-res" hidden></div>
-      </div></details>
-    </div>
 
-    <!-- Agnes AI -->
-    <div class="card" data-base="https://apihub.agnes-ai.com/v1" data-model="agnes-2.5-flash">
-      <div class="card-top">
-        <span class="card-name">Agnes AI</span>
-        <span class="badge region-os">🌐 海外</span>
+    </section>
+
+    <!-- 海外模型（默认折叠） -->
+    <details class="region-section overseas">
+      <summary class="section-title">🌐 海外模型 <span class="section-note">需代理/反代 · 点击展开</span></summary>
+      <span class="section-link">其他海外模型目录：<a href="https://openrouter.ai/models" target="_blank" rel="noopener">OpenRouter Models</a></span>
+
+      <!-- Google Gemini -->
+      <div class="card" data-base="https://generativelanguage.googleapis.com/v1beta/openai" data-model="gemini-3.5-flash-lite">
+        <div class="card-top">
+          <span class="card-name">Google Gemini</span>
+          <span class="badge free">有免费层</span>
+        </div>
+        <p class="card-desc">Google AI Studio 申请 Key 即用，免费档额度足够个人玩。注意要填 OpenAI 兼容端点，别填原生 generateContent。</p>
+        <div class="rows">
+          <div class="row"><span class="k">免费额度</span><span class="v">AI Studio 免费 Tier，有 RPM 限制</span></div>
+          <div class="row"><span class="k">模型</span><span class="v"><code>gemini-3.5-flash-lite</code>（2.0/2.5 已失效，用这个）</span></div>
+        </div>
+        <div class="fill">
+          <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
+          接口地址 = <code>https://generativelanguage.googleapis.com/v1beta/openai</code>（填到 /v1 即可，整条全填反而用不了）<br>
+          模型名 = <code>gemini-3.5-flash-lite</code> · Key = AI Studio 的 Key（Bearer）<br>
+          <span style="opacity:.8">不要填原生 <code>:generateContent</code> 地址，会被拼错成 404。国内直连不通时，需把该域名换成可用反代。</span>
+        </div>
+        <div class="links">
+          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">申请 API Key</a>
+        </div>
+        <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+          <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://generativelanguage.googleapis.com/v1beta/openai"></div>
+          <div><label>模型名</label><input class="p-model" type="text" placeholder="gemini-2.0-flash"></div>
+          <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+          <button class="probe-btn" type="button">测试</button>
+          <div class="probe-res" hidden></div>
+        </div></details>
       </div>
-      <p class="card-desc">Agnes AI 官方开放端点，OpenAI 兼容。模型如 agnes-2.5-flash，个人/测试用。</p>
-      <div class="rows">
-        <div class="row"><span class="k">免费额度</span><span class="v">以官网为准（可能有限额或需要申请 Key）</span></div>
-        <div class="row"><span class="k">模型</span><span class="v"><code>agnes-2.5-flash</code></span></div>
+
+      <!-- Agnes AI -->
+      <div class="card" data-base="https://apihub.agnes-ai.com/v1" data-model="agnes-2.5-flash">
+        <div class="card-top">
+          <span class="card-name">Agnes AI</span>
+        </div>
+        <p class="card-desc">Agnes AI 官方开放端点，OpenAI 兼容。模型如 agnes-2.5-flash，个人/测试用。</p>
+        <div class="rows">
+          <div class="row"><span class="k">免费额度</span><span class="v">以官网为准（可能有限额或需要申请 Key）</span></div>
+          <div class="row"><span class="k">模型</span><span class="v"><code>agnes-2.5-flash</code></span></div>
+        </div>
+        <div class="fill">
+          <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
+          接口地址 = <code>https://apihub.agnes-ai.com/v1</code><br>
+          模型名 = <code>agnes-2.5-flash</code> · Key = 平台申请的 Key（Bearer）<br>
+          <span style="opacity:.8">国内直连不通，需反代。模型名/Key 以官网为准，此处为参考。</span>
+        </div>
+        <div class="links">
+          <a href="https://apihub.agnes-ai.com" target="_blank" rel="noopener">Agnes AI 平台</a>
+        </div>
+        <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+          <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://apihub.agnes-ai.com/v1"></div>
+          <div><label>模型名</label><input class="p-model" type="text" placeholder="agnes-2.5-flash"></div>
+          <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+          <button class="probe-btn" type="button">测试</button>
+          <div class="probe-res" hidden></div>
+        </div></details>
       </div>
-      <div class="fill">
-        <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
-        接口地址 = <code>https://apihub.agnes-ai.com/v1</code><br>
-        模型名 = <code>agnes-2.5-flash</code> · Key = 平台申请的 Key（Bearer）<br>
-        <span style="opacity:.8">国内直连不通，需反代。模型名/Key 以官网为准，此处为参考。</span>
-      </div>
-      <div class="links">
-        <a href="https://apihub.agnes-ai.com" target="_blank" rel="noopener">Agnes AI 平台</a>
-      </div>
-      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
-        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://apihub.agnes-ai.com/v1"></div>
-        <div><label>模型名</label><input class="p-model" type="text" placeholder="agnes-2.5-flash"></div>
-        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-        <button class="probe-btn" type="button">测试</button>
-        <div class="probe-res" hidden></div>
-      </div></details>
-    </div>
+
+    </details>
 
     <p class="note">
       免费额度政策变动极快，本页为静态快照，以官网为准。<br>
       海外模型 🌐 在国内直连不通，请自备可用反代域名。<br>
-      更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary)">国内大模型免费 API 获取教程</a>。<br>
-      <span style="opacity:.85">其他海外模型目录参考：<a href="https://openrouter.ai/models" target="_blank" rel="noopener" style="color:var(--primary)">OpenRouter Models</a></span>
+      更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary)">国内大模型免费 API 获取教程</a>。
     </p>
 
     <a class="back" href="https://955827.xyz">
