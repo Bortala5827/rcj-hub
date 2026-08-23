@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>免费大模型 API 获取汇总 · RCJ Lab</title>
-  <meta name="description" content="国内外可免费用的 OpenAI 兼容大模型 API：小红书 dots、商汤日日新、b.ai、Google Gemini。国内可用优先排，注册入口、模型名、接口地址一文看清。" />
+  <meta name="description" content="国内外可免费用的 OpenAI 兼容大模型 API：小红书 dots、商汤日日新、b.ai、Google Gemini、Agnes AI。国内可用优先排，注册入口、模型名、接口地址一文看清。" />
   <meta name="theme-color" content="#0f172a" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3EA%3C/text%3E%3C/svg%3E" />
   <style>
@@ -264,10 +264,40 @@
       </div></details>
     </div>
 
+    <!-- Agnes AI -->
+    <div class="card" data-base="https://apihub.agnes-ai.com/v1" data-model="agnes-2.5-flash">
+      <div class="card-top">
+        <span class="card-name">Agnes AI</span>
+        <span class="badge region-os">🌐 海外</span>
+      </div>
+      <p class="card-desc">Agnes AI 官方开放端点，OpenAI 兼容。模型如 agnes-2.5-flash，个人/测试用。</p>
+      <div class="rows">
+        <div class="row"><span class="k">免费额度</span><span class="v">以官网为准（可能有限额或需要申请 Key）</span></div>
+        <div class="row"><span class="k">模型</span><span class="v"><code>agnes-2.5-flash</code></span></div>
+      </div>
+      <div class="fill">
+        <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
+        接口地址 = <code>https://apihub.agnes-ai.com/v1</code><br>
+        模型名 = <code>agnes-2.5-flash</code> · Key = 平台申请的 Key（Bearer）<br>
+        <span style="opacity:.8">国内直连不通，需反代。模型名/Key 以官网为准，此处为参考。</span>
+      </div>
+      <div class="links">
+        <a href="https://apihub.agnes-ai.com" target="_blank" rel="noopener">Agnes AI 平台</a>
+      </div>
+      <details class="probe"><summary>测试连通性</summary><div class="probe-box">
+        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://apihub.agnes-ai.com/v1"></div>
+        <div><label>模型名</label><input class="p-model" type="text" placeholder="agnes-2.5-flash"></div>
+        <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
+        <button class="probe-btn" type="button">测试</button>
+        <div class="probe-res" hidden></div>
+      </div></details>
+    </div>
+
     <p class="note">
       免费额度政策变动极快，本页为静态快照，以官网为准。<br>
-      海外模型（如 Gemini）🌐 在国内直连不通，请自备可用反代域名。<br>
-      更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary)">国内大模型免费 API 获取教程</a>。
+      海外模型 🌐 在国内直连不通，请自备可用反代域名。<br>
+      更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary)">国内大模型免费 API 获取教程</a>。<br>
+      <span style="opacity:.85">其他海外模型目录参考：<a href="https://openrouter.ai/models" target="_blank" rel="noopener" style="color:var(--primary)">OpenRouter Models</a></span>
     </p>
 
     <a class="back" href="https://955827.xyz">
