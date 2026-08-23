@@ -112,6 +112,14 @@
     details.probe-section > summary::before { content: "▸ "; opacity: .6; }
     details.probe-section[open] > summary::before { content: "▾ "; }
 
+    /* 兼容性说明折叠 */
+    details.info-section > summary {
+      list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    }
+    details.info-section > summary::-webkit-details-marker { display: none; }
+    details.info-section > summary::before { content: "▸ "; opacity: .6; }
+    details.info-section[open] > summary::before { content: "▾ "; }
+
     .note {
       font-size: 12.5px; color: var(--ink-2); text-align: center; margin-top: 26px;
       padding: 14px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--surface);
@@ -178,8 +186,11 @@
       <p class="lede">还能免费用的大模型 API，按国内可用优先排。拿到接口地址、模型名、Key 三样，填进支持自定义模型的客户端即可用。</p>
     </header>
     <p class="updated">最后核对：<b>2026-08-23</b> · 额度变动极快，以官网为准</p>
-    <p class="compat">全部 OpenAI 兼容 <code>chat/completions</code>，鉴权 <code>Bearer</code> Key。<br>
-      不同客户端的填法略有差异：有的只需填到 <code>/v1</code>（如 b.ai、Gemini、Agnes），有的要填整条 <code>…/chat/completions</code>（如小红书、商汤）。拿不准就用下方「测试连通性」自测。</p>
+    <details class="info-section">
+      <summary class="section-title">⚠️ 兼容性说明 <span class="section-note">点击展开 / 收起</span></summary>
+      <p style="font-size:13px;color:var(--ink-2);margin:0 0 12px;">全部 OpenAI 兼容 <code>chat/completions</code>，鉴权 <code>Bearer</code> Key。不同客户端的填法略有差异：有的只需填到 <code>/v1</code>（如 b.ai、Gemini、Agnes），有的要填整条 <code>…/chat/completions</code>（如小红书、商汤）。拿不准就用下方「测试连通性」自测。</p>
+      <p style="font-size:13px;color:var(--ink-2);margin:0;">免费额度政策变动极快，本页为静态快照，以官网为准。<br>海外模型 🌐 在国内直连不通，请自备可用反代域名。<br>更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary)">国内大模型免费 API 获取教程</a>。</p>
+    </details>
 
     <!-- 国内可用（默认展开） -->
     <section class="region-section">
@@ -389,12 +400,6 @@
         <div class="probe-res" hidden></div>
       </div>
     </details>
-
-    <p class="note">
-      免费额度政策变动极快，本页为静态快照，以官网为准。<br>
-      海外模型 🌐 在国内直连不通，请自备可用反代域名。<br>
-      更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary)">国内大模型免费 API 获取教程</a>。
-    </p>
 
     <a class="back" href="https://955827.xyz">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/></svg>
