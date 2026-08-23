@@ -67,7 +67,8 @@
       padding: 10px 12px; font-size: 12.5px; color: #1e40af; margin-bottom: 12px;
     }
     .fill .ft { font-weight: 700; display: block; margin-bottom: 4px; }
-    .links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .fill .note-sm { font-size: 12px; color: #94a3b8; }
+    .links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
     .links a {
       font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none;
       border: 1px solid #c7d7f5; border-radius: 999px; padding: 5px 14px; transition: background .2s;
@@ -81,6 +82,7 @@
       font-size: 16px; font-weight: 700; color: var(--ink); margin: 0 0 14px;
       padding-bottom: 8px; border-bottom: 2px solid var(--line);
     }
+    .section-title.summary-title { margin-bottom: 0; }
     .section-note { font-size: 12px; font-weight: 400; color: var(--ink-2); margin-left: 8px; }
     .section-link { display: block; font-size: 12px; color: var(--primary); margin-bottom: 12px; }
     .section-link a { color: var(--primary); text-decoration: none; }
@@ -181,7 +183,7 @@
     </header>
     <p class="updated">最后核对：<b>2026-08-23</b> · 额度变动极快，以官网为准</p>
     <details class="info-section">
-      <summary class="section-title">⚠️ 兼容性说明 <span class="section-note">点击展开 / 收起</span></summary>
+      <summary class="section-title summary-title">⚠️ 兼容性说明 <span class="section-note">点击展开 / 收起</span></summary>
       <p style="font-size:13px;color:var(--ink-2);margin:0 0 12px;">全部 OpenAI 兼容 <code>chat/completions</code>，鉴权 <code>Bearer</code> Key。不同客户端的填法略有差异：有的只需填到 <code>/v1</code>（如 b.ai、Gemini、Agnes），有的要填整条 <code>…/chat/completions</code>（如小红书、商汤）。拿不准就用下方「测试连通性」自测。</p>
       <p style="font-size:13px;color:var(--ink-2);margin:0;">免费额度政策变动极快，本页为静态快照，以官网为准。<br>海外模型 🌐 在国内直连不通，请自备可用反代域名。<br>更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary)">国内大模型免费 API 获取教程</a>。</p>
     </details>
@@ -206,7 +208,7 @@
           <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
           接口地址 = <code>https://note3-prev-api.askdiandian.com/v1/chat/completions</code><br>
           模型名 = <code>dots3-note-prev</code> · Key = 平台申请的 Key（Bearer）<br>
-          <span style="opacity:.8">注：公开开放平台的接口地址即 askdiandian.com 这个域名（点点 App 后端域），非 dots.ai 官网。</span>
+          <span class="note-sm">注：公开开放平台的接口地址即 askdiandian.com 这个域名（点点 App 后端域），非 dots.ai 官网。</span>
         </div>
         <div class="links">
           <a href="https://dots.ai/platform/apikeys" target="_blank" rel="noopener">API Key 管理</a>
@@ -239,7 +241,7 @@
 
     <!-- 海外模型（默认折叠） -->
     <details class="region-section overseas">
-      <summary class="section-title">🌐 海外模型 <span class="section-note">需代理/反代 · 点击展开</span></summary>
+      <summary class="section-title summary-title">🌐 海外模型 <span class="section-note">需代理/反代 · 点击展开</span></summary>
       <span class="section-link">其他海外模型目录：<a href="https://openrouter.ai/models" target="_blank" rel="noopener">OpenRouter Models</a></span>
 
       <!-- b.ai -->
@@ -277,7 +279,7 @@
           <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
           接口地址 = <code>https://generativelanguage.googleapis.com/v1beta/openai</code>（填到 /v1 即可，整条全填反而用不了）<br>
           模型名 = <code>gemini-3.5-flash-lite</code> · Key = AI Studio 的 Key（Bearer）<br>
-          <span style="opacity:.8">不要填原生 <code>:generateContent</code> 地址，会被拼错成 404。国内直连不通时，需把该域名换成可用反代。</span>
+          <span class="note-sm">不要填原生 <code>:generateContent</code> 地址，会被拼错成 404。国内直连不通时，需把该域名换成可用反代。</span>
         </div>
         <div class="links">
           <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">申请 API Key</a>
@@ -298,7 +300,7 @@
           <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
           接口地址 = <code>https://apihub.agnes-ai.com/v1</code><br>
           模型名 = <code>agnes-2.5-flash</code> · Key = 平台申请的 Key（Bearer）<br>
-          <span style="opacity:.8">国内直连不通，需反代。模型名/Key 以官网为准，此处为参考。</span>
+          <span class="note-sm">国内直连不通，需反代。模型名/Key 以官网为准，此处为参考。</span>
         </div>
         <div class="links">
           <a href="https://apihub.agnes-ai.com" target="_blank" rel="noopener">Agnes AI 平台</a>
@@ -309,7 +311,8 @@
 
     <!-- 自建中转站 GitHub（默认折叠） -->
     <details class="region-section selfhosted">
-      <summary class="section-title">自建中转站 <span class="section-note">开源项目 · 部署后国内直连 · 点击展开</span> <a href="https://github.com/search?q=free+api&type=repositories" target="_blank" rel="noopener" style="font-size:12px;margin-left:8px;color:var(--ink-2);text-decoration:none;">🔍 搜更多</a></summary>
+      <summary class="section-title summary-title">自建中转站 <span class="section-note">开源项目 · 部署后国内直连 · 点击展开</span></summary>
+      <span class="section-link">🔍 搜 GitHub 免费 API 中转站：<a href="https://github.com/search?q=free+api&type=repositories" target="_blank" rel="noopener">free api</a></span>
       <p style="font-size:13px;color:var(--ink-2);margin:0 0 14px;">把海外模型统一封装成 OpenAI 兼容接口，自己部署即可国内直连调用。以下项目均为开源，按需选一个自建。</p>
 
       <!-- OmniRoute -->
@@ -385,7 +388,7 @@
 
     <!-- 连通性测试 -->
     <details class="region-section probe-section">
-      <summary class="section-title">🔍 连通性测试 <span class="section-note">输入接口地址 / 模型名 / Key，测试是否可用</span></summary>
+      <summary class="section-title summary-title">🔍 连通性测试 <span class="section-note">输入接口地址 / 模型名 / Key，测试是否可用</span></summary>
       <div class="probe-box" style="margin-top:0">
         <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.example.com/v1"></div>
         <div><label>模型名</label><input class="p-model" type="text" placeholder="gemini-2.0-flash"></div>
