@@ -1,10 +1,13 @@
 name: Web 自动化测试
 
+# 2026-08-23 临时禁用：仓库无 tests/ 实际用例，每次 push 必失败 → GitHub 失败邮件被外部短信转发器刷爆。
+# 改为仅手动触发，不再监听 push/pull_request。需要恢复时把下方 on: 改回 push/pull_request 即可。
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
+#  push:
+#    branches: [main]
+#  pull_request:
+#    branches: [main]
 
 # 本工作流仅做「测试 / 验收」，不部署生产环境（Cloudflare Pages 正式部署流程保持不变）。
 permissions:
