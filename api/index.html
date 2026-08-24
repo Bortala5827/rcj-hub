@@ -183,31 +183,88 @@
     .faq-body a { color: var(--primary); text-decoration: none; }
     .faq-body a:hover { text-decoration: underline; }
 
-    .back {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: fit-content; margin: 30px auto 0; padding: 12px 26px;
-      font-size: 14px; font-weight: 700; letter-spacing: .01em;
-      color: var(--primary); text-decoration: none; background: var(--surface);
-      border: 2px solid var(--primary); border-radius: 999px;
-      box-shadow: 0 2px 10px rgba(37,99,235,.12);
-      transition: transform .35s cubic-bezier(.68,-0.55,.27,2.2), background .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease;
-      animation: backPulse 3.2s ease-in-out infinite;
+    /* 返回按钮（参考 Uiverse.io by FColombati 金属质感胶囊钮） */
+    .home-button {
+      all: unset;
+      cursor: pointer;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      position: relative;
+      display: block;
+      width: fit-content;
+      margin: 30px auto 0;
+      border-radius: 100em;
+      background-color: rgba(0, 0, 0, 0.75);
+      box-shadow:
+        -0.15em -0.15em 0.15em -0.075em rgba(5,5,5,.25),
+        0.0375em 0.0375em 0.0675em 0 rgba(5,5,5,.1);
     }
-    .back .ico { width: 17px; height: 17px; fill: currentColor; transition: transform .35s cubic-bezier(.68,-0.55,.27,2.2); }
-    .back:hover {
-      background: var(--primary); color: #fff;
-      transform: scale(1.05);
-      box-shadow: 0 6px 20px rgba(37,99,235,.30);
-      animation-play-state: paused;
+    .home-button::after {
+      content: ""; position: absolute; z-index: 0;
+      width: calc(100% + 0.3em); height: calc(100% + 0.3em);
+      top: -0.15em; left: -0.15em; border-radius: inherit;
+      background: linear-gradient(-135deg, rgba(5,5,5,.5), transparent 20%, transparent 100%);
+      filter: blur(0.0125em); opacity: 0.25; mix-blend-mode: multiply;
     }
-    .back:hover .ico { transform: translateX(-4px); }
-    @keyframes backPulse {
-      0%, 100% { box-shadow: 0 2px 10px rgba(37,99,235,.12); }
-      50%      { box-shadow: 0 4px 18px rgba(37,99,235,.30); }
+    .home-button .button-outer {
+      position: relative; z-index: 1; border-radius: inherit;
+      transition: box-shadow 300ms ease; will-change: box-shadow;
+      box-shadow:
+        0 0.05em 0.05em -0.01em rgba(5,5,5,1),
+        0 0.01em 0.01em -0.01em rgba(5,5,5,.5),
+        0.15em 0.3em 0.1em -0.01em rgba(5,5,5,.25);
     }
+    .home-button:hover .button-outer {
+      box-shadow:
+        0 0 0 0 rgba(5,5,5,1),
+        0 0 0 0 rgba(5,5,5,.5),
+        0 0 0 0 rgba(5,5,5,.25);
+    }
+    .home-button .button-inner {
+      --inset: 0.035em;
+      position: relative; z-index: 1; border-radius: inherit;
+      padding: 0.95em 1.6em;
+      display: flex; align-items: center; justify-content: center; gap: 0.55em;
+      background-image: linear-gradient(135deg, rgba(230,230,230,1), rgba(180,180,180,1));
+      transition: box-shadow 300ms ease, clip-path 250ms ease, background-image 250ms ease, transform 250ms ease;
+      will-change: box-shadow, clip-path, background-image, transform;
+      overflow: clip;
+      clip-path: inset(0 0 0 0 round 100em);
+      box-shadow:
+        0 0 0 0 inset rgba(5,5,5,.1),
+        -0.05em -0.05em 0.05em 0 inset rgba(5,5,5,.25),
+        0 0 0 0 inset rgba(5,5,5,.1),
+        0 0 0.05em 0.2em inset rgba(255,255,255,.25),
+        0.025em 0.05em 0.1em 0 inset rgba(255,255,255,1),
+        0.12em 0.12em 0.12em inset rgba(255,255,255,.25),
+        -0.075em -0.25em 0.25em 0.1em inset rgba(5,5,5,.25);
+    }
+    .home-button:hover .button-inner {
+      clip-path: inset(clamp(1px,0.0625em,2px) clamp(1px,0.0625em,2px) clamp(1px,0.0625em,2px) clamp(1px,0.0625em,2px) round 100em);
+      box-shadow:
+        0.1em 0.15em 0.05em 0 inset rgba(5,5,5,.75),
+        -0.025em -0.03em 0.05em 0.025em inset rgba(5,5,5,.5),
+        0.25em 0.25em 0.2em 0 inset rgba(5,5,5,.5),
+        0 0 0.05em 0.5em inset rgba(255,255,255,.15),
+        0 0 0 0 inset rgba(255,255,255,1),
+        0.12em 0.12em 0.12em inset rgba(255,255,255,.25),
+        -0.075em -0.12em 0.2em 0.1em inset rgba(5,5,5,.25);
+    }
+    .home-button .button-inner svg { position: relative; z-index: 4; width: 15px; height: 15px; fill: #2f2f2f; transition: transform 250ms ease; }
+    .home-button:hover .button-inner svg { transform: translateX(-3px); }
+    .home-button .button-inner span {
+      position: relative; z-index: 4;
+      font-family: Inter, -apple-system, "Segoe UI", Roboto, sans-serif;
+      letter-spacing: -0.02em; font-weight: 500; font-size: 14px;
+      color: rgba(0, 0, 0, 0);
+      background-image: linear-gradient(135deg, rgba(25,25,25,1), rgba(75,75,75,1));
+      -webkit-background-clip: text; background-clip: text;
+      transition: transform 250ms ease; display: block; will-change: transform;
+      -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+    }
+    .home-button:hover .button-inner span { transform: scale(0.975); }
+    .home-button:active .button-inner { transform: scale(0.975); }
     @media (prefers-reduced-motion: reduce) {
-      .back { animation: none; }
-      .back, .back .ico { transition: none; }
+      .home-button *, .home-button { transition: none; }
     }
 
     /* 测试连通性 */
@@ -244,7 +301,7 @@
       <h1>免费大模型 API 获取汇总</h1>
       <p class="lede">还能免费用的大模型 API，按国内可用优先排。拿到接口地址、模型名、Key 三样，填进支持自定义模型的客户端即可用。</p>
     </header>
-    <p class="updated">最后核对：<b>2026-08-23</b> · 额度变动极快，以官网为准</p>
+    <p class="updated">最后核对：<b>2026-08-23</b></p>
     <!-- FAQ 悬浮按钮（参考 Uiverse.io by vinodjangid07），替代顶部兼容性折叠区 -->
     <button class="faq-button" id="faqBtn" type="button" aria-label="FAQ">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" aria-hidden="true">
@@ -473,9 +530,13 @@
       </div>
     </details>
 
-    <a class="back" href="https://exam.955827.xyz">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/></svg>
-      回到 Exam Hub
+    <a class="home-button" href="https://exam.955827.xyz" aria-label="回到 Exam Hub">
+      <div class="button-outer">
+        <div class="button-inner">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/></svg>
+          <span>Back to Exam Hub</span>
+        </div>
+      </div>
     </a>
   </div>
 
