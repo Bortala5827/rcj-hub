@@ -112,13 +112,76 @@
     details.probe-section > summary::before { content: "▸ "; opacity: .6; }
     details.probe-section[open] > summary::before { content: "▾ "; }
 
-    /* 兼容性说明折叠 */
-    details.info-section > summary {
-      list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    /* FAQ 悬浮按钮（参考 Uiverse.io by vinodjangid07） */
+    .faq-button {
+      position: fixed; right: 18px; bottom: 22px; z-index: 60;
+      width: 52px; height: 52px; border-radius: 50%; border: none;
+      background-color: #ffe53b;
+      background-image: linear-gradient(147deg, #ffe53b 0%, #ff2525 74%);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 10px 14px rgba(255, 37, 37, 0.32);
+      transition: transform .25s ease, box-shadow .25s ease;
     }
-    details.info-section > summary::-webkit-details-marker { display: none; }
-    details.info-section > summary::before { content: "▸ "; opacity: .6; }
-    details.info-section[open] > summary::before { content: "▾ "; }
+    .faq-button svg { height: 1.5em; fill: white; }
+    .faq-button:active { transform: scale(.92); }
+    .faq-button:hover svg { animation: jello-vertical 0.7s both; }
+    @keyframes jello-vertical {
+      0%   { transform: scale3d(1, 1, 1); }
+      30%  { transform: scale3d(0.75, 1.25, 1); }
+      40%  { transform: scale3d(1.25, 0.75, 1); }
+      50%  { transform: scale3d(0.85, 1.15, 1); }
+      65%  { transform: scale3d(1.05, 0.95, 1); }
+      75%  { transform: scale3d(0.95, 1.05, 1); }
+      100% { transform: scale3d(1, 1, 1); }
+    }
+    .faq-button .tooltip {
+      position: absolute; top: -14px; opacity: 0; pointer-events: none;
+      background: #ffe53b;
+      background-image: linear-gradient(147deg, #ffe53b 0%, #ff2525 74%);
+      color: #fff; padding: 5px 11px; border-radius: 6px;
+      font-size: 11px; font-weight: 700; letter-spacing: .5px;
+      display: flex; align-items: center; justify-content: center;
+      transition: top .25s ease, opacity .25s ease; white-space: nowrap;
+    }
+    .faq-button .tooltip::before {
+      content: ""; position: absolute; bottom: -5px; left: 50%; margin-left: -5px;
+      width: 10px; height: 10px; background: #ff2525; transform: rotate(45deg);
+    }
+    .faq-button:hover .tooltip { top: -40px; opacity: 1; }
+
+    /* FAQ 弹层 */
+    .faq-panel {
+      position: fixed; right: 18px; bottom: 86px; z-index: 60; width: min(340px, calc(100vw - 36px));
+      background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, .18); overflow: hidden;
+      animation: faqIn .28s cubic-bezier(.34, 1.3, .5, 1) both;
+    }
+    .faq-panel[hidden] { display: none; }
+    @keyframes faqIn {
+      from { opacity: 0; transform: translateY(12px) scale(.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .faq-panel.invert { animation-direction: reverse; animation-fill-mode: backwards; }
+    .faq-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      margin: 0; padding: 12px 16px; font-size: 14px; font-weight: 800; color: #fff;
+      background-image: linear-gradient(147deg, #ffe53b 0%, #ff2525 74%);
+    }
+    .faq-close {
+      border: none; background: transparent; color: rgba(255,255,255,.92);
+      font-size: 15px; line-height: 1; cursor: pointer; padding: 2px 4px; border-radius: 4px;
+    }
+    .faq-close:hover { color: #fff; transform: scale(1.15); }
+    .faq-body { padding: 12px 16px 14px; font-size: 13px; color: var(--ink-2); line-height: 1.7; margin: 0; }
+    .faq-body p { margin: 0 0 10px; }
+    .faq-body p:last-child { margin-bottom: 0; }
+    .faq-body code {
+      font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11.5px;
+      background: #f1f5f9; padding: 1px 5px; border-radius: 4px; color: #b45309;
+    }
+    .faq-body a { color: var(--primary); text-decoration: none; }
+    .faq-body a:hover { text-decoration: underline; }
 
     .back {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -182,11 +245,23 @@
       <p class="lede">还能免费用的大模型 API，按国内可用优先排。拿到接口地址、模型名、Key 三样，填进支持自定义模型的客户端即可用。</p>
     </header>
     <p class="updated">最后核对：<b>2026-08-23</b> · 额度变动极快，以官网为准</p>
-    <details class="info-section">
-      <summary class="section-title summary-title">⚠️ 兼容性说明 <span class="section-note">点击展开 / 收起</span></summary>
-      <p style="font-size:13px;color:var(--ink-2);margin:0 0 12px;">全部 OpenAI 兼容 <code>chat/completions</code>，鉴权 <code>Bearer</code> Key。不同客户端的填法略有差异：有的只需填到 <code>/v1</code>（如 b.ai、Gemini、Agnes），有的要填整条 <code>…/chat/completions</code>（如小红书、商汤）。拿不准就用下方「测试连通性」自测。</p>
-      <p style="font-size:13px;color:var(--ink-2);margin:0;">免费额度政策变动极快，本页为静态快照，以官网为准。<br>海外模型 🌐 在国内直连不通，请自备可用反代域名。<br>更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary)">国内大模型免费 API 获取教程</a>。</p>
-    </details>
+    <!-- FAQ 悬浮按钮（参考 Uiverse.io by vinodjangid07），替代顶部兼容性折叠区 -->
+    <button class="faq-button" id="faqBtn" type="button" aria-label="FAQ">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" aria-hidden="true">
+        <path d="M80 160c0-35.3 28.7-64 64-64h32c35.3 0 64 28.7 64 64v3.6c0 21.8-11.1 42.1-29.4 53.8l-42.2 27.1c-25.2 16.2-40.4 44.1-40.4 74V320c0 17.7 14.3 32 32 32s32-14.3 32-32v-1.4c0-8.2 4.2-15.8 11-20.2l42.2-27.1c36.6-23.6 58.8-64.1 58.8-107.7V160c0-70.7-57.3-128-128-128H144C73.3 32 16 89.3 16 160c0 17.7 14.3 32 32 32s32-14.3 32-32zm80 320a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"></path>
+      </svg>
+      <span class="tooltip">FAQ</span>
+    </button>
+
+    <aside class="faq-panel" id="faqPanel" hidden>
+      <h3 class="faq-head">兼容性说明
+        <button class="faq-close" id="faqClose" type="button" aria-label="关闭">✕</button>
+      </h3>
+      <div class="faq-body">
+        <p>全部 OpenAI 兼容 <code>chat/completions</code>，鉴权 <code>Bearer</code> Key。不同客户端的填法略有差异：有的只需填到 <code>/v1</code>（如 b.ai、Gemini、Agnes），有的要填整条 <code>…/chat/completions</code>（如小红书、商汤）。拿不准就用下方「连通性测试」自测。</p>
+        <p>免费额度政策变动极快，本页为静态快照，以官网为准。海外模型 🌐 在国内直连不通，请自备可用反代域名。更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener">国内大模型免费 API 获取教程</a>。</p>
+      </div>
+    </aside>
 
     <!-- 国内可用（默认展开） -->
     <section class="region-section">
@@ -406,6 +481,19 @@
 
   <script>
   (function () {
+    // FAQ 悬浮按钮开合
+    var btn = document.getElementById("faqBtn");
+    var panel = document.getElementById("faqPanel");
+    var close = document.getElementById("faqClose");
+    function show() { panel.classList.remove("invert"); panel.hidden = false; }
+    function hide() {
+      panel.classList.add("invert");
+      setTimeout(function () { panel.hidden = true; }, 120);
+    }
+    btn.addEventListener("click", function () { panel.hidden ? show() : hide(); });
+    close.addEventListener("click", hide);
+    panel.addEventListener("click", function (e) { if (e.target === panel) hide(); });
+
     // 统一连通性测试
     document.querySelectorAll(".probe-btn").forEach(function (btn) {
       btn.addEventListener("click", function () {
