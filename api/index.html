@@ -318,6 +318,9 @@
       <div class="faq-body">
         <p>全部 OpenAI 兼容 <code>chat/completions</code>，鉴权 <code>Bearer</code> Key。不同客户端的填法略有差异：有的只需填到 <code>/v1</code>（如 b.ai、Gemini、Agnes），有的要填整条 <code>…/chat/completions</code>（如小红书、商汤）。拿不准就用下方「连通性测试」自测。</p>
         <p>免费额度政策变动极快，本页为静态快照，以官网为准。海外模型 🌐 在国内直连不通，请自备可用反代域名。更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener">国内大模型免费 API 获取教程</a>。</p>
+        <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;">
+        <p style="color:#9f1239;">⚠️ <b>自建中转风险提示</b>：自建中转可能违反原模型服务商的使用条款（ToS），存在账号封禁、IP 拉黑、API 限额清零等风险；且相关项目能力依赖上游客户端逆向，稳定性无保障。请谨慎评估合规性与风险后自用，勿对外提供公共服务。</p>
+        <p style="color:#9a3412;">⚠️ <b>小白劝退</b>：自建中转项目均需一定技术基础（Docker/Node.js/Python/Go 环境配置、网络代理、OAuth 授权等），零基础用户请直接用上方国内可用 API，不要瞎折腾浪费时间。</p>
       </div>
     </aside>
 
@@ -446,9 +449,7 @@
     <details class="region-section selfhosted">
       <summary class="section-title summary-title"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true" style="vertical-align:-2px;margin-right:5px;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>自建中转站 <span class="section-note">开源项目 · 部署后国内直连 · 点击展开</span></summary>
       <span class="section-link">🔍 搜 GitHub 免费 API 中转站：<a href="https://github.com/search?q=free+api&type=repositories" target="_blank" rel="noopener">free api</a></span>
-      <p style="font-size:13px;color:var(--ink-2);margin:0 0 10px;">把海外模型统一封装成 OpenAI 兼容接口，自己部署即可国内直连调用。以下项目均为开源，按需选一个自建。</p>
-      <p style="font-size:12px;color:#9f1239;background:#fff1f2;border:1px solid #fecdd3;border-left:3px solid #f43f5e;padding:7px 11px;margin:0 0 14px;border-radius:6px;line-height:1.55;">⚠️ <b>风险提示</b>：自建中转可能违反原模型服务商的使用条款（ToS），存在账号封禁、IP 拉黑、API 限额清零等风险；且相关项目能力依赖上游客户端逆向，稳定性无保障。请谨慎评估合规性与风险后自用，勿对外提供公共服务。</p>
-      <p style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:6px 10px;margin:0 0 14px;border-radius:6px;line-height:1.5;">⚠️ <b>小白劝退</b>：以下项目均需一定技术基础（Docker/Node.js/Python/Go 环境配置、网络代理、OAuth 授权等），零基础用户请直接用上方国内可用 API，不要瞎折腾浪费时间。</p>
+      <p style="font-size:13px;color:var(--ink-2);margin:0 0 10px;">把海外模型统一封装成 OpenAI 兼容接口，自己部署即可国内直连调用。以下项目均为开源，按需选一个自建。风险提示见右上角 ❓。</p>
 
       <!-- AIClient2API -->
       <div class="card" data-base="http://localhost:3000/v1" data-model="gemini-3.6-flash">
