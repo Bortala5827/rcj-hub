@@ -302,7 +302,7 @@
       <h1>免费大模型 API 获取汇总</h1>
       <p class="lede">还能免费用的大模型 API，按国内可用优先排。拿到接口地址、模型名、Key 三样，填进支持自定义模型的客户端即可用。</p>
     </header>
-    <p class="updated">最后核对：<b>2026-08-24</b></p>
+    <p class="updated">最后核对：<b>2026-08-25</b></p>
     <!-- FAQ 悬浮按钮（参考 Uiverse.io by vinodjangid07），替代顶部兼容性折叠区 -->
     <button class="faq-button" id="faqBtn" type="button" aria-label="FAQ">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" aria-hidden="true">
@@ -448,6 +448,7 @@
       <span class="section-link">🔍 搜 GitHub 免费 API 中转站：<a href="https://github.com/search?q=free+api&type=repositories" target="_blank" rel="noopener">free api</a></span>
       <p style="font-size:13px;color:var(--ink-2);margin:0 0 10px;">把海外模型统一封装成 OpenAI 兼容接口，自己部署即可国内直连调用。以下项目均为开源，按需选一个自建。</p>
       <p style="font-size:12px;color:#9f1239;background:#fff1f2;border:1px solid #fecdd3;border-left:3px solid #f43f5e;padding:7px 11px;margin:0 0 14px;border-radius:6px;line-height:1.55;">⚠️ <b>风险提示</b>：自建中转可能违反原模型服务商的使用条款（ToS），存在账号封禁、IP 拉黑、API 限额清零等风险；且相关项目能力依赖上游客户端逆向，稳定性无保障。请谨慎评估合规性与风险后自用，勿对外提供公共服务。</p>
+      <p style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:6px 10px;margin:0 0 14px;border-radius:6px;line-height:1.5;">⚠️ <b>小白劝退</b>：以下项目均需一定技术基础（Docker/Node.js/Python/Go 环境配置、网络代理、OAuth 授权等），零基础用户请直接用上方国内可用 API，不要瞎折腾浪费时间。</p>
 
       <!-- AIClient2API -->
       <div class="card" data-base="http://localhost:3000/v1" data-model="gemini-3.6-flash">
@@ -479,6 +480,7 @@
           <span class="badge free">⭐ 30k+ stars</span>
         </div>
         <p class="card-desc">免费开源 AI 网关，341 个 provider、90+ 免费层。一键本地部署，自动回退配额耗尽的订阅 → API Key → 免费模型。</p>
+        <p style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:6px 10px;margin:0 0 12px;border-radius:6px;line-height:1.5;">⚠️ <b>未经实测</b>：本页信息来自项目 README，实际部署效果、稳定性、provider 兼容性均未经验证，请自行踩坑后评估可用性。</p>
         <div class="rows">
           <div class="row"><span class="k">部署</span><span class="v"><code>npm install -g omniroute && omniroute</code> 或 Docker</span></div>
           <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:20128/v1</code>（本地默认）</span></div>
@@ -502,6 +504,7 @@
           <span class="badge free">⭐ 55k+ stars</span>
         </div>
         <p class="card-desc">Y Combinator 孵化，100+ provider 统一网关。Python SDK + Proxy Server 双形态，企业级预算控制、虚拟 Key、自动 fallback。</p>
+        <p style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:6px 10px;margin:0 0 12px;border-radius:6px;line-height:1.5;">⚠️ <b>部署复杂度高</b>：需要 Python 环境，配置文件语法繁琐，provider 密钥管理 + fallback 策略调优容易踩坑，折腾一下午搞不定是常态。<b>小白慎入，不建议零基础折腾。</b></p>
         <div class="rows">
           <div class="row"><span class="k">部署</span><span class="v"><code>pip install 'litellm[proxy]' && litellm --model openai/gpt-4o</code> 或 Docker</span></div>
           <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:4000/v1</code>（本地默认）</span></div>
@@ -525,6 +528,7 @@
           <span class="badge free">Go 语言 · 轻量</span>
         </div>
         <p class="card-desc">用 Go 写的 API 管理与分发系统，"OpenRouter 的开源替代品"。支持聊天/图像/语音/嵌入多模态，约 28 家模型提供商。</p>
+        <p style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:6px 10px;margin:0 0 12px;border-radius:6px;line-height:1.5;">⚠️ <b>未经实测</b>：本页信息来自项目 README，实际部署效果、稳定性、provider 兼容性均未经验证，请自行踩坑后评估可用性。<b>小白慎入，不建议零基础折腾。</b></p>
         <div class="rows">
           <div class="row"><span class="k">部署</span><span class="v">下载二进制或 Docker；配置 <code>config.json</code> 添加上游 Key</span></div>
           <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:3000/v1</code>（默认端口）</span></div>
