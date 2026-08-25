@@ -457,7 +457,6 @@
           <span class="badge region-os">聚合 11+ 供应商</span>
         </div>
         <p class="card-desc">把「仅客户端可用的免费大模型」统一转成 OpenAI 兼容接口的自托管网关：OAuth 解锁 Gemini / Antigravity / Claude Kiro / Codex / Grok 等客户端专属模型，多账号池轮询 + 跨类型 Fallback。一个入口聚合 11+ 供应商、70+ 模型，零成本调用。</p>
-        <p style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:6px 10px;margin:0 0 12px;border-radius:6px;line-height:1.5;">⚠️ <b>对网络要求较高</b>：依赖 OAuth 客户端登录态与海外服务通信，国内网络环境需自备稳定代理（建议落地海外 VPS）。</p>
         <div class="rows">
           <div class="row"><span class="k">部署</span><span class="v"><code>docker run justlikemaki/aiclient-2-api</code> 或 Node.js 直接跑</span></div>
           <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:3000/{provider}/v1</code>（如 <code>/gemini-antigravity/v1</code>）</span></div>
@@ -497,7 +496,7 @@
           <span class="badge free">⭐ 55k+ stars</span>
         </div>
         <p class="card-desc">Y Combinator 孵化，100+ provider 统一网关。Python SDK + Proxy Server 双形态，企业级预算控制、虚拟 Key、自动 fallback。</p>
-        <p style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:6px 10px;margin:0 0 12px;border-radius:6px;line-height:1.5;">⚠️ <b>部署复杂度高</b>：需要 Python 环境，配置文件语法繁琐，provider 密钥管理 + fallback 策略调优容易踩坑，折腾一下午搞不定是常态。<b>小白慎入，不建议零基础折腾。</b></p>
+        <p style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:6px 10px;margin:0 0 12px;border-radius:6px;line-height:1.5;">⚠️ <b>部署复杂度高</b>：需要 Python 环境，配置文件语法繁琐，provider 密钥管理 + fallback 策略调优容易踩坑。<b>小白慎入，不建议零基础折腾。</b></p>
         <div class="rows">
           <div class="row"><span class="k">部署</span><span class="v"><code>pip install 'litellm[proxy]' && litellm --model openai/gpt-4o</code> 或 Docker</span></div>
           <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:4000/v1</code>（本地默认）</span></div>
