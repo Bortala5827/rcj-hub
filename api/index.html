@@ -364,13 +364,9 @@
         <button class="faq-close" id="faqClose" type="button" aria-label="关闭">✕</button>
       </h3>
       <div class="faq-body">
-        <p>全部 OpenAI 兼容 <code>chat/completions</code>，鉴权 <code>Bearer</code> Key。不同客户端的填法略有差异：有的只需填到 <code>/v1</code>（如 b.ai、Gemini、Agnes），有的要填整条 <code>…/chat/completions</code>（如小红书、商汤）。拿不准就用下方「连通性测试」自测。</p>
-        <p>免费额度政策变动极快，本页为静态快照，以官网为准。海外模型 🌐 在国内直连不通，请自备可用反代域名。更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener">国内大模型免费 API 获取教程</a>。</p>
-        <p style="font-weight:700;margin-bottom:4px;">常见报错速查</p>
-        <p style="margin:0;"><code>401</code> Key 错误或未加 Bearer 前缀 · <code>404</code> 接口地址拼错（多/少了 <code>/v1</code> 或 <code>/chat/completions</code>）· <code>400 model_not_found</code> 模型名拼写错误 · <code>429</code> 超出免费额度或频率限制 · <code>500/502</code> 服务端问题，稍后重试或换模型。</p>
-        <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;">
-        <p style="color:#9f1239;">⚠️ <b>自建中转风险提示</b>：自建中转可能违反原模型服务商的使用条款（ToS），存在账号封禁、IP 拉黑、API 限额清零等风险；且相关项目能力依赖上游客户端逆向，稳定性无保障。请谨慎评估合规性与风险后自用，勿对外提供公共服务。</p>
-        <p style="color:#9a3412;">⚠️ <b>小白劝退</b>：自建中转项目均需一定技术基础（Docker/Node.js/Python/Go 环境配置、网络代理、OAuth 授权等），零基础用户请直接用上方国内可用 API，不要瞎折腾浪费时间。</p>
+        <p>全部 OpenAI 兼容，<code>Bearer</code> 鉴权。接口填到 <code>/v1</code> 或整条 <code>/chat/completions</code> 因平台而异，拿不准用下方连通性测试。</p>
+        <p><b>报错速查</b>：<code>401</code> Key 错 · <code>404</code> 地址拼错 · <code>400</code> 模型名错 · <code>429</code> 超额/限流 · <code>500/502</code> 服务端问题。</p>
+        <p style="color:#9f1239;margin:0;">⚠️ 自建中转可能违反上游 ToS，有封号风险，且需技术基础，零基础勿碰。</p>
       </div>
     </aside>
 
@@ -452,8 +448,6 @@
           <a class="ac-btn" href="https://www.scnet.cn/" target="_blank" rel="noopener">申请</a>
         </div>
       </div>
-
-      <p style="font-size:12px;color:var(--ink-2);margin:14px 0 0;">额度以官网为准。海外平台（Google/Groq/Agnes）和自建中转见下方折叠区。图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary);">API Key 获取教程</a>。</p>
     </section>
 
     <!-- 海外模型（默认折叠） -->
