@@ -32,6 +32,7 @@
     header { text-align: center; margin-bottom: 8px; }
     h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; }
     .lede { font-size: 14px; color: var(--ink-2); margin: 0 auto 4px; max-width: 560px; }
+    .lede a { color: var(--primary); }
     .updated { font-size: 12px; color: var(--ink-2); margin-bottom: 6px; text-align: center; }
     .updated b { color: var(--primary); }
 
@@ -91,6 +92,23 @@
     .section-link { display: block; font-size: 12px; color: var(--primary); margin-bottom: 12px; }
     .section-link a { color: var(--primary); text-decoration: none; }
     .section-link a:hover { text-decoration: underline; }
+
+    /* 国产模型 Key 直达 — 紧凑卡片 */
+    .quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+    .quick-card {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+      padding: 14px 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 6px;
+    }
+    .quick-card .qc-name { font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
+    .quick-card .qc-free { font-size: 11px; font-weight: 700; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 7px; border-radius: 999px; }
+    .quick-card .qc-row { font-size: 12px; color: var(--ink-2); line-height: 1.5; }
+    .quick-card .qc-row code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11px; background: #f1f5f9; padding: 1px 4px; border-radius: 3px; color: #b45309; }
+    .quick-card .qc-btn {
+      display: inline-block; margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--primary);
+      text-decoration: none; border: 1px solid #c7d7f5; border-radius: 999px; padding: 4px 12px; text-align: center;
+      transition: background .2s;
+    }
+    .quick-card .qc-btn:hover { background: var(--primary-soft); }
 
     /* 海外区折叠 */
     details.region-section.overseas > summary {
@@ -303,9 +321,9 @@
   <div class="wrap">
     <header>
       <h1>免费大模型 API 获取汇总</h1>
-      <p class="lede">把有免费额度，可用的大模型 API，按国内可用优先排。拿到接口地址、模型名、Key 三样，填进支持自定义模型的客户端即可用。</p>
+      <p class="lede">本页是速查表：有免费额度、可用的大模型 API，按国内可用优先排。拿到接口地址、模型名、Key 三样，填进支持自定义模型的客户端即可用。零基础申请 Key 的图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener">国内大模型免费 API 获取教程</a>。</p>
     </header>
-    <p class="updated">最后核对：<b>2026-08-25</b> · 💡 点击下方代码可一键复制</p>
+    <p class="updated">最后核对：<b>2026-08-26</b> · 💡 点击下方代码可一键复制</p>
     <!-- FAQ 悬浮按钮（参考 Uiverse.io by vinodjangid07），替代顶部兼容性折叠区 -->
     <button class="faq-button" id="faqBtn" type="button" aria-label="FAQ">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" aria-hidden="true">
@@ -378,6 +396,44 @@
           <a href="https://www.sensenova.cn/token-plan" target="_blank" rel="noopener">Token Plan</a>
         </div>
       </div>
+    </section>
+
+    <!-- 国产模型 Key 直达 -->
+    <section class="region-section">
+      <h2 class="section-title">国产模型 Key 直达 <span class="section-note">注册即送免费额度 · 点击直达申请页</span></h2>
+      <div class="quick-grid">
+        <div class="quick-card">
+          <div class="qc-name">硅基流动 <span class="qc-free">送体验金</span></div>
+          <div class="qc-row">Base：<code>https://api.siliconflow.cn/v1</code></div>
+          <div class="qc-row">模型：<code>deepseek-ai/DeepSeek-V4-Flash</code> / <code>FunAudioLLM/SenseVoiceSmall</code>（转写）</div>
+          <a class="qc-btn" href="https://cloud.siliconflow.cn/i/JXohBRlG" target="_blank" rel="noopener">申请 Key</a>
+        </div>
+        <div class="quick-card">
+          <div class="qc-name">DeepSeek <span class="qc-free">送体验额度</span></div>
+          <div class="qc-row">Base：<code>https://api.deepseek.com/v1</code></div>
+          <div class="qc-row">模型：<code>deepseek-v4-flash</code> / <code>deepseek-v4-pro</code> / 多模态 <code>deepseek-v4-flash-vision-exp</code></div>
+          <a class="qc-btn" href="https://platform.deepseek.com/" target="_blank" rel="noopener">申请 Key</a>
+        </div>
+        <div class="quick-card">
+          <div class="qc-name">Kimi 月之暗面 <span class="qc-free">送 ¥15</span></div>
+          <div class="qc-row">Base：<code>https://api.moonshot.cn/v1</code></div>
+          <div class="qc-row">模型：<code>kimi-k2.5</code> / <code>moonshot-v1-8k</code></div>
+          <a class="qc-btn" href="https://platform.moonshot.cn/" target="_blank" rel="noopener">申请 Key</a>
+        </div>
+        <div class="quick-card">
+          <div class="qc-name">智谱 GLM <span class="qc-free">有免费档</span></div>
+          <div class="qc-row">Base：<code>https://open.bigmodel.cn/api/paas/v4</code></div>
+          <div class="qc-row">模型：<code>glm-4-flash</code> / <code>glm-4-plus</code></div>
+          <a class="qc-btn" href="https://open.bigmodel.cn/" target="_blank" rel="noopener">申请 Key</a>
+        </div>
+        <div class="quick-card">
+          <div class="qc-name">小米 MiMo <span class="qc-free">送 ¥10</span></div>
+          <div class="qc-row">Base：<code>https://api.xiaomimimo.com/v1</code></div>
+          <div class="qc-row">模型：<code>mimo-v2.5-pro</code> 等</div>
+          <a class="qc-btn" href="https://platform.xiaomimimo.com/" target="_blank" rel="noopener">申请 Key</a>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--ink-2);margin:10px 0 0;">免费额度以官网为准，变动极快。详细图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary);">国内大模型免费 API 获取教程</a>。</p>
     </section>
 
     <!-- 海外模型（默认折叠） -->
