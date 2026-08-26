@@ -16,21 +16,10 @@
     .series-label { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
     .series-sub { font-size: 13px; color: var(--ink-2); }
 
-    .exam-entry { display: flex; align-items: center; gap: 22px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 26px; transition: box-shadow .25s ease, border-color .25s ease; will-change: transform; }
-    .exam-entry:hover { box-shadow: 0 18px 40px rgba(15,23,42,.14); border-color: var(--ink-4); }
-    .exam-img { width: 100px; height: 100px; border-radius: 14px; object-fit: cover; flex: 0 0 auto; transition: transform .45s cubic-bezier(0.22,0.61,0.36,1); }
-    .exam-entry:hover .exam-img { transform: scale(1.06); }
-    .exam-body { flex: 1; }
-    .exam-body h3 { font-size: 19px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
-    .exam-body p { font-size: 14px; color: var(--ink-2); }
-    .exam-cta { font-size: 14px; font-weight: 600; color: var(--accent); white-space: nowrap; }
-
-    .playground { display: block; text-align: center; padding: 18px; border: 1px dashed var(--ink-4); border-radius: var(--radius); color: var(--ink-3); font-size: 14px; }
     .playground-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 26px 18px; border-style: solid; border-color: var(--line); background: var(--bg-soft); color: var(--ink); transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease; }
     .playground-card:hover { border-color: var(--ink-4); background: var(--bg); transform: translateY(-1px); }
     .playground-eyebrow { font-size: 12px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; }
     .playground-title { font-size: 18px; font-weight: 700; color: var(--ink); }
-    .playground-sub { font-size: 13px; color: var(--ink-3); }
     /* 极简 playground：只放「此刻」两字，小而克制 */
     a.playground-card { max-width: 180px; margin: 0 auto; padding: 14px 18px; }
     a.playground-card .playground-title { font-size: 15px; }
@@ -48,16 +37,6 @@
       content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
       width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--ink-4), transparent);
     }
-    .closing-eyebrow {
-      font-size: 15px; font-weight: 600; letter-spacing: .02em;
-      color: var(--ink-2); margin-bottom: 0;
-    }
-    .closing-line {
-      font-size: clamp(18px, 2.4vw, 22px); font-weight: 600;
-      letter-spacing: -0.012em; color: var(--ink); line-height: 1.5;
-      margin-bottom: 14px;
-    }
-    .closing-sub { font-size: 14px; color: var(--ink-3); line-height: 1.7; max-width: 460px; margin: 0 auto; }
     .closing-mark {
       margin-top: 32px; font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace;
       font-size: 12px; letter-spacing: .14em; color: var(--ink-4);
@@ -70,20 +49,6 @@
     }
     @keyframes closing-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
     @media (prefers-reduced-motion: reduce) { .closing-mark .dot { animation: none; } }
-
-    /* marquee 滚动带：产品与子项目，悬停暂停，点击跳转 */
-    .marquee { overflow: hidden; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); padding: 14px 0; background: var(--bg-soft); }
-    .marquee-track { display: inline-flex; white-space: nowrap; animation: marquee 30s linear infinite; }
-    .marquee-track a {
-      display: inline-flex; align-items: baseline; gap: 8px;
-      font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace;
-      font-size: 13px; font-weight: 500; letter-spacing: .14em; color: var(--ink-3);
-      padding: 0 26px; text-decoration: none; transition: color .2s;
-    }
-    .marquee-track a b { color: var(--ink); font-weight: 600; }
-    .marquee-track a:hover { color: var(--accent); }
-    .marquee-track .m-sep { padding: 0; color: var(--ink-4); }
-    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
     /* Speak Series 简洁列表 + 角色图缩略图 + 每项独特色彩（产品性格） */
     .mini-list { display: grid; gap: 10px; }
@@ -116,12 +81,9 @@
 
     @media (max-width: 720px) {
       .series-head { flex-direction: column; align-items: flex-start; gap: 4px; }
-      .exam-entry { flex-direction: column; align-items: flex-start; gap: 16px; }
-      .exam-img { width: 80px; height: 80px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; }
-      .marquee-track { animation: none; }
       .hero-glow, .hero-grid { animation: none; }
       .mini-item, .mini-item:hover, .mini-img { transform: none !important; transition: none !important; }
     }
@@ -140,8 +102,6 @@
     /* 产品卡 hover 轻微上浮（灵动但不抢戏） */
     .mini-item { transition: border-color .2s ease, box-shadow .2s ease, border-left-color .2s ease, transform .25s cubic-bezier(.22,.61,.36,1); }
     .mini-item:hover { transform: translateY(-2px); }
-    /* marquee 悬停暂停：想看某个词条时不被滚走 */
-    .marquee:hover .marquee-track { animation-play-state: paused; }
   </style>
 </head>
 <body class="hub">
@@ -174,28 +134,6 @@
         <h1>把想法，<br />做成顺手的小工具</h1>
       </div>
     </section>
-
-    <!-- marquee：产品与子项目滚动带（悬停暂停，点击跳转） -->
-    <div class="marquee">
-      <div class="marquee-track">
-        <a href="https://exam.955827.xyz" target="_blank" rel="noopener"><b>Exam Hub</b> 考试训练</a><span class="m-sep">·</span>
-        <a href="https://facetalk.955827.xyz" target="_blank" rel="noopener"><b>FaceTalk</b> 面试连接</a><span class="m-sep">·</span>
-        <a href="/letout/"><b>LetOut</b> 情绪释放</a><span class="m-sep">·</span>
-        <a href="/solospeak/"><b>SoloSpeak</b> 独处表达</a><span class="m-sep">·</span>
-        <a href="https://exam.955827.xyz/learn/" target="_blank" rel="noopener"><b>你懂的</b> 知识卡</a><span class="m-sep">·</span>
-        <a href="https://exam.955827.xyz/structured.html" target="_blank" rel="noopener"><b>结构化面试</b> 开口练</a><span class="m-sep">·</span>
-        <a href="https://exam.955827.xyz/guides/" target="_blank" rel="noopener"><b>建站教学</b> guides</a><span class="m-sep">·</span>
-        <a href="/commute/"><b>此刻通勤</b> 天涯共此时</a><span class="m-sep">·</span>
-        <a href="https://exam.955827.xyz" target="_blank" rel="noopener"><b>Exam Hub</b> 考试训练</a><span class="m-sep">·</span>
-        <a href="https://facetalk.955827.xyz" target="_blank" rel="noopener"><b>FaceTalk</b> 面试连接</a><span class="m-sep">·</span>
-        <a href="/letout/"><b>LetOut</b> 情绪释放</a><span class="m-sep">·</span>
-        <a href="/solospeak/"><b>SoloSpeak</b> 独处表达</a><span class="m-sep">·</span>
-        <a href="https://exam.955827.xyz/learn/" target="_blank" rel="noopener"><b>你懂的</b> 知识卡</a><span class="m-sep">·</span>
-        <a href="https://exam.955827.xyz/structured.html" target="_blank" rel="noopener"><b>结构化面试</b> 开口练</a><span class="m-sep">·</span>
-        <a href="https://exam.955827.xyz/guides/" target="_blank" rel="noopener"><b>建站教学</b> guides</a><span class="m-sep">·</span>
-        <a href="/commute/"><b>此刻通勤</b> 天涯共此时</a><span class="m-sep">·</span>
-      </div>
-    </div>
 
     <!-- ============== Current Projects ============== -->
     <section id="lab" class="directions">
@@ -267,7 +205,7 @@
               </span>
             </a>
           </div>
-        </di        </div>
+        </div>
       </div>
     </section>
 

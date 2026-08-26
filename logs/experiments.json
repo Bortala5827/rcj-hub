@@ -3,6 +3,13 @@
   "experiments": [
     {
       "date": "2026-08-26",
+      "title": "首页赘述清理与 Exam 埋点修复",
+      "summary": "移除与产品卡完全重复的 marquee 滚动带（8 链接，链接数 27→11）；修复损坏的 </div 标签；删除 exam-entry/playground-sub/closing-eyebrow 等约 50 行死 CSS；修复 exam 站 8 个页面埋点 fetch 引号错误（method:/POST/），恢复访问统计。",
+      "type": "refactor",
+      "tags": ["hub", "exam", "cleanup"]
+    },
+    {
+      "date": "2026-08-26",
       "title": "FaceTalk 移除 GSAP，首屏瘦身约 100KB",
       "summary": "用原生 CSS+JS 重写 Hero 入场动画、入口卡磁吸和滚动淡化，删除 GSAP 依赖；留言墙空态文案重写。",
       "type": "refactor",
