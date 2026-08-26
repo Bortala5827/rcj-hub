@@ -46,6 +46,10 @@ export async function onRequestPost({ request }) {
     return json({ error: "消息不能为空" }, 400);
   }
 
+  // 内置系统提示词：简洁高效，不啰嗦
+  const sysMsg = { role: "system", content: "你是简洁高效的 AI 助手。回答简明扼要，直击要点，不寒暄不废话。" };
+  const finalMessages = [sysMsg].concat(messages);
+
   let baseUrl, model, apiKey;
 
   if (provider === "dots" || provider === "agnes") {
@@ -77,7 +81,7 @@ export async function onRequestPost({ request }) {
         "Authorization": `Bearer ${apiKey}`,
         "Cache-Control": "no-store",
       },
-      body: JSON.stringify({ model, messages, stream: false }),
+      body: JSON.stringify({ model, messages: finalMessages, stream: false }),
     });
     const text = await res.text();
     if (!res.ok) {
