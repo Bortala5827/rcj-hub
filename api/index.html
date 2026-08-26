@@ -467,17 +467,10 @@
           <span class="card-name">b.ai</span>
           <span class="badge free">有免费模型</span>
         </div>
-        <p class="card-desc">聚合多家模型的中立网关，免费档可用 DeepSeek 系。本站在「DeepSeek（b.ai）」源走的就是它。</p>
-        <div class="rows">
-          <div class="row"><span class="k">免费额度</span><span class="v"><code>deepseek-v4-flash</code> 免费；也可 hy3</span></div>
-          <div class="row"><span class="k">模型</span><span class="v"><code>deepseek-v4-flash</code> / <code>hy3</code></span></div>
-        </div>
-        <div class="fill">
-          <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
-          接口地址 = <code>https://api.b.ai/v1</code> · 模型名 = <code>deepseek-v4-flash</code> · Key = 平台申请的 Key（Bearer）
-        </div>
+        <p class="card-desc">聚合多家模型的中立网关，免费档可用 DeepSeek 系，本站「DeepSeek（b.ai）」源走的就是它。</p>
+        <div class="fill"><code>URL: https://api.b.ai/v1 · Model: deepseek-v4-flash · Key: 平台申请（Bearer）</code></div>
         <div class="links">
-          <a href="https://api.b.ai" target="_blank" rel="noopener">b.ai 平台</a>
+          <a href="https://api.b.ai" target="_blank" rel="noopener">申请 Key</a>
         </div>
       </div>
 
@@ -487,19 +480,10 @@
           <span class="card-name">Google Gemini</span>
           <span class="badge free">有免费层</span>
         </div>
-        <p class="card-desc">Google AI Studio 申请 Key 即用，免费档额度足够个人玩。注意要填 OpenAI 兼容端点，别填原生 generateContent。</p>
-        <div class="rows">
-          <div class="row"><span class="k">免费额度</span><span class="v">AI Studio 免费 Tier，有 RPM 限制</span></div>
-          <div class="row"><span class="k">模型</span><span class="v"><code>gemini-3.5-flash-lite</code>（2.0/2.5 已失效，用这个）</span></div>
-        </div>
-        <div class="fill">
-          <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
-          接口地址 = <code>https://generativelanguage.googleapis.com/v1beta/openai</code>（填到 /v1 即可，整条全填反而用不了）<br>
-          模型名 = <code>gemini-3.5-flash-lite</code> · Key = AI Studio 的 Key（Bearer）<br>
-          <span class="note-sm">不要填原生 <code>:generateContent</code> 地址，会被拼错成 404。国内直连不通时，需把该域名换成可用反代。</span>
-        </div>
+        <p class="card-desc">AI Studio 申请 Key 即用，免费档够个人玩。填 OpenAI 兼容端点，别填原生 generateContent。</p>
+        <div class="fill"><code>URL: https://generativelanguage.googleapis.com/v1beta/openai · Model: gemini-3.5-flash-lite · Key: AI Studio</code></div>
         <div class="links">
-          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">申请 API Key</a>
+          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">申请 Key</a>
         </div>
       </div>
 
@@ -509,19 +493,10 @@
           <span class="card-name">Agnes AI</span>
           <span class="badge region">国内可用</span>
         </div>
-        <p class="card-desc">Agnes AI 官方开放端点，新加坡节点，国内直连可用。OpenAI 兼容，模型如 agnes-2.5-flash，个人/测试用。</p>
-        <div class="rows">
-          <div class="row"><span class="k">免费额度</span><span class="v">以官网为准（可能有限额或需要申请 Key）</span></div>
-          <div class="row"><span class="k">模型</span><span class="v"><code>agnes-2.5-flash</code></span></div>
-        </div>
-        <div class="fill">
-          <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
-          接口地址 = <code>https://apihub.agnes-ai.com/v1</code><br>
-          模型名 = <code>agnes-2.5-flash</code> · Key = 平台申请的 Key（Bearer）<br>
-          <span class="note-sm">新加坡节点，国内直连可用。模型名/Key 以官网为准，此处为参考。</span>
-        </div>
+        <p class="card-desc">新加坡节点，国内直连可用，OpenAI 兼容。</p>
+        <div class="fill"><code>URL: https://apihub.agnes-ai.com/v1 · Model: agnes-2.5-flash · Key: 平台申请（Bearer）</code></div>
         <div class="links">
-          <a href="https://apihub.agnes-ai.com" target="_blank" rel="noopener">Agnes AI 平台</a>
+          <a href="https://apihub.agnes-ai.com" target="_blank" rel="noopener">申请 Key</a>
         </div>
       </div>
 
