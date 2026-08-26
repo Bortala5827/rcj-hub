@@ -85,14 +85,14 @@
     .card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
     .card-name { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
     .badge {
-      font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
-      background: var(--grad); color: #fff; border: none; white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(37,99,235,.25);
+      font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+      background: rgba(109,40,217,.08); color: var(--primary); border: 1px solid rgba(109,40,217,.15);
+      white-space: nowrap; cursor: default;
     }
-    .badge.free { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 2px 8px rgba(16,185,129,.25); }
-    .badge.region { background: linear-gradient(135deg, #06b6d4, #0891b2); box-shadow: 0 2px 8px rgba(6,182,212,.25); }
-    .badge.region-os { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 2px 8px rgba(245,158,11,.25); }
-    .badge.hot { background: linear-gradient(135deg, #f43f5e, #e11d48); box-shadow: 0 2px 8px rgba(244,63,94,.25); }
+    .badge.free { background: rgba(16,185,129,.08); color: #059669; border-color: rgba(16,185,129,.18); }
+    .badge.region { background: rgba(6,182,212,.08); color: #0891b2; border-color: rgba(6,182,212,.18); }
+    .badge.region-os { background: rgba(245,158,11,.08); color: #d97706; border-color: rgba(245,158,11,.18); }
+    .badge.hot { background: rgba(244,63,94,.08); color: #e11d48; border-color: rgba(244,63,94,.18); }
     .card-desc { font-size: 13.5px; color: var(--ink-2); margin: 0 0 12px; line-height: 1.65; }
     .rows { display: grid; gap: 7px; margin-bottom: 12px; }
     .row { display: flex; gap: 8px; font-size: 13px; align-items: baseline; }
@@ -175,8 +175,8 @@
     .featured-card .fc-head { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
     .featured-card .fc-name { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; letter-spacing: -0.01em; }
     .featured-card .fc-badge {
-      font-size: 11px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #10b981, #059669);
-      padding: 4px 10px; border-radius: 999px; box-shadow: 0 2px 8px rgba(16,185,129,.3);
+      font-size: 11px; font-weight: 700; color: #059669; background: rgba(16,185,129,.08);
+      border: 1px solid rgba(16,185,129,.18); padding: 3px 10px; border-radius: 999px; cursor: default;
     }
     .featured-card .fc-desc { font-size: 12.5px; color: var(--ink-2); line-height: 1.6; margin: 0; position: relative; z-index: 1; }
     .featured-card .fc-btn {
@@ -205,8 +205,8 @@
     .alt-card:hover { transform: translateY(-2px); border-color: rgba(37,99,235,.3); box-shadow: 0 4px 14px rgba(37,99,235,.1); }
     .alt-card .ac-name { font-size: 13px; font-weight: 700; }
     .alt-card .ac-free {
-      font-size: 10px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #10b981, #059669);
-      padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+      font-size: 10px; font-weight: 700; color: #059669; background: rgba(16,185,129,.08);
+      border: 1px solid rgba(16,185,129,.18); padding: 2px 8px; border-radius: 999px; white-space: nowrap; cursor: default;
     }
     .alt-card .ac-btn {
       font-size: 12px; font-weight: 700; color: #fff; background: var(--grad); text-decoration: none;
