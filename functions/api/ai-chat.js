@@ -1,23 +1,25 @@
-// /api/ai-chat —— AI 对话代理（内置 dots/agnes Key，支持自定义）
-// 内置 Key 仅存在后端，前端不暴露。自定义模式由前端传参。
+// /api/ai-chat —— AI 对话代理（内置 dots/agnes/b.ai Key，支持自定义）
+// Key 存在 Cloudflare Pages Secrets（环境变量），代码里不留明文。自定义模式由前端传参。
 
-const BUILTIN = {
-  dots: {
-    baseUrl: "https://note3-prev-api.askdiandian.com/v1",
-    model: "dots3-note-prev",
-    apiKey: "ak_dxfPSu7FFgBmIzKUC6m3YLKMhHUP1"
-  },
-  agnes: {
-    baseUrl: "https://apihub.agnes-ai.com/v1",
-    model: "agnes-2.5-flash",
-    apiKey: "sk-tjkkFISPVQ7WgIZr6TUhkNWaLO1ClPHvnv7rTTloUrf1HClZ"
-  },
-  bai: {
-    baseUrl: "https://api.b.ai/v1",
-    model: "deepseek-v4-flash",
-    apiKey: "sk-1ljgsb1j4u8zt6uok1muddjzel9h3r88"
-  }
-};
+function getBuiltin(env) {
+  return {
+    dots: {
+      baseUrl: "https://note3-prev-api.askdiandian.com/v1",
+      model: "dots3-note-prev",
+      apiKey: env.DOTS_API_KEY || ""
+    },
+    agnes: {
+      baseUrl: "https://apihub.agnes-ai.com/v1",
+      model: "agnes-2.5-flash",
+      apiKey: env.AGNES_API_KEY || ""
+    },
+    bai: {
+      baseUrl: "https://api.b.ai/v1",
+      model: "deepseek-v4-flash",
+      apiKey: env.BAI_API_KEY || ""
+    }
+  };
+}
 
 function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
@@ -36,7 +38,7 @@ export async function onRequestOptions() {
   return json({}, 204);
 }
 
-export async function onRequestPost({ request }) {
+export async function onRequestPost({ request, env }) {
   let body;
   try {
     body = await request.json();
@@ -87,7 +89,7 @@ export async function onRequestPost({ request }) {
   let baseUrl, model, apiKey;
 
   if (provider === "dots" || provider === "agnes" || provider === "bai") {
-    const cfg = BUILTIN[provider];
+    const cfg = getBuiltin(env)[provider];
     if (!cfg.apiKey) {
       return json({ error: `${provider} 内置 Key 未配置，请联系站长` }, 500);
     }
