@@ -11,6 +11,11 @@ const BUILTIN = {
     baseUrl: "https://apihub.agnes-ai.com/v1",
     model: "agnes-2.5-flash",
     apiKey: "sk-tjkkFISPVQ7WgIZr6TUhkNWaLO1ClPHvnv7rTTloUrf1HClZ"
+  },
+  bai: {
+    baseUrl: "https://api.b.ai/v1",
+    model: "deepseek-v4-flash",
+    apiKey: ""
   }
 };
 
@@ -52,8 +57,11 @@ export async function onRequestPost({ request }) {
 
   let baseUrl, model, apiKey;
 
-  if (provider === "dots" || provider === "agnes") {
+  if (provider === "dots" || provider === "agnes" || provider === "bai") {
     const cfg = BUILTIN[provider];
+    if (!cfg.apiKey) {
+      return json({ error: `${provider} 内置 Key 未配置，请联系站长` }, 500);
+    }
     baseUrl = cfg.baseUrl;
     model = cfg.model;
     apiKey = cfg.apiKey;
