@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>免费大模型 API 获取汇总 · RCJ Lab</title>
-  <meta name="description" content="国内外可免费用的 OpenAI 兼容大模型 API：小红书 dots、商汤日日新、b.ai、Google Gemini、Agnes AI。内含自建中转站（OmniRoute/LiteLLM/One API），国内直连一键部署。" />
+  <meta name="description" content="国内外可免费用的 OpenAI 兼容大模型 API：小红书 dots、商汤日日新、b.ai、Google Gemini、Agnes AI。内含自建中转站（AIClient2API/LiteLLM），国内直连一键部署。" />
   <meta name="theme-color" content="#0f172a" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e88e5'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='system-ui' font-size='28' font-weight='800' fill='white'%3EA%3C/text%3E%3C/svg%3E" />
   <style>
@@ -69,6 +69,9 @@
     }
     .fill .ft { font-weight: 700; display: block; margin-bottom: 4px; }
     .fill .note-sm { font-size: 12px; color: #94a3b8; }
+    .fill code { cursor: pointer; transition: background .15s, color .15s; }
+    .fill code:hover { background: #dbeafe; }
+    .fill code.copied { background: #dcfce7; color: #166534; }
     .links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
     .links a {
       font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none;
@@ -302,7 +305,7 @@
       <h1>免费大模型 API 获取汇总</h1>
       <p class="lede">还能免费用的大模型 API，按国内可用优先排。拿到接口地址、模型名、Key 三样，填进支持自定义模型的客户端即可用。</p>
     </header>
-    <p class="updated">最后核对：<b>2026-08-25</b></p>
+    <p class="updated">最后核对：<b>2026-08-25</b> · 💡 点击下方代码可一键复制</p>
     <!-- FAQ 悬浮按钮（参考 Uiverse.io by vinodjangid07），替代顶部兼容性折叠区 -->
     <button class="faq-button" id="faqBtn" type="button" aria-label="FAQ">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" aria-hidden="true">
@@ -318,6 +321,8 @@
       <div class="faq-body">
         <p>全部 OpenAI 兼容 <code>chat/completions</code>，鉴权 <code>Bearer</code> Key。不同客户端的填法略有差异：有的只需填到 <code>/v1</code>（如 b.ai、Gemini、Agnes），有的要填整条 <code>…/chat/completions</code>（如小红书、商汤）。拿不准就用下方「连通性测试」自测。</p>
         <p>免费额度政策变动极快，本页为静态快照，以官网为准。海外模型 🌐 在国内直连不通，请自备可用反代域名。更详细的逐平台图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener">国内大模型免费 API 获取教程</a>。</p>
+        <p style="font-weight:700;margin-bottom:4px;">常见报错速查</p>
+        <p style="margin:0;"><code>401</code> Key 错误或未加 Bearer 前缀 · <code>404</code> 接口地址拼错（多/少了 <code>/v1</code> 或 <code>/chat/completions</code>）· <code>400 model_not_found</code> 模型名拼写错误 · <code>429</code> 超出免费额度或频率限制 · <code>500/502</code> 服务端问题，稍后重试或换模型。</p>
         <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;">
         <p style="color:#9f1239;">⚠️ <b>自建中转风险提示</b>：自建中转可能违反原模型服务商的使用条款（ToS），存在账号封禁、IP 拉黑、API 限额清零等风险；且相关项目能力依赖上游客户端逆向，稳定性无保障。请谨慎评估合规性与风险后自用，勿对外提供公共服务。</p>
         <p style="color:#9a3412;">⚠️ <b>小白劝退</b>：自建中转项目均需一定技术基础（Docker/Node.js/Python/Go 环境配置、网络代理、OAuth 授权等），零基础用户请直接用上方国内可用 API，不要瞎折腾浪费时间。</p>
@@ -344,7 +349,7 @@
           <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
           接口地址 = <code>https://note3-prev-api.askdiandian.com/v1/chat/completions</code><br>
           模型名 = <code>dots3-note-prev</code> · Key = 平台申请的 Key（Bearer）<br>
-          <span class="note-sm">注：公开开放平台的接口地址即 askdiandian.com 这个域名（点点 App 后端域），非 dots.ai 官网。</span>
+          <span class="note-sm">注：dots.ai 是控制台/官网，API 实际端点为 askdiandian.com 域名（点点 App 后端域），两者需登录同一小红书账号。</span>
         </div>
         <div class="links">
           <a href="https://dots.ai/platform/apikeys" target="_blank" rel="noopener">API Key 管理</a>
@@ -352,7 +357,7 @@
       </div>
 
       <!-- 商汤日日新 -->
-      <div class="card" data-base="https://api.sensenova.cn/v1" data-model="SenseNova-6.8-Flash-Lite-Preview">
+      <div class="card" data-base="https://token.sensenova.cn/v1" data-model="sensenova-6.8-flash-lite">
         <div class="card-top">
           <span class="card-name">商汤日日新 SenseNova</span>
           <span class="badge region">国内可用</span>
@@ -426,8 +431,9 @@
       <div class="card" data-base="https://apihub.agnes-ai.com/v1" data-model="agnes-2.5-flash">
         <div class="card-top">
           <span class="card-name">Agnes AI</span>
+          <span class="badge region">国内可用</span>
         </div>
-        <p class="card-desc">Agnes AI 官方开放端点，OpenAI 兼容。模型如 agnes-2.5-flash，个人/测试用。</p>
+        <p class="card-desc">Agnes AI 官方开放端点，新加坡节点，国内直连可用。OpenAI 兼容，模型如 agnes-2.5-flash，个人/测试用。</p>
         <div class="rows">
           <div class="row"><span class="k">免费额度</span><span class="v">以官网为准（可能有限额或需要申请 Key）</span></div>
           <div class="row"><span class="k">模型</span><span class="v"><code>agnes-2.5-flash</code></span></div>
@@ -436,7 +442,7 @@
           <span class="ft">填进自定义模型客户端（参考值，以你实测为准）：</span>
           接口地址 = <code>https://apihub.agnes-ai.com/v1</code><br>
           模型名 = <code>agnes-2.5-flash</code> · Key = 平台申请的 Key（Bearer）<br>
-          <span class="note-sm">国内直连不通，需反代。模型名/Key 以官网为准，此处为参考。</span>
+          <span class="note-sm">新加坡节点，国内直连可用。模型名/Key 以官网为准，此处为参考。</span>
         </div>
         <div class="links">
           <a href="https://apihub.agnes-ai.com" target="_blank" rel="noopener">Agnes AI 平台</a>
@@ -473,24 +479,6 @@
         </div>
       </div>
 
-      <!-- OmniRoute -->
-      <div class="card" data-base="http://localhost:20128/v1" data-model="auto">
-        <div class="card-top">
-          <span class="card-name">OmniRoute</span>
-          <span class="badge free">⭐ 30k+ stars</span>
-        </div>
-        <p class="card-desc">Node.js 开源 AI 网关，341 个 provider，自动回退配额耗尽的模型。支持 <code>auto</code> 路由自动选最优模型。</p>
-        <p style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:6px 10px;margin:0 0 12px;border-radius:6px;line-height:1.5;">⚠️ <b>未经实测</b>，部署效果与稳定性未知，请自行评估。</p>
-        <div class="rows">
-          <div class="row"><span class="k">部署</span><span class="v"><code>npm install -g omniroute && omniroute</code> 或 Docker</span></div>
-          <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:20128/v1</code></span></div>
-          <div class="row"><span class="k">模型示例</span><span class="v"><code>openai/gpt-5.4</code>、<code>auto</code>（自动路由）</span></div>
-        </div>
-        <div class="links">
-          <a href="https://github.com/diegosouzapw/OmniRoute" target="_blank" rel="noopener">GitHub</a>
-        </div>
-      </div>
-
       <!-- LiteLLM -->
       <div class="card" data-base="http://localhost:4000/v1" data-model="openai/gpt-4o">
         <div class="card-top">
@@ -515,24 +503,6 @@
         </div>
       </div>
 
-      <!-- One API -->
-      <div class="card" data-base="http://localhost:3000/v1" data-model="gpt-4">
-        <div class="card-top">
-          <span class="card-name">One API</span>
-          <span class="badge free">Go 语言 · 轻量</span>
-        </div>
-        <p class="card-desc">Go 语言写的 API 管理与分发系统，支持聊天/图像/语音/嵌入多模态，约 28 家模型提供商。</p>
-        <p style="font-size:12px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;padding:6px 10px;margin:0 0 12px;border-radius:6px;line-height:1.5;">⚠️ <b>未经实测</b>，部署效果与稳定性未知，请自行评估。<b>小白慎入，不建议零基础折腾。</b></p>
-        <div class="rows">
-          <div class="row"><span class="k">部署</span><span class="v">下载二进制或 Docker</span></div>
-          <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:3000/v1</code></span></div>
-          <div class="row"><span class="k">模型示例</span><span class="v"><code>gpt-4</code>、<code>claude-3-opus</code>、<code>glm-4</code></span></div>
-        </div>
-        <div class="links">
-          <a href="https://github.com/songquanpeng/one-api" target="_blank" rel="noopener">GitHub</a>
-        </div>
-      </div>
-
     </details>
 
     <!-- 连通性测试 -->
@@ -540,7 +510,7 @@
       <summary class="section-title summary-title">🔍 连通性测试 <span class="section-note">输入接口地址 / 模型名 / Key，测试是否可用</span></summary>
       <div class="probe-box" style="margin-top:0">
         <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.example.com/v1"></div>
-        <div><label>模型名</label><input class="p-model" type="text" placeholder="gemini-2.0-flash"></div>
+        <div><label>模型名</label><input class="p-model" type="text" placeholder="gemini-3.5-flash-lite"></div>
         <div><label>API Key（仅本地验证，不上传）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
         <button class="probe-btn" type="button">测试</button>
         <div class="probe-res" hidden></div>
@@ -612,6 +582,35 @@
             btn.disabled = false;
             btn.textContent = "测试";
           });
+      });
+    });
+
+    // 点击 fill 中的 code 复制到剪贴板
+    document.querySelectorAll(".fill code").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var text = el.textContent.trim();
+        if (!text) return;
+        function done() {
+          el.classList.add("copied");
+          var old = el.textContent;
+          el.textContent = "✓ 已复制";
+          setTimeout(function () {
+            el.textContent = old;
+            el.classList.remove("copied");
+          }, 1200);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(function () { fallback(); });
+        } else {
+          fallback();
+        }
+        function fallback() {
+          var ta = document.createElement("textarea");
+          ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand("copy"); } catch (e) {}
+          document.body.removeChild(ta); done();
+        }
       });
     });
   })();
