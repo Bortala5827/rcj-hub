@@ -174,24 +174,12 @@
       <div class="grid" data-layer="workflow"></div>
     </section>
 
-    <!-- 五、设计资产 -->
-    <section class="layer">
-      <div class="layer-head">
-        <span class="layer-ico">🎨</span>
-        <span class="layer-kicker">UI Library</span>
-        <span class="layer-title">设计资产</span>
-        <span class="layer-repo">rcj-ui-library（规划中）</span>
-      </div>
-      <div class="grid" data-layer="ui"></div>
-    </section>
-
-    <!-- 六、产品映射 -->
+    <!-- 五、产品映射 -->
     <section class="layer">
       <div class="layer-head">
         <span class="layer-ico">🧭</span>
         <span class="layer-kicker">Product Map</span>
         <span class="layer-title">产品映射</span>
-        <span class="layer-repo">资产不是孤立的</span>
       </div>
       <div class="pmap">
         <div class="pm-node pm-root">RCJ Assets</div>
@@ -199,7 +187,6 @@
         <div class="pm-row">
           <div class="pm-node">🎙 Voice</div>
           <div class="pm-node">✨ Motion</div>
-          <div class="pm-node">🌀 Particle</div>
         </div>
         <div class="pm-arrow">↓</div>
         <div class="pm-node pm-mid">Speak Series</div>
@@ -212,7 +199,7 @@
       </div>
     </section>
 
-    <!-- 七、能力地图 -->
+    <!-- 六、能力地图 -->
     <section class="layer">
       <div class="layer-head">
         <span class="layer-ico">🧠</span>
@@ -224,26 +211,23 @@
     </section>
 
     <div class="foot">
-      <p>新增 / 升级资产后，需同步两处索引：① <code>assets/rcj-assets</code> 各子目录 README + manifest；② 本页目录。规则见 <code>assets/rcj-assets/interaction/REUSE.md</code>。旧仓（skills / rcj-media-assets / rcj-interaction-assets / rcj-assets）已归档，内容并入本仓库 <code>assets/rcj-assets</code>。</p>
+      <p>资产统一存放在 <code>assets/rcj-assets/</code>，新增资产后同步更新本页。</p>
       <a class="back" href="/">← 返回 RCJ Lab 主页</a>
     </div>
   </main>
 
   <script>
-    // ===== 核心引擎（最重要的一层）=====
+    // ===== 核心引擎 =====
     const ENGINES = [
       { ico: '🎙️', name: 'Voice Engine', tag: '声音输入与理解能力',
-        caps: ['录音', '声纹分析', '波形', '频谱', '回放', '声音反馈'],
+        caps: ['录音', '声纹分析', '波形', '频谱', '回放'],
         apps: 'SoloSpeak · LetOut · FaceTalk' },
       { ico: '✨', name: 'Motion Engine', tag: '视觉运动能力',
-        caps: ['页面动画', '文字动态', '转场', 'GSAP 效果', '微交互'],
-        apps: 'RCJ Hub · Speak Series · Exam Hub' },
-      { ico: '🌀', name: 'Particle Engine', tag: '情绪反馈能力',
-        caps: ['粒子爆炸', '星尘', '烟花', '能量反馈'],
-        apps: 'LetOut · FaceTalk · RCJ Hub' },
+        caps: ['页面动画', '微交互', '入场动效'],
+        apps: 'RCJ Hub · Speak Series' },
     ];
 
-    // ===== 资产层（二~五）=====
+    // ===== 资产层 =====
     const ASSETS = {
       interaction: [
         { name: 'voice/waveform', status: 'done', tech: 'Web Audio + Canvas',
@@ -251,77 +235,45 @@
           usedBy: 'SoloSpeak · FaceTalk',
           url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/interaction/voice/waveform' },
         { name: 'voice/voice-particles', status: 'done', tech: 'Web Audio · RMS',
-          desc: '声音驱动视觉反馈：用户讲话 → 表情 / 粒子随之变化。面试前暖场用。',
+          desc: '声音驱动视觉反馈：讲话时粒子随之变化，面试前暖场用。',
           usedBy: 'FaceTalk',
           url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/interaction/voice/voice-particles' },
         { name: 'voice/spectrum', status: 'done', tech: '复用 waveform.js',
           desc: '频谱可视化模块，与 waveform 同源引擎。',
           usedBy: 'SoloSpeak · FaceTalk',
           url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/interaction/voice/spectrum' },
-        { name: 'relax/bubble-pop', status: 'planned', tech: 'Canvas + Web Audio',
-          desc: '压力泡泡：用户点击 → 释放压力（粒子 + 音效 + 数字反馈）。',
-          usedBy: 'LetOut', url: '#' },
-        { name: 'relax/shake', status: 'planned', tech: 'Canvas · 物理',
-          desc: '甩一甩升级版：加入重力 / 碰撞 / 弹性。',
-          usedBy: 'LetOut', url: '#' },
-        { name: 'relax/particle-burst', status: 'planned', tech: 'canvas-confetti',
-          desc: '文字 / 庆祝粒子爆炸，「我要上岸！」式情绪释放。',
-          usedBy: 'LetOut · SoloSpeak · FaceTalk', url: '#' },
-        { name: 'relax/breathe', status: 'planned', tech: 'CSS / Canvas',
-          desc: '呼吸圆圈：吸气扩大 / 呼气缩小，引导平复。',
-          usedBy: 'SoloSpeak', url: '#' },
-        { name: 'motion/floating-text', status: 'planned', tech: 'CSS / Canvas',
-          desc: '情绪词漂浮 / 碎裂重组。', usedBy: 'LetOut', url: '#' },
-        { name: 'motion/gsap-effects', status: 'planned', tech: 'GSAP · ScrollTrigger',
-          desc: '统一入场 / 滚动联动 / 时间线 / stagger 动效原子。',
-          usedBy: '全产品', url: '#' },
-        { name: 'motion/page-transition', status: 'planned', tech: 'GSAP / CSS',
-          desc: '产品矩阵内统一转场，保持品牌连贯。', usedBy: 'RCJ Hub', url: '#' },
-        { name: 'particles/confetti', status: 'planned', tech: 'canvas-confetti',
-          desc: '轻量庆祝纸屑，打卡 / 匹配成功反馈。', usedBy: 'SoloSpeak · FaceTalk · Hub', url: '#' },
-        { name: 'particles/stars', status: 'planned', tech: 'Canvas',
-          desc: '鼠标星尘轨迹，「声音留下痕迹」。', usedBy: 'SoloSpeak · Hub', url: '#' },
-        { name: 'particles/firework', status: 'planned', tech: 'Canvas',
-          desc: '里程碑庆祝烟花。', usedBy: 'RCJ Hub', url: '#' },
       ],
       media: [
-        { name: '情绪影子台词库', status: 'done', tech: 'manifest.json 轮换',
-          desc: '用于治愈 / 陪伴 / 情绪释放；SoloSpeak / LetOut 的台词 + 影视原声素材，每 3 天自动轮换。',
-          usedBy: 'SoloSpeak · LetOut',
-          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/media' },
-        { name: '音频素材库', status: 'done', tech: 'MP3 / manifest',
-          desc: '语音 / 环境音 / 原声片段；远程拉取，无需修改代码。',
+        { name: '情绪影子台词库', status: 'done', tech: 'manifest.json 轮换 + MP3',
+          desc: '影视/人物台词 + 原声片段，每 3 天自动轮换；远程仓库拉取，失败回退本地。',
           usedBy: 'SoloSpeak · LetOut',
           url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/media' },
       ],
       workflow: [
         { name: 'rcj-audio-core', status: 'done', tech: 'Web Audio · 录音/播放/波形',
-          desc: 'Speak Series 共享音频核心：录音引擎 + 声波可视化 + 拖拽回放 + 分享卡。',
+          desc: 'Speak Series 共享音频核心：录音引擎 + 声波可视化 + 拖拽回放。',
           usedBy: 'SoloSpeak · LetOut · FaceTalk',
-          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/skills/rcj-audio-core' },
+          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/skills/rcj-audio-core' },
         { name: 'rcj-exam-builder', status: 'done', tech: '静态刷题站生成器',
           desc: '输入考试资料 → 输出 HTML 刷题站 / Cloudflare 版 / 离线版。',
           usedBy: 'Exam Hub · 辅警/消防',
-          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/skills/rcj-exam-builder' },
+          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/skills/rcj-exam-builder' },
         { name: 'rcj-written-exam-standard', status: 'done', tech: '笔试刷题标准',
           desc: '沉淀数据结构 / 页面规范 / 训练模式，统一笔试产品实现。',
           usedBy: 'Exam Hub',
-          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/skills/rcj-written-exam-standard' },
-        { name: 'rcj-push-local-edits', status: 'done', tech: 'Git 推送工作流',
-          desc: '解决本地修改安全同步 GitHub（防覆盖、强删守卫）。',
-          usedBy: '全仓库',
-          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/skills/rcj-push-local-edits' },
+          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/skills/rcj-written-exam-standard' },
+        { name: 'site-smoke-test', status: 'done', tech: 'Playwright · 本机 Chrome',
+          desc: '站点冒烟测试：核心页面可加载 / 无 JS 报错 / 关键按钮可点击。',
+          usedBy: '全产品',
+          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/skills/site-smoke-test' },
         { name: 'wechat-cover / wechat-draft', status: 'done', tech: '公众号工作流',
-          desc: '爆款数据驱动的封面设计 + 草稿批量生成（build.js 渲染）。',
-          usedBy: '内容运营', url: '#' },
+          desc: '封面设计 + 草稿批量生成（build.js 渲染）。',
+          usedBy: '内容运营',
+          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/skills/wechat-cover' },
         { name: 'github-dns-bypass', status: 'done', tech: 'DoH 代理',
-          desc: 'GitHub DNS 污染绕过（127.0.0.1:10809 DoH 代理），推送 / 克隆稳定通道。',
-          usedBy: '全仓库', url: '#' },
-      ],
-      ui: [
-        { name: '卡片 / 页面模板 / 组件', status: 'planned', tech: 'HTML / CSS',
-          desc: '统一 RCJ 视觉语言（角色图风格 / 配色 / 卡片 / 动效规范），被各产品引用。',
-          usedBy: '全产品', url: '#' },
+          desc: 'GitHub DNS 污染绕过，推送/克隆稳定通道。',
+          usedBy: '全仓库',
+          url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/skills/github-dns-bypass' },
       ],
     };
 
@@ -335,23 +287,16 @@
           { label: 'RCJ Hub · 品牌枢纽', url: '/' },
         ] },
       { ico: '📚', name: '内容工程',
-        items: ['资料 → 结构化 → 题库 → 产品', '长文 / 笔记'],
+        items: ['资料 → 结构化 → 题库 → 产品'],
         projects: [
           { label: '辅警题库', url: 'https://exam.955827.xyz/fj' },
           { label: '消防题库', url: 'https://exam.955827.xyz/xf' },
-          { label: '情绪影子台词库 & 音频素材', url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/media' },
+          { label: 'Learn 知识卡', url: 'https://exam.955827.xyz/learn' },
         ] },
       { ico: '🚀', name: '独立部署',
-        items: ['GitHub', 'Cloudflare Pages', '自定义域名', 'CI / 自动部署'],
+        items: ['GitHub', 'Cloudflare Pages', '自定义域名', 'CI 自动部署'],
         projects: [
           { label: 'Cloudflare Pages 全自动部署', url: '/' },
-          { label: 'GitHub 推送工作流', url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/skills/rcj-push-local-edits' },
-        ] },
-      { ico: '🎨', name: '互动开发',
-        items: ['Web Audio', 'Canvas', 'GSAP', '动画系统'],
-        projects: [
-          { label: '声波引擎 rcj-audio-core', url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/skills/rcj-audio-core' },
-          { label: 'Voice / Motion / Particle 引擎', url: 'https://github.com/Bortala5827/rcj-hub/tree/main/assets/rcj-assets/interaction' },
         ] },
     ];
 

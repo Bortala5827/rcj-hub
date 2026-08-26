@@ -1,6 +1,48 @@
 {
-  "updated": "2026-08-18",
+  "updated": "2026-08-26",
   "experiments": [
+    {
+      "date": "2026-08-26",
+      "title": "FaceTalk 移除 GSAP，首屏瘦身约 100KB",
+      "summary": "用原生 CSS+JS 重写 Hero 入场动画、入口卡磁吸和滚动淡化，删除 GSAP 依赖；留言墙空态文案重写。",
+      "type": "refactor",
+      "tags": ["facetalk", "performance"]
+    },
+    {
+      "date": "2026-08-26",
+      "title": "API 汇总页安全头与连通性测试优化",
+      "summary": "修正 API 连通性测试表述为「仅用于本次测试转发，不存储不记录」；增加 X-Content-Type-Options 和 Referrer-Policy 安全头。",
+      "type": "feature",
+      "tags": ["hub", "api", "security"]
+    },
+    {
+      "date": "2026-08-25",
+      "title": "API 汇总页精简与风险提示",
+      "summary": "删除未实测的 OmniRoute/One API，增加一键复制和错误码速查；自建中转站加风险提示和小白劝退说明。",
+      "type": "feature",
+      "tags": ["hub", "api"]
+    },
+    {
+      "date": "2026-08-24",
+      "title": "Learn 知识卡接入 Groq AI 关联源",
+      "summary": "新增 Groq 极速 AI 关联源（worker 反代），悬浮 AI 助手支持 dots/DeepSeek/Groq/自定义四源切换；标签体系从 171 收敛到 30。",
+      "type": "feature",
+      "tags": ["exam", "learn", "ai"]
+    },
+    {
+      "date": "2026-08-24",
+      "title": "Learn 新增 12 张知识卡",
+      "summary": "覆盖利率、基金、投资心态、灵活就业社保、税收、预制菜、直播电商、下沉市场、数据要素等主题。",
+      "type": "feature",
+      "tags": ["exam", "learn", "content"]
+    },
+    {
+      "date": "2026-08-22",
+      "title": "Learn 桌面端适配与首页按钮优化",
+      "summary": "拓宽主容器与瀑布流列数，避免大屏内容截断；Vibe Coding 按钮改金属胶囊风格，强化按压感。",
+      "type": "feature",
+      "tags": ["exam", "learn", "ui"]
+    },
     {
       "date": "2026-08-18",
       "title": "主站信息架构升级",
@@ -11,15 +53,15 @@
     {
       "date": "2026-08-18",
       "title": "SoloSpeak IndexedDB 旧缓存报错修复",
-      "summary": "排查线上 NotFoundError 报错，确认为旧版 schema 残留；清理后控制台零错误，线上功能正常。",
+      "summary": "排查线上 NotFoundError 报错，确认为旧版 schema 残留；清理后控制台零错误。",
       "type": "bugfix",
       "tags": ["solospeak", "indexeddb"]
     },
     {
       "date": "2026-08-15",
       "title": "SoloSpeak 录音引擎模块化拆分",
-      "summary": "recorder / waveform / player 拆分为独立模块，主应用通过 ES Module 导入，便于后续维护。",
-      "type": "feature",
+      "summary": "recorder / waveform / player 拆分为独立模块，主应用通过 ES Module 导入。",
+      "type": "refactor",
       "tags": ["solospeak", "refactor"]
     }
   ]

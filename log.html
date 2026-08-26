@@ -53,6 +53,7 @@
     }
     .st-feature { background: #e8f1fc; color: #1565c0; border: 1px solid #c7def6; }
     .st-bugfix  { background: #fff4e0; color: #b45309; border: 1px solid #f7d6b1; }
+    .st-refactor { background: #f0e8fc; color: #6d28d9; border: 1px solid #ddd0f5; }
 
     .log-empty { text-align: center; padding: 60px 0; color: var(--ink-3); font-size: 14px; }
     .log-back {
@@ -130,8 +131,9 @@
 (function(){
   // 极简 JSON 驱动：只读 logs/experiments.json，渲染列表
   var TYPE_MAP = {
-    'feature': { cls: 'st-feature', label: '新功能' },
-    'bugfix':  { cls: 'st-bugfix',  label: 'Bug 修复' }
+    'feature':  { cls: 'st-feature',  label: '新功能' },
+    'bugfix':   { cls: 'st-bugfix',   label: 'Bug 修复' },
+    'refactor': { cls: 'st-refactor', label: '重构' }
   };
 
   function render(data){
