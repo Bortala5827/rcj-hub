@@ -514,17 +514,8 @@
           <span class="card-name">AIClient2API</span>
           <span class="badge region-os">聚合 11+ 供应商</span>
         </div>
-        <p class="card-desc">把「仅客户端可用的免费大模型」统一转成 OpenAI 兼容接口的自托管网关：OAuth 解锁 Gemini / Antigravity / Claude Kiro / Codex / Grok 等客户端专属模型，多账号池轮询 + 跨类型 Fallback。一个入口聚合 11+ 供应商、70+ 模型，零成本调用。</p>
-        <div class="rows">
-          <div class="row"><span class="k">部署</span><span class="v"><code>docker run justlikemaki/aiclient-2-api</code> 或 Node.js 直接跑</span></div>
-          <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:3000/{provider}/v1</code>（如 <code>/gemini-antigravity/v1</code>）</span></div>
-          <div class="row"><span class="k">模型示例</span><span class="v"><code>gemini-3.6-flash</code>、<code>gemini-3.1-pro-high</code>、<code>claude-opus-4-6-thinking</code>、<code>gpt-5.4</code></span></div>
-        </div>
-        <div class="fill">
-          <span class="ft">部署并 OAuth 授权后填进客户端：</span>
-          接口地址 = <code>http://localhost:3000/gemini-antigravity/v1</code>（provider 换成实际授权的）<br>
-          模型名 = 按需填，如 <code>gemini-3.6-flash</code> · Key = 网关配置的 API Key
-        </div>
+        <p class="card-desc">自托管网关，OAuth 解锁 Gemini / Claude / Codex / Grok 等客户端专属模型，多账号池轮询 + Fallback。</p>
+        <div class="fill"><code>Docker: justlikemaki/aiclient-2-api · 端点: localhost:3000/{provider}/v1</code></div>
         <div class="links">
           <a href="https://github.com/justlovemaki/AIClient2API" target="_blank" rel="noopener">GitHub</a>
         </div>
@@ -536,19 +527,8 @@
           <span class="card-name">LiteLLM</span>
           <span class="badge free">⭐ 55k+ stars</span>
         </div>
-        <p class="card-desc">Y Combinator 孵化，100+ provider 统一网关。Python SDK + Proxy Server 双形态，企业级预算控制、虚拟 Key、自动 fallback。</p>
-        <p style="font-size:12px;color:#065f46;background:#ecfdf5;border:1px solid #a7f3d0;padding:6px 10px;margin:0 0 12px;border-radius:6px;line-height:1.5;">✅ <b>实测可用</b>（Windows 11 + Python 3.13）：已验证路由到硅基流动（SiliconFlow），返回正常，token 用量统计准确。</p>
-        <div class="rows">
-          <div class="row"><span class="k">部署</span><span class="v"><code>pip install 'litellm[proxy]' && litellm --model openai/gpt-4o</code> 或 Docker</span></div>
-          <div class="row"><span class="k">端点</span><span class="v"><code>http://localhost:4000/v1</code>（本地默认）</span></div>
-          <div class="row"><span class="k">模型示例</span><span class="v"><code>openai/gpt-4o</code>、<code>anthropic/claude-3-sonnet</code>、<code>google/gemini-pro</code></span></div>
-        </div>
-        <div class="fill">
-          <span class="ft">部署后填进客户端：</span>
-          接口地址 = <code>http://localhost:4000/v1</code>（或你的服务器 IP）<br>
-          模型名 = 按 LiteLLM 格式：<code>openai/gpt-4o</code>、<code>anthropic/claude-3-sonnet</code> 等<br>
-          Key = 配置在 <code>config.yaml</code> 上游密钥，客户端 Key 可填任意值
-        </div>
+        <p class="card-desc">YC 孵化，100+ provider 统一网关，Python SDK + Proxy Server，预算控制 + 自动 fallback。实测可路由硅基流动。</p>
+        <div class="fill"><code>pip install litellm[proxy] · 端点: localhost:4000/v1</code></div>
         <div class="links">
           <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">GitHub</a>
         </div>
