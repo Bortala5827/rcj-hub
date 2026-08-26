@@ -523,16 +523,13 @@
         <label class="ai-model-opt"><input type="radio" name="aiModel" value="agnes"><span>Agnes</span></label>
         <label class="ai-model-opt"><input type="radio" name="aiModel" value="custom"><span>自定义</span></label>
       </div>
-      <div class="ai-key-row" id="aiKeyRow">
-        <input type="password" id="aiKey" placeholder="API Key（仅存本机）" autocomplete="off">
-      </div>
       <div class="ai-custom-row" id="aiCustomRow" hidden>
         <input type="text" id="aiBase" placeholder="接口地址 https://.../v1" autocomplete="off">
         <input type="text" id="aiModelName" placeholder="模型名" autocomplete="off">
         <input type="password" id="aiCustomKey" placeholder="API Key" autocomplete="off">
       </div>
       <div class="ai-messages" id="aiMessages">
-        <div class="ai-msg ai-msg-sys">选模型、填 Key，开始对话。Key 只存你本机浏览器。</div>
+        <div class="ai-msg ai-msg-sys">选模型开始对话。dots / Agnes 内置 Key 免填，自定义需填自己的接口。</div>
       </div>
       <div class="ai-input-row">
         <input type="text" id="aiInput" placeholder="输入消息…" maxlength="500" autocomplete="off">
@@ -553,7 +550,7 @@
         <button class="faq-close" id="faqClose" type="button" aria-label="关闭">✕</button>
       </h3>
       <div class="faq-body">
-        <p>全部 OpenAI 兼容，<code>Bearer</code> 鉴权。接口填到 <code>/v1</code> 或整条 <code>/chat/completions</code> 因平台而异，拿不准用下方连通性测试。</p>
+        <p>全部 OpenAI 兼容，<code>Bearer</code> 鉴权。接口填到 <code>/v1</code> 或整条 <code>/chat/completions</code> 因平台而异，拿不准用左下角 AI 对话实测。</p>
         <p><b>报错速查</b>：<code>401</code> Key 错 · <code>404</code> 地址拼错 · <code>400</code> 模型名错 · <code>429</code> 超额/限流 · <code>500/502</code> 服务端问题。</p>
         <p style="color:#9f1239;margin:0;">⚠️ 自建中转可能违反上游 ToS，有封号风险，且需技术基础，零基础勿碰。</p>
       </div>
@@ -717,18 +714,6 @@
 
     </details>
 
-    <!-- 连通性测试 -->
-    <details class="region-section probe-section">
-      <summary class="section-title summary-title">🔍 连通性测试 <span class="section-note">输入接口地址 / 模型名 / Key，测试是否可用</span></summary>
-      <div class="probe-box" style="margin-top:0">
-        <div><label>接口地址</label><input class="p-base" type="text" placeholder="https://api.example.com/v1"></div>
-        <div><label>模型名</label><input class="p-model" type="text" placeholder="gemini-3.5-flash-lite"></div>
-        <div><label>API Key（仅用于本次测试转发，不存储不记录）</label><input class="p-key" type="password" placeholder="粘贴你的 Key"></div>
-        <button class="probe-btn" type="button">测试</button>
-        <div class="probe-res" hidden></div>
-      </div>
-    </details>
-
     <a class="home-button" href="https://exam.955827.xyz" aria-label="回到 Exam Hub">
       <div class="button-outer">
         <div class="button-inner">
@@ -753,49 +738,6 @@
     btn.addEventListener("click", function () { panel.hidden ? show() : hide(); });
     close.addEventListener("click", hide);
     panel.addEventListener("click", function (e) { if (e.target === panel) hide(); });
-
-    // 统一连通性测试
-    document.querySelectorAll(".probe-btn").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var box = btn.closest(".probe-box");
-        var base = box.querySelector(".p-base").value.trim();
-        var model = box.querySelector(".p-model").value.trim();
-        var key = box.querySelector(".p-key").value.trim();
-        var res = box.querySelector(".probe-res");
-        res.hidden = false;
-        res.className = "probe-res";
-        if (!base || !model || !key) {
-          res.classList.add("err");
-          res.textContent = "接口地址、模型名、API Key 三项都要填。";
-          return;
-        }
-        btn.disabled = true;
-        btn.textContent = "测试中…";
-        res.textContent = "请求中…";
-        fetch("/api/probe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ baseUrl: base, model: model, apiKey: key })
-        }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-          .then(function (o) {
-            var j = o.j;
-            if (j.ok) {
-              res.classList.add("ok");
-              res.innerHTML = "✓ 连通正常 · 模型 <code>" + (j.model || model) + "</code><br>实际请求：<code>" + j.url + "</code>";
-            } else {
-              res.classList.add("err");
-              var msg = j.error || ("HTTP " + (o.ok ? "" : "错误"));
-              res.innerHTML = "✗ " + msg + (j.url ? "<br>实际请求：<code>" + j.url + "</code>" : "");
-            }
-          }).catch(function (e) {
-            res.classList.add("err");
-            res.textContent = "✗ 请求失败：" + e.message;
-          }).finally(function () {
-            btn.disabled = false;
-            btn.textContent = "测试";
-          });
-      });
-    });
 
     // 点击 fill 中的 code 复制到剪贴板
     document.querySelectorAll(".fill code").forEach(function (el) {
@@ -827,10 +769,6 @@
     });
 
     // ========== 悬浮 AI 对话 ==========
-    var AI_PRESETS = {
-      dots: { baseUrl: "https://note3-prev-api.askdiandian.com/v1", model: "dots3-note-prev" },
-      agnes: { baseUrl: "https://apihub.agnes-ai.com/v1", model: "agnes-2.5-flash" }
-    };
     var AI_KEY = "rcj_api_ai_v1";
     function aiGetConfig() { try { return JSON.parse(localStorage.getItem(AI_KEY) || "{}"); } catch(e) { return {}; } }
     function aiSetConfig(c) { try { localStorage.setItem(AI_KEY, JSON.stringify(c)); } catch(e) {} }
@@ -840,9 +778,7 @@
     var aiMessages = document.getElementById("aiMessages");
     var aiInput = document.getElementById("aiInput");
     var aiSend = document.getElementById("aiSend");
-    var aiKeyRow = document.getElementById("aiKeyRow");
     var aiCustomRow = document.getElementById("aiCustomRow");
-    var aiKeyInput = document.getElementById("aiKey");
     var aiBaseInput = document.getElementById("aiBase");
     var aiModelInput = document.getElementById("aiModelName");
     var aiCustomKeyInput = document.getElementById("aiCustomKey");
@@ -850,7 +786,6 @@
     (function restoreAi() {
       var c = aiGetConfig();
       if (c.model) { var r = document.querySelector('input[name="aiModel"][value="' + c.model + '"]'); if (r) r.checked = true; }
-      aiKeyInput.value = c.apiKey || "";
       aiBaseInput.value = c.baseUrl || "";
       aiModelInput.value = c.customModel || "";
       aiCustomKeyInput.value = c.customKey || "";
@@ -858,7 +793,6 @@
     })();
     function aiToggleModel() {
       var m = document.querySelector('input[name="aiModel"]:checked').value;
-      aiKeyRow.hidden = (m === "custom");
       aiCustomRow.hidden = (m !== "custom");
     }
     document.querySelectorAll('input[name="aiModel"]').forEach(function(r) { r.addEventListener("change", aiToggleModel); });
@@ -875,46 +809,40 @@
       aiMessages.scrollTop = aiMessages.scrollHeight;
       return div;
     }
-    function aiGetEndpoint() {
-      var m = document.querySelector('input[name="aiModel"]:checked').value;
-      if (m === "custom") {
-        var base = aiBaseInput.value.trim(), model = aiModelInput.value.trim(), key = aiCustomKeyInput.value.trim();
-        if (!base || !model || !key) return null;
-        aiSetConfig({ model: "custom", baseUrl: base, customModel: model, customKey: key });
-        return { baseUrl: base, model: model, apiKey: key };
-      }
-      var p = AI_PRESETS[m], key = aiKeyInput.value.trim();
-      if (!key) return null;
-      var c = aiGetConfig(); c.model = m; c.apiKey = key; aiSetConfig(c);
-      return { baseUrl: p.baseUrl, model: p.model, apiKey: key };
-    }
     function aiSendMsg() {
       var text = aiInput.value.trim();
       if (!text) return;
-      var ep = aiGetEndpoint();
-      if (!ep) { aiAddMsg("请先填好 API Key（自定义模式需填接口+模型名+Key）。", "err"); return; }
+      var provider = document.querySelector('input[name="aiModel"]:checked').value;
+      var payload = { provider: provider, messages: aiHistory.concat([{ role: "user", content: text }]) };
+      if (provider === "custom") {
+        var base = aiBaseInput.value.trim(), model = aiModelInput.value.trim(), key = aiCustomKeyInput.value.trim();
+        if (!base || !model || !key) { aiAddMsg("自定义模式需填接口地址、模型名、API Key。", "err"); return; }
+        payload.baseUrl = base; payload.model = model; payload.apiKey = key;
+        aiSetConfig({ model: "custom", baseUrl: base, customModel: model, customKey: key });
+      } else {
+        var c = aiGetConfig(); c.model = provider; aiSetConfig(c);
+      }
       aiInput.value = "";
       aiAddMsg(text, "user");
       aiHistory.push({ role: "user", content: text });
       var loading = aiAddMsg("思考中…", "loading");
       aiSend.disabled = true;
-      fetch(ep.baseUrl.replace(/\/+$/, "") + "/chat/completions", {
+      fetch("/api/ai-chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + ep.apiKey },
-        body: JSON.stringify({ model: ep.model, messages: aiHistory, stream: false })
-      }).then(function(r) { return r.json().then(function(j) { return { ok: r.ok, j: j }; }); })
-        .then(function(o) {
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(function(r) { return r.json(); })
+        .then(function(d) {
           loading.remove();
-          if (o.ok && o.j.choices && o.j.choices[0]) {
-            var reply = o.j.choices[0].message.content;
-            aiAddMsg(reply, "ai"); aiHistory.push({ role: "assistant", content: reply });
+          if (d.error) {
+            aiAddMsg("请求失败：" + d.error, "err");
           } else {
-            var err = o.j.error ? (o.j.error.message || JSON.stringify(o.j.error)) : "HTTP 失败";
-            aiAddMsg("请求失败：" + err, "err");
+            aiAddMsg(d.reply || "(空回复)", "ai");
+            aiHistory.push({ role: "assistant", content: d.reply || "" });
           }
         }).catch(function(e) {
           loading.remove();
-          aiAddMsg("网络错误：" + e.message + "（可能 CORS 受限，试试自定义模式或换网络）", "err");
+          aiAddMsg("网络错误：" + e.message, "err");
         }).finally(function() { aiSend.disabled = false; aiInput.focus(); });
     }
     aiSend.addEventListener("click", aiSendMsg);
