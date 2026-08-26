@@ -380,6 +380,28 @@
     .ai-card-custom:hover, .ai-card-custom.active { background:#f59e0b; }
     .ai-model-card:hover .ai-card-text, .ai-model-card.active .ai-card-text { color:white; }
     .ai-custom-row { padding:10px 14px; border-bottom:1px solid var(--line); }
+    .ai-custom-inputs { display:flex; flex-direction:column; gap:6px; }
+    .ai-custom-row2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    .ai-custom-row input {
+      width:100%; box-sizing:border-box; font-size:12px; padding:7px 10px;
+      border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); font-family:inherit;
+    }
+    .ai-custom-row input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(109,40,217,.1); }
+    .ai-probe-toggle {
+      margin-top:8px; font-size:11px; color:var(--ink-2); background:none; border:none; cursor:pointer;
+      padding:0; display:flex; align-items:center; gap:3px; transition:color .15s;
+    }
+    .ai-probe-toggle:hover { color:var(--primary); }
+    .ai-probe-toggle.open { color:var(--primary); }
+    .ai-probe-box { margin-top:6px; display:flex; align-items:center; gap:8px; }
+    .ai-probe-btn {
+      font-size:11px; font-weight:600; color:#fff; background:var(--primary); border:none;
+      border-radius:6px; padding:5px 12px; cursor:pointer; transition:opacity .15s;
+    }
+    .ai-probe-btn:disabled { opacity:.5; cursor:default; }
+    .ai-probe-res { font-size:11px; color:var(--ink-2); flex:1; line-height:1.4; word-break:break-all; }
+    .ai-probe-res.ok { color:#065f46; }
+    .ai-probe-res.err { color:#b91c1c; }
     .ai-messages { flex:1; overflow-y:auto; padding:12px 14px; max-height:200px; display:flex; flex-direction:column; gap:8px; }
     .ai-msg { font-size:13px; line-height:1.6; padding:8px 12px; border-radius:12px; max-width:90%; word-break:break-word; }
     .ai-msg-sys { background:var(--grad-soft); color:var(--ink-2); font-size:12px; align-self:center; text-align:center; max-width:100%; }
@@ -553,9 +575,18 @@
         </div>
       </div>
       <div class="ai-custom-row" id="aiCustomRow" hidden>
-        <input type="text" id="aiBase" placeholder="接口地址 https://.../v1" autocomplete="off">
-        <input type="text" id="aiModelName" placeholder="模型名" autocomplete="off">
-        <input type="password" id="aiCustomKey" placeholder="API Key" autocomplete="off">
+        <div class="ai-custom-inputs">
+          <input type="text" id="aiBase" placeholder="接口地址 https://.../v1" autocomplete="off">
+          <div class="ai-custom-row2">
+            <input type="text" id="aiModelName" placeholder="模型名" autocomplete="off">
+            <input type="password" id="aiCustomKey" placeholder="API Key" autocomplete="off">
+          </div>
+        </div>
+        <button class="ai-probe-toggle" id="aiProbeToggle" type="button">▸ 测试连通性</button>
+        <div class="ai-probe-box" id="aiProbeBox" hidden>
+          <button class="ai-probe-btn" id="aiProbeBtn" type="button">测试</button>
+          <span class="ai-probe-res" id="aiProbeRes"></span>
+        </div>
       </div>
       <div class="ai-messages" id="aiMessages">
         <div class="ai-msg ai-msg-sys">我是 API 选型顾问，帮你挑模型、配接口。问我哪个平台适合你。dots / Agnes / b.ai 内置 Key 免填，DIY 需填自己的接口。</div>
@@ -581,6 +612,7 @@
       <div class="faq-body">
         <p>全部 OpenAI 兼容，<code>Bearer</code> 鉴权。接口填到 <code>/v1</code> 或整条 <code>/chat/completions</code> 因平台而异，拿不准用左下角 AI 对话实测。</p>
         <p><b>报错速查</b>：<code>401</code> Key 错 · <code>404</code> 地址拼错 · <code>400</code> 模型名错 · <code>429</code> 超额/限流 · <code>500/502</code> 服务端问题。</p>
+        <p style="color:#92400e;margin:0;">⚠️ 左下角 AI 对话的内置 Key（dots/Agnes/b.ai）走免费额度，用的人多可能限流或变慢，高频使用建议点 DIY 自备 API Key。</p>
         <p style="color:#9f1239;margin:0;">⚠️ 自建中转可能违反上游 ToS，有封号风险，且需技术基础，零基础勿碰。</p>
       </div>
     </aside>
@@ -890,6 +922,41 @@
     }
     aiSend.addEventListener("click", aiSendMsg);
     aiInput.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); aiSendMsg(); } });
+
+    // DIY 连通性测试
+    var aiProbeToggle = document.getElementById("aiProbeToggle");
+    var aiProbeBox = document.getElementById("aiProbeBox");
+    var aiProbeBtn = document.getElementById("aiProbeBtn");
+    var aiProbeRes = document.getElementById("aiProbeRes");
+    aiProbeToggle.addEventListener("click", function() {
+      var open = !aiProbeBox.hidden;
+      aiProbeBox.hidden = open;
+      aiProbeToggle.classList.toggle("open", !open);
+      aiProbeToggle.textContent = (open ? "▸ " : "▾ ") + "测试连通性";
+    });
+    aiProbeBtn.addEventListener("click", function() {
+      var base = aiBaseInput.value.trim(), model = aiModelInput.value.trim(), key = aiCustomKeyInput.value.trim();
+      if (!base || !model || !key) { aiProbeRes.className = "ai-probe-res err"; aiProbeRes.textContent = "三项都要填"; return; }
+      aiProbeBtn.disabled = true; aiProbeBtn.textContent = "测试中…";
+      aiProbeRes.className = "ai-probe-res"; aiProbeRes.textContent = "请求中…";
+      fetch("/api/probe", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ baseUrl: base, model: model, apiKey: key })
+      }).then(function(r) { return r.json().then(function(j) { return { ok: r.ok, j: j }; }); })
+        .then(function(o) {
+          var j = o.j;
+          if (j.ok) {
+            aiProbeRes.className = "ai-probe-res ok";
+            aiProbeRes.textContent = "✓ 连通正常 · 模型 " + (j.model || model);
+          } else {
+            aiProbeRes.className = "ai-probe-res err";
+            aiProbeRes.textContent = "✗ " + (j.error || "失败");
+          }
+        }).catch(function(e) {
+          aiProbeRes.className = "ai-probe-res err";
+          aiProbeRes.textContent = "✗ " + e.message;
+        }).finally(function() { aiProbeBtn.disabled = false; aiProbeBtn.textContent = "测试"; });
+    });
   })();
   </script>
 </body>
