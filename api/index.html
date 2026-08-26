@@ -317,6 +317,78 @@
     .faq-body a { color: var(--primary); text-decoration: none; }
     .faq-body a:hover { text-decoration: underline; }
 
+    /* 悬浮 AI 对话（左侧，与右侧 FAQ 对称） */
+    .ai-fab {
+      position: fixed; left: 18px; bottom: 22px; z-index: 60;
+      width: 52px; height: 52px; border-radius: 50%; border: none;
+      background: var(--grad); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 4px 16px rgba(109,40,217,.4);
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+    .ai-fab svg { width: 24px; height: 24px; fill: #fff; }
+    .ai-fab:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 6px 24px rgba(109,40,217,.5); }
+    .ai-fab:active { transform: scale(.95); }
+    .ai-fab.on { box-shadow: 0 0 0 4px rgba(109,40,217,.2), 0 4px 16px rgba(109,40,217,.4); }
+    .ai-fab .tooltip {
+      position: absolute; left: 60px; top: 50%; transform: translateY(-50%);
+      background: var(--grad); color: #fff; padding: 5px 12px; border-radius: 6px;
+      font-size: 12px; font-weight: 700; white-space: nowrap;
+      opacity: 0; pointer-events: none; transition: opacity .2s, left .2s;
+    }
+    .ai-fab:hover .tooltip { opacity: 1; left: 64px; }
+    .ai-panel {
+      position: fixed; left: 18px; bottom: 86px; z-index: 60;
+      width: min(360px, calc(100vw - 36px));
+      background: rgba(255,255,255,.95); backdrop-filter: blur(16px);
+      border: 1px solid var(--line); border-radius: 18px;
+      box-shadow: 0 16px 48px rgba(109,40,217,.18);
+      overflow: hidden; display: flex; flex-direction: column;
+      animation: aiPanelIn .25s cubic-bezier(.34,1.3,.5,1) both;
+    }
+    .ai-panel[hidden] { display: none; }
+    @keyframes aiPanelIn { from { opacity:0; transform:translateY(12px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+    .ai-panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; font-size: 14px; font-weight: 800; color: #fff; background: var(--grad);
+    }
+    .ai-close { border:none; background:transparent; color:rgba(255,255,255,.9); font-size:15px; cursor:pointer; padding:2px 6px; border-radius:4px; }
+    .ai-close:hover { color:#fff; background:rgba(255,255,255,.15); }
+    .ai-model-bar { display:flex; gap:6px; padding:10px 14px; border-bottom:1px solid var(--line); }
+    .ai-model-opt { flex:1; text-align:center; cursor:pointer; }
+    .ai-model-opt input { display:none; }
+    .ai-model-opt span {
+      display:block; padding:6px 8px; border-radius:8px; font-size:12px; font-weight:600;
+      color:var(--ink-2); border:1px solid var(--line); transition:all .15s;
+    }
+    .ai-model-opt input:checked + span { background:var(--grad); color:#fff; border-color:transparent; box-shadow:0 2px 8px rgba(109,40,217,.3); }
+    .ai-key-row, .ai-custom-row { padding:10px 14px; border-bottom:1px solid var(--line); }
+    .ai-key-row input, .ai-custom-row input {
+      width:100%; box-sizing:border-box; font-size:12.5px; padding:7px 10px; margin-bottom:6px;
+      border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); font-family:inherit;
+    }
+    .ai-custom-row input:last-child { margin-bottom:0; }
+    .ai-key-row input:focus, .ai-custom-row input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(109,40,217,.1); }
+    .ai-messages { flex:1; overflow-y:auto; padding:12px 14px; max-height:280px; display:flex; flex-direction:column; gap:8px; }
+    .ai-msg { font-size:13px; line-height:1.6; padding:8px 12px; border-radius:12px; max-width:90%; word-break:break-word; }
+    .ai-msg-sys { background:var(--grad-soft); color:var(--ink-2); font-size:12px; align-self:center; text-align:center; max-width:100%; }
+    .ai-msg-user { background:var(--grad); color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
+    .ai-msg-ai { background:#f1f5f9; color:var(--ink); align-self:flex-start; border-bottom-left-radius:4px; }
+    .ai-msg-err { background:#fef2f2; color:#b91c1c; align-self:flex-start; border-bottom-left-radius:4px; }
+    .ai-msg-loading { color:var(--ink-2); font-style:italic; }
+    .ai-input-row { display:flex; gap:8px; padding:10px 14px; border-top:1px solid var(--line); }
+    .ai-input-row input {
+      flex:1; font-size:13px; padding:9px 12px; border:1px solid var(--line); border-radius:10px;
+      background:#fff; color:var(--ink); font-family:inherit;
+    }
+    .ai-input-row input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(109,40,217,.1); }
+    .ai-send {
+      width:40px; border:none; border-radius:10px; background:var(--grad); color:#fff; font-size:16px;
+      cursor:pointer; flex-shrink:0; transition:transform .15s, box-shadow .2s; box-shadow:0 2px 8px rgba(109,40,217,.3);
+    }
+    .ai-send:hover { transform:scale(1.05); box-shadow:0 4px 14px rgba(109,40,217,.4); }
+    .ai-send:active { transform:scale(.92); }
+    .ai-send:disabled { opacity:.5; cursor:default; transform:none; }
+
     /* 返回按钮（参考 Uiverse.io by FColombati 金属质感胶囊钮） */
     .home-button {
       all: unset;
@@ -436,6 +508,38 @@
       <p class="lede">本页是速查表：有免费额度、可用的大模型 API，按国内可用优先排。拿到接口地址、模型名、Key 三样，填进支持自定义模型的客户端即可用。零基础申请 Key 的图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener">国内大模型免费 API 获取教程</a>。</p>
     </header>
     <p class="updated">最后核对：<b>2026-08-26</b> · 💡 点击下方代码可一键复制</p>
+    <!-- 悬浮 AI 对话（左侧，与右侧 FAQ 对称） -->
+    <button class="ai-fab" id="aiFab" type="button" aria-label="AI 对话">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      <span class="tooltip">AI 对话</span>
+    </button>
+    <aside class="ai-panel" id="aiPanel" hidden>
+      <div class="ai-panel-head">
+        <span>AI 对话</span>
+        <button class="ai-close" id="aiClose" type="button" aria-label="关闭">✕</button>
+      </div>
+      <div class="ai-model-bar">
+        <label class="ai-model-opt"><input type="radio" name="aiModel" value="dots" checked><span>dots</span></label>
+        <label class="ai-model-opt"><input type="radio" name="aiModel" value="agnes"><span>Agnes</span></label>
+        <label class="ai-model-opt"><input type="radio" name="aiModel" value="custom"><span>自定义</span></label>
+      </div>
+      <div class="ai-key-row" id="aiKeyRow">
+        <input type="password" id="aiKey" placeholder="API Key（仅存本机）" autocomplete="off">
+      </div>
+      <div class="ai-custom-row" id="aiCustomRow" hidden>
+        <input type="text" id="aiBase" placeholder="接口地址 https://.../v1" autocomplete="off">
+        <input type="text" id="aiModelName" placeholder="模型名" autocomplete="off">
+        <input type="password" id="aiCustomKey" placeholder="API Key" autocomplete="off">
+      </div>
+      <div class="ai-messages" id="aiMessages">
+        <div class="ai-msg ai-msg-sys">选模型、填 Key，开始对话。Key 只存你本机浏览器。</div>
+      </div>
+      <div class="ai-input-row">
+        <input type="text" id="aiInput" placeholder="输入消息…" maxlength="500" autocomplete="off">
+        <button class="ai-send" id="aiSend" type="button">➤</button>
+      </div>
+    </aside>
+
     <!-- FAQ 悬浮按钮（参考 Uiverse.io by vinodjangid07），替代顶部兼容性折叠区 -->
     <button class="faq-button" id="faqBtn" type="button" aria-label="FAQ">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" aria-hidden="true">
@@ -721,6 +825,100 @@
         }
       });
     });
+
+    // ========== 悬浮 AI 对话 ==========
+    var AI_PRESETS = {
+      dots: { baseUrl: "https://note3-prev-api.askdiandian.com/v1", model: "dots3-note-prev" },
+      agnes: { baseUrl: "https://apihub.agnes-ai.com/v1", model: "agnes-2.5-flash" }
+    };
+    var AI_KEY = "rcj_api_ai_v1";
+    function aiGetConfig() { try { return JSON.parse(localStorage.getItem(AI_KEY) || "{}"); } catch(e) { return {}; } }
+    function aiSetConfig(c) { try { localStorage.setItem(AI_KEY, JSON.stringify(c)); } catch(e) {} }
+    var aiFab = document.getElementById("aiFab");
+    var aiPanel = document.getElementById("aiPanel");
+    var aiClose = document.getElementById("aiClose");
+    var aiMessages = document.getElementById("aiMessages");
+    var aiInput = document.getElementById("aiInput");
+    var aiSend = document.getElementById("aiSend");
+    var aiKeyRow = document.getElementById("aiKeyRow");
+    var aiCustomRow = document.getElementById("aiCustomRow");
+    var aiKeyInput = document.getElementById("aiKey");
+    var aiBaseInput = document.getElementById("aiBase");
+    var aiModelInput = document.getElementById("aiModelName");
+    var aiCustomKeyInput = document.getElementById("aiCustomKey");
+    var aiHistory = [];
+    (function restoreAi() {
+      var c = aiGetConfig();
+      if (c.model) { var r = document.querySelector('input[name="aiModel"][value="' + c.model + '"]'); if (r) r.checked = true; }
+      aiKeyInput.value = c.apiKey || "";
+      aiBaseInput.value = c.baseUrl || "";
+      aiModelInput.value = c.customModel || "";
+      aiCustomKeyInput.value = c.customKey || "";
+      aiToggleModel();
+    })();
+    function aiToggleModel() {
+      var m = document.querySelector('input[name="aiModel"]:checked').value;
+      aiKeyRow.hidden = (m === "custom");
+      aiCustomRow.hidden = (m !== "custom");
+    }
+    document.querySelectorAll('input[name="aiModel"]').forEach(function(r) { r.addEventListener("change", aiToggleModel); });
+    function aiOpen() { aiPanel.hidden = false; aiFab.classList.add("on"); }
+    function aiHide() { aiPanel.hidden = true; aiFab.classList.remove("on"); }
+    aiFab.addEventListener("click", function() { aiPanel.hidden ? aiOpen() : aiHide(); });
+    aiClose.addEventListener("click", aiHide);
+    aiPanel.addEventListener("click", function(e) { if (e.target === aiPanel) aiHide(); });
+    function aiAddMsg(text, type) {
+      var div = document.createElement("div");
+      div.className = "ai-msg ai-msg-" + type;
+      div.textContent = text;
+      aiMessages.appendChild(div);
+      aiMessages.scrollTop = aiMessages.scrollHeight;
+      return div;
+    }
+    function aiGetEndpoint() {
+      var m = document.querySelector('input[name="aiModel"]:checked').value;
+      if (m === "custom") {
+        var base = aiBaseInput.value.trim(), model = aiModelInput.value.trim(), key = aiCustomKeyInput.value.trim();
+        if (!base || !model || !key) return null;
+        aiSetConfig({ model: "custom", baseUrl: base, customModel: model, customKey: key });
+        return { baseUrl: base, model: model, apiKey: key };
+      }
+      var p = AI_PRESETS[m], key = aiKeyInput.value.trim();
+      if (!key) return null;
+      var c = aiGetConfig(); c.model = m; c.apiKey = key; aiSetConfig(c);
+      return { baseUrl: p.baseUrl, model: p.model, apiKey: key };
+    }
+    function aiSendMsg() {
+      var text = aiInput.value.trim();
+      if (!text) return;
+      var ep = aiGetEndpoint();
+      if (!ep) { aiAddMsg("请先填好 API Key（自定义模式需填接口+模型名+Key）。", "err"); return; }
+      aiInput.value = "";
+      aiAddMsg(text, "user");
+      aiHistory.push({ role: "user", content: text });
+      var loading = aiAddMsg("思考中…", "loading");
+      aiSend.disabled = true;
+      fetch(ep.baseUrl.replace(/\/+$/, "") + "/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + ep.apiKey },
+        body: JSON.stringify({ model: ep.model, messages: aiHistory, stream: false })
+      }).then(function(r) { return r.json().then(function(j) { return { ok: r.ok, j: j }; }); })
+        .then(function(o) {
+          loading.remove();
+          if (o.ok && o.j.choices && o.j.choices[0]) {
+            var reply = o.j.choices[0].message.content;
+            aiAddMsg(reply, "ai"); aiHistory.push({ role: "assistant", content: reply });
+          } else {
+            var err = o.j.error ? (o.j.error.message || JSON.stringify(o.j.error)) : "HTTP 失败";
+            aiAddMsg("请求失败：" + err, "err");
+          }
+        }).catch(function(e) {
+          loading.remove();
+          aiAddMsg("网络错误：" + e.message + "（可能 CORS 受限，试试自定义模式或换网络）", "err");
+        }).finally(function() { aiSend.disabled = false; aiInput.focus(); });
+    }
+    aiSend.addEventListener("click", aiSendMsg);
+    aiInput.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); aiSendMsg(); } });
   })();
   </script>
 </body>
