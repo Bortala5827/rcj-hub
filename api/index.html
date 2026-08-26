@@ -93,22 +93,49 @@
     .section-link a { color: var(--primary); text-decoration: none; }
     .section-link a:hover { text-decoration: underline; }
 
-    /* 国产模型 Key 直达 — 紧凑卡片 */
-    .quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
-    .quick-card {
-      background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
-      padding: 14px 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 6px;
+    /* API Key 快速申请 */
+    .key-section { margin-top: 8px; }
+    .key-group-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 700; color: var(--ink);
+      margin: 18px 0 10px; padding-left: 10px;
+      border-left: 3px solid var(--primary);
     }
-    .quick-card .qc-name { font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
-    .quick-card .qc-free { font-size: 11px; font-weight: 700; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 7px; border-radius: 999px; }
-    .quick-card .qc-row { font-size: 12px; color: var(--ink-2); line-height: 1.5; }
-    .quick-card .qc-row code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11px; background: #f1f5f9; padding: 1px 4px; border-radius: 3px; color: #b45309; }
-    .quick-card .qc-btn {
-      display: inline-block; margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--primary);
-      text-decoration: none; border: 1px solid #c7d7f5; border-radius: 999px; padding: 4px 12px; text-align: center;
-      transition: background .2s;
+    .key-group-title .sub { font-weight: 400; color: var(--ink-2); font-size: 12px; }
+
+    /* 首推大卡片 */
+    .featured-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .featured-card {
+      background: linear-gradient(135deg, #fff 0%, #f0f7ff 100%);
+      border: 1px solid #c7d7f5; border-radius: 14px;
+      padding: 18px 20px; box-shadow: 0 2px 8px rgba(37,99,235,.08);
+      display: flex; flex-direction: column; gap: 10px;
+      transition: transform .15s, box-shadow .15s;
     }
-    .quick-card .qc-btn:hover { background: var(--primary-soft); }
+    .featured-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,.12); }
+    .featured-card .fc-head { display: flex; align-items: center; justify-content: space-between; }
+    .featured-card .fc-name { font-size: 17px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .featured-card .fc-badge { font-size: 11px; font-weight: 700; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 3px 9px; border-radius: 999px; }
+    .featured-card .fc-desc { font-size: 12px; color: var(--ink-2); line-height: 1.5; margin: 0; }
+    .featured-card .fc-btn {
+      display: inline-block; align-self: flex-start; font-size: 13px; font-weight: 700;
+      color: #fff; background: var(--primary); text-decoration: none;
+      padding: 8px 20px; border-radius: 999px; transition: background .2s;
+    }
+    .featured-card .fc-btn:hover { background: #1d4ed8; }
+
+    /* 备选紧凑卡片 */
+    .alt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    .alt-card {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+      padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      transition: border-color .15s;
+    }
+    .alt-card:hover { border-color: #c7d7f5; }
+    .alt-card .ac-name { font-size: 13px; font-weight: 700; }
+    .alt-card .ac-free { font-size: 10px; font-weight: 700; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 6px; border-radius: 999px; white-space: nowrap; }
+    .alt-card .ac-btn { font-size: 11px; font-weight: 600; color: var(--primary); text-decoration: none; border: 1px solid #c7d7f5; border-radius: 999px; padding: 4px 10px; white-space: nowrap; transition: background .15s; }
+    .alt-card .ac-btn:hover { background: var(--primary-soft); }
 
     /* 海外区折叠 */
     details.region-section.overseas > summary {
@@ -399,42 +426,54 @@
     </section>
 
     <!-- API Key 快速申请 -->
-    <section class="region-section">
+    <section class="region-section key-section">
       <h2 class="section-title">API Key 快速申请 <span class="section-note">注册即送免费额度 · 点击直达</span></h2>
 
-      <h3 style="font-size:13px;font-weight:700;color:var(--ink-2);margin:4px 0 8px;letter-spacing:.02em;">⭐ 首推（最稳，一个 Key 覆盖多数需求）</h3>
-      <div class="quick-grid">
-        <div class="quick-card">
-          <div class="qc-name">硅基流动 <span class="qc-free">送体验金</span></div>
-          <a class="qc-btn" href="https://cloud.siliconflow.cn/i/JXohBRlG" target="_blank" rel="noopener">申请 Key</a>
+      <div class="key-group-title">⭐ 首推 <span class="sub">最稳，一个 Key 覆盖多数需求</span></div>
+      <div class="featured-grid">
+        <div class="featured-card">
+          <div class="fc-head">
+            <span class="fc-name">硅基流动</span>
+            <span class="fc-badge">送体验金</span>
+          </div>
+          <p class="fc-desc">同时支持语音转写 + AI 对话，一个 Key 全包。新手首推。</p>
+          <a class="fc-btn" href="https://cloud.siliconflow.cn/i/JXohBRlG" target="_blank" rel="noopener">申请 Key</a>
         </div>
-        <div class="quick-card">
-          <div class="qc-name">DeepSeek <span class="qc-free">送额度</span></div>
-          <a class="qc-btn" href="https://platform.deepseek.com/" target="_blank" rel="noopener">申请 Key</a>
-        </div>
-      </div>
-
-      <h3 style="font-size:13px;font-weight:700;color:var(--ink-2);margin:14px 0 8px;letter-spacing:.02em;">🔄 备选（国内直连，多一个选择）</h3>
-      <div class="quick-grid">
-        <div class="quick-card">
-          <div class="qc-name">Kimi <span class="qc-free">送 ¥15</span></div>
-          <a class="qc-btn" href="https://platform.moonshot.cn/" target="_blank" rel="noopener">申请 Key</a>
-        </div>
-        <div class="quick-card">
-          <div class="qc-name">智谱 GLM <span class="qc-free">免费档</span></div>
-          <a class="qc-btn" href="https://open.bigmodel.cn/usercenter/apikeys" target="_blank" rel="noopener">申请 Key</a>
-        </div>
-        <div class="quick-card">
-          <div class="qc-name">小米 MiMo <span class="qc-free">送 ¥10</span></div>
-          <a class="qc-btn" href="https://platform.xiaomimimo.com/" target="_blank" rel="noopener">申请 Key</a>
-        </div>
-        <div class="quick-card">
-          <div class="qc-name">国家超算互联网 <span class="qc-free">注册查看</span></div>
-          <a class="qc-btn" href="https://www.scnet.cn/" target="_blank" rel="noopener">申请 Key</a>
+        <div class="featured-card">
+          <div class="fc-head">
+            <span class="fc-name">DeepSeek</span>
+            <span class="fc-badge">送额度</span>
+          </div>
+          <p class="fc-desc">高质量对话推理，支持多模态看图。不支持语音转写。</p>
+          <a class="fc-btn" href="https://platform.deepseek.com/" target="_blank" rel="noopener">申请 Key</a>
         </div>
       </div>
 
-      <p style="font-size:12px;color:var(--ink-2);margin:12px 0 0;">额度以官网为准。海外平台（Google/Groq/Agnes）和自建中转见下方折叠区。图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary);">API Key 获取教程</a>。</p>
+      <div class="key-group-title">🔄 备选 <span class="sub">国内直连，多一个选择</span></div>
+      <div class="alt-grid">
+        <div class="alt-card">
+          <span class="ac-name">Kimi</span>
+          <span class="ac-free">送 ¥15</span>
+          <a class="ac-btn" href="https://platform.moonshot.cn/" target="_blank" rel="noopener">申请</a>
+        </div>
+        <div class="alt-card">
+          <span class="ac-name">智谱 GLM</span>
+          <span class="ac-free">免费档</span>
+          <a class="ac-btn" href="https://open.bigmodel.cn/usercenter/apikeys" target="_blank" rel="noopener">申请</a>
+        </div>
+        <div class="alt-card">
+          <span class="ac-name">小米 MiMo</span>
+          <span class="ac-free">送 ¥10</span>
+          <a class="ac-btn" href="https://platform.xiaomimimo.com/" target="_blank" rel="noopener">申请</a>
+        </div>
+        <div class="alt-card">
+          <span class="ac-name">国家超算互联网</span>
+          <span class="ac-free">注册查看</span>
+          <a class="ac-btn" href="https://www.scnet.cn/" target="_blank" rel="noopener">申请</a>
+        </div>
+      </div>
+
+      <p style="font-size:12px;color:var(--ink-2);margin:14px 0 0;">额度以官网为准。海外平台（Google/Groq/Agnes）和自建中转见下方折叠区。图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener" style="color:var(--primary);">API Key 获取教程</a>。</p>
     </section>
 
     <!-- 海外模型（默认折叠） -->
