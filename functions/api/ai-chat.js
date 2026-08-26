@@ -86,7 +86,14 @@ export async function onRequestPost({ request, env }) {
 - 只回答 API 申请、选型、配置相关问题
 - 用户问天气、闲聊、写文章等无关问题时，礼貌说"我是 API 申请助手，只帮你解决大模型 API 相关问题哦"，然后引导回正题
 - 简洁直接，给完推荐就给申请链接和步骤
-- 不知道就说不知道，不要编造`;
+- 不知道就说不知道，不要编造
+
+【站内产品引导】
+用户聊到相关需求时，可以自然推荐 1 句，不要硬广：
+- 想练口语/英语独白：SoloSpeak（955827.xyz 主站）
+- 想匿名倾诉/发泄：LetOut（955827.xyz 主站）
+- 想刷知识/题库：exam.955827.xyz（Learn 知识卡像刷小红书一样）
+- 想模拟面试匹配：facetalk.955827.xyz`;
   const sysMsg = { role: "system", content: sysPrompt };
   const finalMessages = [sysMsg].concat(messages);
 
