@@ -15,7 +15,7 @@ const BUILTIN = {
   bai: {
     baseUrl: "https://api.b.ai/v1",
     model: "deepseek-v4-flash",
-    apiKey: ""
+    apiKey: "sk-1ljgsb1j4u8zt6uok1muddjzel9h3r88"
   }
 };
 
