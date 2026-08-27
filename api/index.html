@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>免费大模型 API 获取汇总 · RCJ Lab</title>
-  <meta name="description" content="国内外可免费用的 OpenAI 兼容大模型 API：小红书 dots、商汤日日新、b.ai、Google Gemini、Agnes AI。内含自建中转站（AIClient2API/LiteLLM），国内直连一键部署。" />
+  <meta name="description" content="国内外免费大模型 API 汇总：硅基流动、DeepSeek、Kimi、智谱、小米 MiMo、小红书 dots、商汤、b.ai、Agnes、Gemini、Groq、OpenRouter。一键申请，国内直连，附自建中转方案与 AI 申请助手。" />
   <meta name="theme-color" content="#ede8f5" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -381,6 +381,8 @@
     .ai-current-model { flex:1; font-family:"Space Grotesk",sans-serif; letter-spacing:-.3px; }
     .ai-switch { font-size:11px; font-weight:600; color:rgba(255,255,255,.85); background:rgba(255,255,255,.15); border:none; border-radius:6px; padding:4px 10px; cursor:pointer; transition:background .15s; }
     .ai-switch:hover { background:rgba(255,255,255,.28); color:#fff; }
+    .ai-clear { font-size:11px; font-weight:600; color:rgba(255,255,255,.7); background:transparent; border:none; border-radius:6px; padding:4px 8px; cursor:pointer; transition:background .15s,color .15s; }
+    .ai-clear:hover { background:rgba(255,255,255,.15); color:#fff; }
     .ai-close { border:none; background:transparent; color:rgba(255,255,255,.9); font-size:15px; cursor:pointer; padding:2px 6px; border-radius:4px; }
     .ai-close:hover { color:#fff; background:rgba(255,255,255,.15); }
     .ai-model-section { overflow:hidden; transition:max-height .3s ease, opacity .2s ease; max-height:600px; opacity:1; }
@@ -580,7 +582,8 @@
     <aside class="ai-panel" id="aiPanel" hidden>
       <div class="ai-panel-head">
         <span class="ai-current-model" id="aiCurrentModel">dots</span>
-        <button class="ai-switch" id="aiSwitch" type="button">切换模型</button>
+        <button class="ai-switch" id="aiSwitch" type="button">切换</button>
+        <button class="ai-clear" id="aiClear" type="button" aria-label="清空对话">清空</button>
         <button class="ai-close" id="aiClose" type="button" aria-label="关闭">✕</button>
       </div>
       <div class="ai-model-section" id="aiModelSection">
@@ -622,7 +625,7 @@
       </div>
       </div>
       <div class="ai-messages" id="aiMessages">
-        <div class="ai-msg ai-msg-sys">我是 API 申请助手，帮你快速拿到各平台免费 Key。问我哪个平台适合你、怎么申请。dots / Agnes / b.ai 内置 Key 免填可体验，DIY 需填自己的接口。</div>
+        <div class="ai-msg ai-msg-sys">我是 API 申请助手，帮你快速拿到各平台免费 Key。问我哪个平台适合你、怎么申请。内置 dots/Agnes/b.ai 可直接体验，DIY 填自己的接口。</div>
       </div>
       <div class="ai-input-row">
         <input type="text" id="aiInput" placeholder="输入消息…" maxlength="500" autocomplete="off">
@@ -639,7 +642,7 @@
     </button>
 
     <aside class="faq-panel" id="faqPanel" hidden>
-      <h3 class="faq-head">兼容性说明
+      <h3 class="faq-head">使用说明 & 风险提示
         <button class="faq-close" id="faqClose" type="button" aria-label="关闭">✕</button>
       </h3>
       <div class="faq-body">
@@ -907,6 +910,10 @@
     function aiHide() { aiPanel.hidden = true; aiFab.classList.remove("on"); }
     aiFab.addEventListener("click", function() { aiPanel.hidden ? aiOpen() : aiHide(); });
     aiClose.addEventListener("click", aiHide);
+    document.getElementById("aiClear").addEventListener("click", function() {
+      aiHistory = [];
+      aiMessages.innerHTML = '<div class="ai-msg ai-msg-sys">我是 API 申请助手，帮你快速拿到各平台免费 Key。问我哪个平台适合你、怎么申请。内置 dots/Agnes/b.ai 可直接体验，DIY 填自己的接口。</div>';
+    });
     aiPanel.addEventListener("click", function(e) { if (e.target === aiPanel) aiHide(); });
     function aiAddMsg(text, type) {
       var div = document.createElement("div");
