@@ -1,24 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <script>
-  // SW 自愈：自动注销与当前版本不符的旧 Service Worker，打破坏 SW 卡死循环
-  // 内联执行，不依赖任何外部 JS——即使旧 SW 拦截了 app.js 也能先跑这句
-  (function () {
-    if (!('serviceWorker' in navigator)) return;
-    var EXPECT = '20260816v8'; // 需与 js/app.20260815.js 中 sw.js 注册带的 ?v= 保持一致
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.getRegistrations().then(function (regs) {
-        regs.forEach(function (r) {
-          var url = (r.active && r.active.scriptURL) || (r.waiting && r.waiting.scriptURL) || (r.installing && r.installing.scriptURL) || '';
-          if (url.indexOf(EXPECT) === -1) {
-            r.unregister().then(function () { location.reload(); });
-          }
-        });
-      }).catch(function () {});
-    });
-  })();
-  </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>SoloSpeak · 独声</title>
