@@ -444,6 +444,22 @@
     .ai-msg-ai { background:#f1f5f9; color:var(--ink); align-self:flex-start; border-bottom-left-radius:4px; }
     .ai-msg-err { background:#fef2f2; color:#b91c1c; align-self:flex-start; border-bottom-left-radius:4px; }
     .ai-msg-loading { color:var(--ink-2); font-style:italic; }
+    .ai-msg-loading .ai-load-row { display:flex; align-items:center; gap:10px; }
+    .ai-msg-loading .ai-load-text { font-size:12px; }
+    .ai-msg-loading .ai-load-hint { font-size:11px; color:#92400e; margin-top:6px; font-style:normal; }
+    /* 赛车 loader */
+    .speeder { position:relative; width:60px; height:24px; flex-shrink:0; }
+    .speeder .sp-body { position:absolute; top:8px; left:0; width:0; height:0; border-top:5px solid transparent; border-right:50px solid var(--primary); border-bottom:5px solid transparent; }
+    .speeder .sp-body:before { content:""; position:absolute; width:14px; height:14px; border-radius:50%; background:var(--primary); right:-58px; top:-9px; }
+    .speeder .sp-body:after { content:""; position:absolute; width:0; height:0; border-top:0 solid transparent; border-right:30px solid var(--primary); border-bottom:10px solid transparent; top:-9px; right:-50px; }
+    .speeder .sp-face { position:absolute; width:14px; height:10px; background:var(--primary); border-radius:12px 12px 0 0; transform:rotate(-40deg); right:-68px; top:-8px; }
+    .speeder .sp-face:after { content:""; position:absolute; width:8px; height:8px; background:var(--primary); right:2px; top:6px; border-radius:0 0 0 2px; transform:rotate(40deg); }
+    .speeder .sp-dust { position:absolute; top:-4px; left:30px; width:20px; height:3px; background:var(--primary); border-radius:2px; opacity:.6; animation:sp-dust .3s linear infinite; }
+    .speeder .sp-dust:nth-child(2) { top:0; animation:sp-dust2 .5s linear infinite; }
+    .speeder .sp-dust:nth-child(3) { top:-2px; animation:sp-dust3 .4s linear infinite; animation-delay:-.5s; }
+    @keyframes sp-dust { 0%{left:30px;opacity:.6} 100%{left:-20px;opacity:0} }
+    @keyframes sp-dust2 { 0%{left:30px;opacity:.5} 100%{left:-40px;opacity:0} }
+    @keyframes sp-dust3 { 0%{left:30px;opacity:.4} 100%{left:-10px;opacity:0} }
     .ai-input-row { display:flex; gap:8px; padding:10px 14px; border-top:1px solid var(--line); }
     .ai-input-row input {
       flex:1; font-size:13px; padding:9px 12px; border:1px solid var(--line); border-radius:10px;
@@ -991,7 +1007,20 @@
       aiInput.value = "";
       aiAddMsg(text, "user");
       aiHistory.push({ role: "user", content: text });
-      var loading = aiAddMsg("思考中…", "loading");
+      // 赛车 loader + 超时提示
+      var loading = document.createElement("div");
+      loading.className = "ai-msg ai-msg-loading";
+      loading.innerHTML = '<div class="ai-load-row"><div class="speeder"><span class="sp-dust"></span><span class="sp-dust"></span><span class="sp-dust"></span><div class="sp-body"></div><div class="sp-face"></div></div><span class="ai-load-text">正在飙车思考中…</span></div>';
+      aiMessages.appendChild(loading);
+      aiMessages.scrollTop = aiMessages.scrollHeight;
+      var slowTimer = setTimeout(function() {
+        if (loading.parentNode) {
+          var hint = document.createElement("div");
+          hint.className = "ai-load-hint";
+          hint.textContent = "🐢 免费 Key 用的人有点多，稍等一下～高频用建议点 DIY 自备 API 更稳";
+          loading.appendChild(hint);
+        }
+      }, 12000);
       aiSend.disabled = true;
       fetch("/api/ai-chat", {
         method: "POST",
@@ -999,16 +1028,18 @@
         body: JSON.stringify(payload)
       }).then(function(r) { return r.json(); })
         .then(function(d) {
+          clearTimeout(slowTimer);
           loading.remove();
           if (d.error) {
-            aiAddMsg("请求失败：" + d.error, "err");
+            aiAddMsg("请求失败：" + d.error + "。免费 Key 可能限流了，试试切换模型或 DIY 自备 API～", "err");
           } else {
             aiAddMsg(d.reply || "(空回复)", "ai");
             aiHistory.push({ role: "assistant", content: d.reply || "" });
           }
         }).catch(function(e) {
+          clearTimeout(slowTimer);
           loading.remove();
-          aiAddMsg("网络错误：" + e.message, "err");
+          aiAddMsg("网络开小差了：" + e.message + "。免费 Key 人多可能限流，切个模型或 DIY 自备 API 试试～", "err");
         }).finally(function() { aiSend.disabled = false; aiInput.focus(); });
     }
     aiSend.addEventListener("click", aiSendMsg);
