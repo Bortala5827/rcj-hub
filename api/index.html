@@ -584,6 +584,17 @@
     .probe-res.ok { color: #065f46; }
     .probe-res.err { color: #b91c1c; }
     .probe-res code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11.5px; background: #f1f5f9; padding: 1px 4px; border-radius: 4px; }
+
+    /* 产品矩阵 */
+    .product-grid { margin: 36px 0 8px; }
+    .pg-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--ink); margin: 0 0 14px; text-align: center; }
+    .pg-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .pg-card { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 18px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; text-decoration: none; transition: transform .18s, box-shadow .18s, border-color .18s; }
+    .pg-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: rgba(109,40,217,.3); }
+    .pg-icon { font-size: 28px; margin-bottom: 8px; line-height: 1; }
+    .pg-name { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .pg-desc { font-size: 11.5px; color: var(--ink-2); line-height: 1.5; }
+    @media (max-width: 640px) { .pg-cards { grid-template-columns: repeat(2, 1fr); } .pg-desc { font-size: 11px; } }
   </style>
 </head>
 <body>
@@ -592,7 +603,7 @@
       <h1>免费大模型 <span class="accent">API</span> 汇总</h1>
       <p class="lede">本页是速查表：有免费额度、可用的大模型 API，按国内可用优先排。拿到接口地址、模型名、Key 三样，填进支持自定义模型的客户端即可用。零基础申请 Key 的图文教程见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener">国内大模型免费 API 获取教程</a>。</p>
     </header>
-    <p class="updated">最后核对：<b>2026-08-26</b> · 💡 点击下方代码可一键复制</p>
+    <p class="updated" style="text-align:center;">最后核对：<b>2026-08-26</b></p>
     <!-- 悬浮 AI 对话（左侧，与右侧 FAQ 对称） -->
     <button class="ai-fab" id="aiFab" type="button" aria-label="AI 助手">
       <span class="ai-fab-text">AI</span>
@@ -812,6 +823,33 @@
       </div>
 
     </details>
+
+    <!-- 产品矩阵：拿完 Key 还能玩点别的 -->
+    <section class="product-grid">
+      <h2 class="pg-title">拿完 Key，还能玩点别的</h2>
+      <div class="pg-cards">
+        <a class="pg-card" href="https://exam.955827.xyz/fj/sz/" target="_blank" rel="noopener">
+          <div class="pg-icon">🚔</div>
+          <div class="pg-name">深圳辅警面试</div>
+          <div class="pg-desc">138 道真题 · 录音演练 · AI 备考助手</div>
+        </a>
+        <a class="pg-card" href="https://exam.955827.xyz/learn/" target="_blank" rel="noopener">
+          <div class="pg-icon">🧩</div>
+          <div class="pg-name">你懂的 · 知识卡</div>
+          <div class="pg-desc">像刷小红书一样刷有用的知识</div>
+        </a>
+        <a class="pg-card" href="https://exam.955827.xyz/xf/" target="_blank" rel="noopener">
+          <div class="pg-icon">🚒</div>
+          <div class="pg-name">消防员面试题库</div>
+          <div class="pg-desc">国家队 + 政府专职 · 结构化真题</div>
+        </a>
+        <a class="pg-card" href="https://955827.xyz/" target="_blank" rel="noopener">
+          <div class="pg-icon">🎙️</div>
+          <div class="pg-name">SoloSpeak</div>
+          <div class="pg-desc">一个人的口语陪练 · 阅后即焚</div>
+        </a>
+      </div>
+    </section>
 
     <a class="home-button" href="https://exam.955827.xyz" aria-label="回到 Exam Hub">
       <div class="button-outer">
