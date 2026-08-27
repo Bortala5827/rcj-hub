@@ -1,6 +1,13 @@
 {
-  "updated": "2026-08-26",
+  "updated": "2026-08-27",
   "experiments": [
+    {
+      "date": "2026-08-27",
+      "title": "now 通勤实验冷启动优化",
+      "summary": "主数字从「此刻正在通勤」（瞬时值，冷启动长期挂 0）改为「今日完成通勤」（累计值 doneToday）；瞬时 active 降级为副行，仅在 >0 时显示「此刻路上 N 人」；无人在途时副行显示今日平均时长；新增今日各小时完成人数迷你折线图（复用已有 m-spark 样式）；commute.js 改用文件名版本 commute-20260827.js 替代 ?v= 缓存参数。",
+      "type": "feature",
+      "tags": ["hub", "commute", "ui"]
+    },
     {
       "date": "2026-08-26",
       "title": "首页赘述清理与 Exam 埋点修复",

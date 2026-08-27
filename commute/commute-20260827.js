@@ -1,5 +1,7 @@
 // 此刻通勤 · 极简实时感 + 轻聊天
 // 单一职责：拉快照、点 start/arrive、显示数字、时段门禁、聊天轮询。
+// v20260827：主数字改为「今日完成通勤」（累计值），瞬时 active 降级为副行；
+//           新增今日各小时完成人数迷你折线。文件名版本替代 ?v=（CF 忽略 query）。
 (function () {
   'use strict';
 
@@ -47,10 +49,41 @@
   }
 
   // ── 视图：数字 / 统计 / 按钮态切换 ──
+  // 冷启动优化：主数字用累计值 doneToday（随一天必然增长），
+  // 瞬时 active 只在 >0 时展示为副行「此刻路上 N 人」，避免长期挂 0 的冷清感。
+  // POST 响应不含 stats（只有 active），用 lastStats 兜底保持今日数字不闪跳。
+  let lastStats = null;
   function renderCount(snap) {
-    const n = (snap && Number(snap.active)) || 0;
-    $('mNum').textContent = n > 0 ? fmt(n) : '0';
+    if (snap && snap.stats) lastStats = snap.stats;
+    const active = (snap && Number(snap.active)) || 0;
+    const done = lastStats ? (Number(lastStats.doneToday) || 0) : null;
+    $('mNum').textContent = done === null ? '—' : fmt(done);
+    const foot = $('mStatFoot');
+    if (foot) {
+      if (active > 0) foot.textContent = `此刻路上 ${fmt(active)} 人`;
+      else if (lastStats && Number(lastStats.avgSec) > 0) foot.textContent = `今日平均 ${fmtDur(lastStats.avgSec)}`;
+      else foot.textContent = '完成后计入今日数字';
+    }
+    if (snap && Array.isArray(snap.hourly)) renderSpark(snap.hourly);
     if (typeof snap.open === 'boolean') serverOpen = snap.open;
+  }
+
+  // 今日各小时完成人数 · 迷你折线（数据 /api/moment 本就返回，此前未用）
+  function renderSpark(hourly) {
+    const box = $('mSpark');
+    if (!box) return;
+    const max = Math.max(0, ...hourly);
+    if (max <= 0) { box.hidden = true; return; }
+    const W = 320, H = 48, PAD = 5;
+    const pts = hourly.map((c, h) => {
+      const x = (PAD + (h / 23) * (W - PAD * 2)).toFixed(1);
+      const y = (H - PAD - (c / max) * (H - PAD * 2)).toFixed(1);
+      return x + ',' + y;
+    }).join(' ');
+    box.innerHTML = '<svg width="100%" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="今日各小时完成通勤人数">'
+      + '<polyline points="' + pts + '" fill="none" stroke="var(--ink-3)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+      + '</svg>';
+    box.hidden = false;
   }
 
   function showIdle() {
@@ -175,6 +208,8 @@
       renderCount(j);
       showIdle();
       showOk(`已记录 · 通勤 ${formatDur(j.durationSec || 0)}`);
+      // POST 响应不含今日统计，补拉一次让「今日完成通勤」立即 +1
+      fetchSnap().then(renderCount).catch(() => {});
     } catch (e) {
       showErr(e.message);
     } finally {

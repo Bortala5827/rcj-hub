@@ -33,10 +33,12 @@
 
     <section class="moment-card reveal" aria-live="polite">
       <div class="m-stat">
-        <div class="m-stat-label">此刻正在通勤</div>
+        <div class="m-stat-label">今日完成通勤</div>
         <div class="m-stat-num" id="mNum">—</div>
-        <div class="m-stat-foot">最近 2 小时内未结束的记录</div>
+        <div class="m-stat-foot" id="mStatFoot">完成后计入今日数字</div>
       </div>
+      <!-- 今日各小时完成人数 · 迷你折线（有数据才显示） -->
+      <div class="m-spark" id="mSpark" hidden></div>
 
       <!-- 状态 A：未在通勤 -->
       <div class="m-action" id="mActionIdle">
@@ -114,6 +116,6 @@
     </p>
   </main>
 
-  <script src="./commute.js?v=20260822j" defer></script>
+  <script src="./commute-20260827.js" defer></script>
 </body>
 </html>
