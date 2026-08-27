@@ -93,10 +93,9 @@ function getSystemPrompt(scene) {
 - 不知道就说不知道，不编造
 - 链接用 markdown [文字](URL)
 
-引导：用户拿到 Key 或说"搞定了/谢谢"时，末尾自然带一句，只推 1 个：
-- 大多数情况：Key 拿到了？可以去「你懂的」像刷小红书一样刷有用的知识 → [你懂的·知识卡](https://exam.955827.xyz/learn/)
-- 提到练口语/独白：→ [SoloSpeak](https://955827.xyz/solospeak/)
-不硬广，不堆链接。`;
+引导：用户拿到 Key 或说"搞定了/谢谢"时，末尾自然带一句：
+Key 拿到了？可以去「你懂的」像刷小红书一样刷有用的知识 → [你懂的·知识卡](https://exam.955827.xyz/learn/)
+不硬广。`;
 }
 
 function json(obj, status = 200) {
