@@ -225,6 +225,30 @@
     .alt-card .ac-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(109,40,217,.4), inset 0 1px 0 rgba(255,255,255,.35); filter: brightness(1.05); }
     .alt-card .ac-btn:active { transform: translateY(1px) scale(.94); box-shadow: 0 1px 3px rgba(109,40,217,.25), inset 0 2px 5px rgba(0,0,0,.25); filter: brightness(.95); }
 
+    /* 海外简洁卡片 */
+    .overseas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+    .oc-card {
+      background: var(--surface); backdrop-filter: blur(8px);
+      border: 1px solid var(--line); border-radius: 12px;
+      padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+    }
+    .oc-card:hover { transform: translateY(-2px); border-color: rgba(37,99,235,.3); box-shadow: 0 4px 14px rgba(37,99,235,.1); }
+    .oc-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+    .oc-name { font-size: 13px; font-weight: 700; }
+    .oc-desc { font-size: 11.5px; color: var(--ink-2); line-height: 1.5; margin: 0; flex: 1; }
+    .oc-btn {
+      font-size: 11.5px; font-weight: 700; color: #fff; background: var(--grad); text-decoration: none;
+      border-radius: 999px; padding: 5px 12px; text-align: center; transition: transform .15s, box-shadow .2s, filter .2s;
+      box-shadow: 0 2px 8px rgba(109,40,217,.3), inset 0 1px 0 rgba(255,255,255,.3);
+      align-self: flex-start;
+    }
+    .oc-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .oc-btn:active { transform: translateY(1px) scale(.96); filter: brightness(.95); }
+
+    /* key-subsection 子分组 */
+    .key-subsection { margin-top: 4px; }
+
     /* 海外区折叠 */
     details.region-section.overseas > summary {
       list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
@@ -628,7 +652,7 @@
 
     <!-- 国内可用（默认展开） -->
     <section class="region-section">
-      <h2 class="section-title">国内可用 <span class="section-note">直连即可，无需代理</span></h2>
+      <h2 class="section-title">国内模型 API <span class="section-note">直连即可，无需代理</span></h2>
 
       <!-- 小红书 dots -->
       <div class="card" data-base="https://note3-prev-api.askdiandian.com/v1" data-model="dots3-note-prev">
@@ -655,9 +679,9 @@
       </div>
     </section>
 
-    <!-- API Key 快速申请 -->
-    <section class="region-section key-section">
-      <h2 class="section-title">API Key 快速申请 <span class="section-note">注册即送免费额度 · 点击直达</span></h2>
+    <!-- API Key 快速申请（国内子分组） -->
+    <div class="key-subsection">
+      <div class="key-group-title">⚡ 快速申请 <span class="sub">注册即送免费额度 · 点击直达</span></div>
 
       <div class="key-group-title">⭐ 首推 <span class="sub">最稳，一个 Key 覆盖多数需求</span></div>
       <div class="featured-grid">
@@ -702,53 +726,36 @@
           <a class="ac-btn" href="https://www.scnet.cn/" target="_blank" rel="noopener">申请</a>
         </div>
       </div>
-    </section>
 
-    <!-- 海外模型（默认折叠） -->
-    <details class="region-section overseas">
-      <summary class="section-title summary-title">🌐 海外模型 <span class="section-note">需代理/反代 · 点击展开</span></summary>
-      <span class="section-link">其他海外模型目录：<a href="https://openrouter.ai/models" target="_blank" rel="noopener">OpenRouter Models</a></span>
-
-      <!-- b.ai -->
-      <div class="card" data-base="https://api.b.ai/v1" data-model="deepseek-v4-flash">
-        <div class="card-top">
-          <span class="card-name">b.ai</span>
-          <span class="badge region">国内直连</span>
+      <div class="key-group-title">🌐 海外 <span class="sub">部分需代理 · 一句话简介</span></div>
+      <div class="overseas-grid">
+        <div class="oc-card">
+          <div class="oc-top"><span class="oc-name">b.ai</span><span class="badge region">国内直连</span></div>
+          <p class="oc-desc">聚合多家模型的中立网关，免费档可用 DeepSeek 系。</p>
+          <a class="oc-btn" href="https://api.b.ai" target="_blank" rel="noopener">申请 Key</a>
         </div>
-        <p class="card-desc">聚合多家模型的中立网关，免费档可用 DeepSeek 系，本站「DeepSeek（b.ai）」源走的就是它。</p>
-        <div class="fill"><code>URL: https://api.b.ai/v1 · Model: deepseek-v4-flash · Key: 平台申请（Bearer）</code></div>
-        <div class="links">
-          <a href="https://api.b.ai" target="_blank" rel="noopener">申请 Key</a>
+        <div class="oc-card">
+          <div class="oc-top"><span class="oc-name">Agnes AI</span><span class="badge region">国内直连</span></div>
+          <p class="oc-desc">新加坡节点，国内直连可用，多模态+推理。</p>
+          <a class="oc-btn" href="https://apihub.agnes-ai.com" target="_blank" rel="noopener">申请 Key</a>
+        </div>
+        <div class="oc-card">
+          <div class="oc-top"><span class="oc-name">Google Gemini</span><span class="badge free">有免费层</span></div>
+          <p class="oc-desc">AI Studio 申请 Key 即用，多模态能力强。</p>
+          <a class="oc-btn" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">申请 Key</a>
+        </div>
+        <div class="oc-card">
+          <div class="oc-top"><span class="oc-name">Groq</span><span class="badge free">有免费层</span></div>
+          <p class="oc-desc">LPU 架构，推理速度极快，免费档够用。</p>
+          <a class="oc-btn" href="https://console.groq.com/keys" target="_blank" rel="noopener">申请 Key</a>
+        </div>
+        <div class="oc-card">
+          <div class="oc-top"><span class="oc-name">OpenRouter</span><span class="badge free">有免费模型</span></div>
+          <p class="oc-desc">聚合 200+ 模型，一个 Key 切换多家。</p>
+          <a class="oc-btn" href="https://openrouter.ai/keys" target="_blank" rel="noopener">申请 Key</a>
         </div>
       </div>
-
-      <!-- Google Gemini -->
-      <div class="card" data-base="https://generativelanguage.googleapis.com/v1beta/openai" data-model="gemini-3.5-flash-lite">
-        <div class="card-top">
-          <span class="card-name">Google Gemini</span>
-          <span class="badge free">有免费层</span>
-        </div>
-        <p class="card-desc">AI Studio 申请 Key 即用，免费档够个人玩。填 OpenAI 兼容端点，别填原生 generateContent。</p>
-        <div class="fill"><code>URL: https://generativelanguage.googleapis.com/v1beta/openai · Model: gemini-3.5-flash-lite · Key: AI Studio</code></div>
-        <div class="links">
-          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">申请 Key</a>
-        </div>
-      </div>
-
-      <!-- Agnes AI -->
-      <div class="card" data-base="https://apihub.agnes-ai.com/v1" data-model="agnes-2.5-flash">
-        <div class="card-top">
-          <span class="card-name">Agnes AI</span>
-          <span class="badge region">国内直连</span>
-        </div>
-        <p class="card-desc">新加坡节点，国内直连可用，OpenAI 兼容。</p>
-        <div class="fill"><code>URL: https://apihub.agnes-ai.com/v1 · Model: agnes-2.5-flash · Key: 平台申请（Bearer）</code></div>
-        <div class="links">
-          <a href="https://apihub.agnes-ai.com" target="_blank" rel="noopener">申请 Key</a>
-        </div>
-      </div>
-
-    </details>
+    </div>
 
     <!-- 自建中转站 GitHub（默认折叠） -->
     <details class="region-section selfhosted">
