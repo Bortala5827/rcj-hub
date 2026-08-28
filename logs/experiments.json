@@ -3,6 +3,13 @@
   "experiments": [
     {
       "date": "2026-08-29",
+      "title": "API 导航页自建中转站补充 One API + Cloudflare AI Gateway",
+      "summary": "自建中转站区域从 2 个项目扩充到 4 个：新增 One API（20k+ stars，中文社区最火的 API 聚合管理面板，Web UI 多渠道+令牌）和 Cloudflare AI Gateway（零服务器，CF 免费托管，给海外 API 加缓存+限流+日志）。覆盖从自托管 Docker 到零服务器三种部署形态。",
+      "type": "content",
+      "tags": ["api", "selfhosted", "one-api", "cloudflare"]
+    },
+    {
+      "date": "2026-08-29",
       "title": "API 导航页全卡片描述加模型名",
       "summary": "17 张卡片描述从泛泛而谈改为带具体模型名：首推 4 张（DeepSeek-V3/R1、Qwen/DeepSeek/GLM 托管、moonshot-v1-128k、glm-4-flash/plus）+ 备选 7 张（dots-llk、SenseChat-5、MiMo-7B、step-2、abab6.5、doubao-pro 等）+ 海外 6 张（gemini-2.0-flash、llama-3.3-70b、deepseek-r1 等）。用户拿到 Key 后直接知道该填什么模型名。",
       "type": "content",
