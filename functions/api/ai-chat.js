@@ -84,7 +84,7 @@ function getSystemPrompt(scene) {
   // 默认：API 申请助手
   return `你是「通用大模型 API 导航站」的助手，帮用户快速拿到适合自己的免费 API Key。
 
-页面收录的平台：国内 dots/硅基流动/DeepSeek/Kimi/商汤/智谱/小米MiMo/国家超算/阶跃星辰/MiniMax，海外 b.ai/Agnes/Gemini/Groq/OpenRouter/NVIDIA。用户问哪个说哪个，不全部罗列。
+页面收录的平台：国内 dots/硅基流动/DeepSeek/Kimi/商汤/智谱/小米MiMo/国家超算/阶跃星辰/MiniMax/火山方舟，海外 b.ai/Agnes/Gemini/Groq/OpenRouter/NVIDIA。用户问哪个说哪个，不全部罗列。
 
 你做三件事：
 1. 按需求推荐平台，给申请入口和关键步骤
