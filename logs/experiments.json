@@ -3,6 +3,13 @@
   "experiments": [
     {
       "date": "2026-08-28",
+      "title": "API 导航页首推卡片品牌色视觉升级",
+      "summary": "4 张首推卡片从统一蓝紫色改为各品牌色身份系统：DeepSeek 蓝(#4D6BFE)、硅基流动 紫(#7C3AED)、Kimi 橙(#FF6B35)、智谱GLM 绿(#00A65A)。每张卡片新增品牌色左侧条 + 字母标记(D/S/K/G) + 品牌色微染背景 + 品牌色按钮，使用 CSS color-mix + 自定义属性实现。",
+      "type": "design",
+      "tags": ["api", "visual", "brand-color"]
+    },
+    {
+      "date": "2026-08-28",
       "title": "API 导航页窄屏适配 + 清理无效 meta",
       "summary": "featured-grid 在 ≤520px 窄屏下从 2 列降为 1 列，避免首推卡片挤压；删除 3 行无效的 http-equiv Cache-Control/Pragma/Expires（浏览器基本忽略 HTTP meta，真实 header 由 Cloudflare Pages 控制）。",
       "type": "refactor",
