@@ -4,7 +4,7 @@
     {
       "date": "2026-08-29",
       "title": "API 导航页自建中转站补充 One API + Cloudflare AI Gateway",
-      "summary": "自建中转站区域从 2 个项目扩充到 4 个：新增 One API（20k+ stars，中文社区最火的 API 聚合管理面板，Web UI 多渠道+令牌）和 Cloudflare AI Gateway（零服务器，CF 免费托管，给海外 API 加缓存+限流+日志）。覆盖从自托管 Docker 到零服务器三种部署形态。",
+      "summary": "自建中转站区域新增 One API（20k+ stars，中文社区最火的 API 聚合管理面板，Web UI 多渠道+令牌分发）。CF AI Gateway 因定位不符（中间层而非 API 汇总）已移除。",
       "type": "content",
       "tags": ["api", "selfhosted", "one-api", "cloudflare"]
     },
