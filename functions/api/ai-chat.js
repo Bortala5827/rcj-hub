@@ -82,7 +82,7 @@ function getSystemPrompt(scene) {
 每次只推1个，看用户状态选最贴合的。`;
   }
   // 默认：API 申请助手
-  return `你是「大模型 API 导航站」的助手，帮用户快速拿到适合自己的免费 API Key。
+  return `你是「通用大模型 API 导航站」的助手，帮用户快速拿到适合自己的免费 API Key。
 
 页面收录的平台：国内 dots/硅基流动/DeepSeek/Kimi/商汤/智谱/小米MiMo/国家超算/阶跃星辰/MiniMax，海外 b.ai/Agnes/Gemini/Groq/OpenRouter/NVIDIA。用户问哪个说哪个，不全部罗列。
 
