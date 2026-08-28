@@ -3,6 +3,13 @@
   "experiments": [
     {
       "date": "2026-08-28",
+      "title": "API 导航页窄屏适配 + 清理无效 meta",
+      "summary": "featured-grid 在 ≤520px 窄屏下从 2 列降为 1 列，避免首推卡片挤压；删除 3 行无效的 http-equiv Cache-Control/Pragma/Expires（浏览器基本忽略 HTTP meta，真实 header 由 Cloudflare Pages 控制）。",
+      "type": "refactor",
+      "tags": ["api", "responsive", "cleanup"]
+    },
+    {
+      "date": "2026-08-28",
       "title": "主导航隐藏资产库入口",
       "summary": "从 6 个页面（index/assets/log/blog/principles/archive）的 hamburger 导航菜单中移除「资产库」链接；/assets URL 仍可直达，定位与 /blog 一致——自己用，不在公开导航暴露。",
       "type": "refactor",

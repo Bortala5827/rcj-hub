@@ -6,9 +6,6 @@
   <title>通用大模型 API 导航站 · RCJ Lab</title>
   <meta name="description" content="通用大模型 API 导航站：优先收录注册即拿 Key 的纯粹平台，附 AI 申请助手。" />
   <meta name="theme-color" content="#ede8f5" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -155,6 +152,7 @@
 
     /* 首推大卡片 */
     .featured-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 520px) { .featured-grid { grid-template-columns: 1fr; } }
     .featured-card {
       background: linear-gradient(145deg, #fff 0%, #f0f4ff 100%);
       border: 1px solid rgba(37,99,235,.18); border-radius: 16px;
