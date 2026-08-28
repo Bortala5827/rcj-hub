@@ -119,20 +119,13 @@
     .fill code.copied { background: #dcfce7; color: #166534; }
     .links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
     .links a {
-      font-size: 13px; font-weight: 700; color: #fff; text-decoration: none;
-      background: var(--grad); border-radius: 999px; padding: 9px 22px;
-      transition: transform .15s ease, box-shadow .2s ease, filter .2s;
-      box-shadow: 0 3px 12px rgba(109,40,217,.35), inset 0 1px 0 rgba(255,255,255,.3);
-      position: relative; overflow: hidden;
+      font-size: 13px; font-weight: 700; color: var(--primary); text-decoration: none;
+      background: var(--primary-soft); border: 1px solid rgba(109,40,217,.15); border-radius: 999px; padding: 8px 20px;
+      transition: transform .15s ease, background .2s, border-color .2s;
     }
-    .links a::before {
-      content: ""; position: absolute; inset: 0; border-radius: inherit;
-      background: linear-gradient(180deg, rgba(255,255,255,.25), transparent 50%);
-      pointer-events: none;
-    }
-    .links a:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(109,40,217,.45), inset 0 1px 0 rgba(255,255,255,.35); filter: brightness(1.05); }
-    .links a:active { transform: translateY(1px) scale(.96); box-shadow: 0 1px 4px rgba(109,40,217,.3), inset 0 2px 6px rgba(0,0,0,.25); filter: brightness(.95); }
-    .links a.ghost { color: var(--ink-2); background: transparent; border: 1px solid var(--line); box-shadow: none; }
+    .links a:hover { transform: translateY(-1px); background: #ede9fe; border-color: rgba(109,40,217,.3); }
+    .links a:active { transform: translateY(1px) scale(.97); }
+    .links a.ghost { color: var(--ink-2); background: transparent; border: 1px solid var(--line); }
 
     /* 分区标题 */
     .region-section { margin-bottom: 28px; }
@@ -184,18 +177,11 @@
     .featured-card .fc-desc { font-size: 12.5px; color: var(--ink-2); line-height: 1.6; margin: 0; position: relative; z-index: 1; }
     .featured-card .fc-btn {
       display: inline-block; align-self: flex-start; font-size: 14px; font-weight: 700;
-      color: #fff; background: var(--grad); text-decoration: none;
-      padding: 11px 26px; border-radius: 999px; transition: transform .15s ease, box-shadow .2s, filter .2s;
-      box-shadow: 0 4px 16px rgba(109,40,217,.4), inset 0 1px 0 rgba(255,255,255,.3);
-      position: relative; overflow: hidden;
+      color: var(--primary); background: var(--primary-soft); border: 1px solid rgba(109,40,217,.15); text-decoration: none;
+      padding: 9px 22px; border-radius: 999px; transition: transform .15s ease, background .2s, border-color .2s;
     }
-    .featured-card .fc-btn::before {
-      content: ""; position: absolute; inset: 0; border-radius: inherit;
-      background: linear-gradient(180deg, rgba(255,255,255,.25), transparent 50%);
-      pointer-events: none;
-    }
-    .featured-card .fc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(109,40,217,.5), inset 0 1px 0 rgba(255,255,255,.35); filter: brightness(1.05); }
-    .featured-card .fc-btn:active { transform: translateY(1px) scale(.96); box-shadow: 0 1px 4px rgba(109,40,217,.3), inset 0 2px 8px rgba(0,0,0,.25); filter: brightness(.95); }
+    .featured-card .fc-btn:hover { transform: translateY(-1px); background: #ede9fe; border-color: rgba(109,40,217,.3); }
+    .featured-card .fc-btn:active { transform: translateY(1px) scale(.97); }
 
     /* 备选紧凑卡片 */
     .alt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
@@ -214,18 +200,12 @@
     }
     .alt-card .ac-desc { font-size: 11.5px; color: var(--ink-2); line-height: 1.55; margin: 0; }
     .alt-card .ac-btn {
-      font-size: 12px; font-weight: 700; color: #fff; background: var(--grad); text-decoration: none;
-      border-radius: 999px; padding: 6px 14px; white-space: nowrap; transition: transform .15s ease, box-shadow .2s, filter .2s;
-      box-shadow: 0 2px 8px rgba(109,40,217,.3), inset 0 1px 0 rgba(255,255,255,.3);
-      position: relative; overflow: hidden; align-self: flex-start;
+      font-size: 12px; font-weight: 700; color: var(--primary); background: var(--primary-soft); border: 1px solid rgba(109,40,217,.12); text-decoration: none;
+      border-radius: 999px; padding: 5px 12px; white-space: nowrap; transition: transform .15s ease, background .2s, border-color .2s;
+      align-self: flex-start;
     }
-    .alt-card .ac-btn::before {
-      content: ""; position: absolute; inset: 0; border-radius: inherit;
-      background: linear-gradient(180deg, rgba(255,255,255,.25), transparent 50%);
-      pointer-events: none;
-    }
-    .alt-card .ac-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(109,40,217,.4), inset 0 1px 0 rgba(255,255,255,.35); filter: brightness(1.05); }
-    .alt-card .ac-btn:active { transform: translateY(1px) scale(.94); box-shadow: 0 1px 3px rgba(109,40,217,.25), inset 0 2px 5px rgba(0,0,0,.25); filter: brightness(.95); }
+    .alt-card .ac-btn:hover { transform: translateY(-1px); background: #ede9fe; border-color: rgba(109,40,217,.25); }
+    .alt-card .ac-btn:active { transform: translateY(1px) scale(.95); }
     .alt-note { font-size: 11px; color: var(--ink-2); text-align: center; margin: 6px 0 14px; line-height: 1.6; opacity: .8; }
 
     /* 海外简洁卡片 */
@@ -241,13 +221,12 @@
     .oc-name { font-size: 13px; font-weight: 700; }
     .oc-desc { font-size: 11.5px; color: var(--ink-2); line-height: 1.5; margin: 0; flex: 1; }
     .oc-btn {
-      font-size: 11.5px; font-weight: 700; color: #fff; background: var(--grad); text-decoration: none;
-      border-radius: 999px; padding: 5px 12px; text-align: center; transition: transform .15s, box-shadow .2s, filter .2s;
-      box-shadow: 0 2px 8px rgba(109,40,217,.3), inset 0 1px 0 rgba(255,255,255,.3);
+      font-size: 11.5px; font-weight: 700; color: var(--primary); background: var(--primary-soft); border: 1px solid rgba(109,40,217,.12); text-decoration: none;
+      border-radius: 999px; padding: 4px 10px; text-align: center; transition: transform .15s, background .2s, border-color .2s;
       align-self: flex-start;
     }
-    .oc-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
-    .oc-btn:active { transform: translateY(1px) scale(.96); filter: brightness(.95); }
+    .oc-btn:hover { transform: translateY(-1px); background: #ede9fe; border-color: rgba(109,40,217,.25); }
+    .oc-btn:active { transform: translateY(1px) scale(.96); }
 
     /* key-subsection 子分组 */
     .key-subsection { margin-top: 4px; }
