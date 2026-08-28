@@ -59,57 +59,9 @@
       margin: 0 0 10px; line-height: 1.05;
       color: var(--ink);
     }
-    h1 .accent-text {
-      background: linear-gradient(135deg, rgba(109,40,217,.45) 0%, rgba(37,99,235,.45) 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      position: relative; z-index: 1;
+    h1 .accent {
+      background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    /* API 文字中间小仓鼠装饰 */
-    .api-wrap { position: relative; display: inline-block; }
-    .api-wrap .accent-text { position: relative; z-index: 1; }
-    .hamster-wrap {
-      position: absolute; left: 50%; bottom: -28px; transform: translateX(-50%);
-      width: 56px; height: 56px; pointer-events: auto; cursor: pointer; z-index: 0;
-      display: flex; justify-content: center; align-items: center;
-    }
-    .wheel2 {
-      width: 56px; height: 56px; border-radius: 50%;
-      border: 3px solid #d97706; position: relative;
-      display: flex; justify-content: center; align-items: center;
-      animation: spin2 2.4s linear infinite;
-      background: rgba(254,243,199,.3);
-      box-shadow: inset 0 0 0 2px rgba(253,230,138,.5);
-      transition: animation-duration .15s;
-    }
-    .wheel2.speed-up { animation-duration: .3s; }
-    .wheel2::before {
-      content: ''; position: absolute; width: 70%; height: 2px;
-      background: #d97706; border-radius: 2px;
-      box-shadow: 0 14px 0 0 #d97706, 0 -14px 0 0 #d97706, 14px 0 0 0 #d97706, -14px 0 0 0 #d97706;
-    }
-    .hamster2 { position: relative; z-index: 3; width: 36px; height: 40px; animation: bob2 .4s ease-in-out infinite alternate; }
-    .hamster2 .h-torso { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 28px; height: 22px; background: #d97706; border-radius: 50% 50% 45% 45%; background-image: radial-gradient(circle at 50% 80%, #fcd34d 28%, transparent 40%); }
-    .hamster2 .h-head { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 20px; background: #d97706; border-radius: 50% 50% 45% 45%; z-index: 2; }
-    .hamster2 .h-ear { position: absolute; width: 7px; height: 7px; background: #d97706; border-radius: 50% 50% 0 50%; top: 0; z-index: 1; }
-    .hamster2 .h-ear.l { left: 1px; transform: rotate(-20deg); }
-    .hamster2 .h-ear.r { right: 1px; transform: rotate(20deg) scaleX(-1); }
-    .hamster2 .h-ear::after { content: ''; position: absolute; width: 3px; height: 3px; background: #fcd34d; border-radius: 50% 50% 0 50%; top: 1px; left: 1px; }
-    .hamster2 .h-eye { position: absolute; width: 3px; height: 3.5px; background: #1e293b; border-radius: 50%; top: 7px; z-index: 4; }
-    .hamster2 .h-eye.l { left: 4px; }
-    .hamster2 .h-eye.r { right: 4px; }
-    .hamster2 .h-eye::after { content: ''; position: absolute; width: 1px; height: 1px; background: white; border-radius: 50%; top: .5px; right: .5px; }
-    .hamster2 .h-nose { position: absolute; width: 2px; height: 1.5px; background: #f43f5e; border-radius: 50%; top: 11px; left: 50%; transform: translateX(-50%); z-index: 4; }
-    .hamster2 .h-leg { position: absolute; width: 5px; height: 8px; background: #b45309; border-radius: 0 0 40% 40%; bottom: 0; transform-origin: top center; z-index: 0; }
-    .hamster2 .h-leg.fl { left: 2px; animation: legRun2 .35s ease-in-out infinite alternate; }
-    .hamster2 .h-leg.fr { right: 2px; animation: legRun2 .35s ease-in-out infinite alternate-reverse; }
-    .hamster2 .h-leg.bl { left: 9px; animation: legRun2 .35s ease-in-out infinite alternate-reverse; }
-    .hamster2 .h-leg.br { right: 9px; animation: legRun2 .35s ease-in-out infinite alternate; }
-    .hamster2 .h-tail { position: absolute; bottom: 2px; right: -5px; width: 4px; height: 4px; background: #d97706; border-radius: 50% 50% 50% 0; transform: rotate(-30deg); animation: tailWag2 .5s ease-in-out infinite alternate; z-index: 0; }
-    @keyframes spin2 { to { transform: rotate(360deg); } }
-    @keyframes bob2 { 0% { transform: translateY(0); } 100% { transform: translateY(-2px); } }
-    @keyframes legRun2 { 0% { transform: rotate(-25deg); } 100% { transform: rotate(25deg); } }
-    @keyframes tailWag2 { 0% { transform: rotate(-40deg); } 100% { transform: rotate(-15deg); } }
-    @media (prefers-reduced-motion: reduce) { .hamster-wrap { display: none; } }
     .lede { font-size: 15px; color: var(--ink-2); margin: 0 auto 8px; max-width: 560px; line-height: 1.7; }
     .lede a { color: var(--primary); font-weight: 600; }
     .updated { font-size: 12px; color: var(--ink-2); margin-bottom: 10px; text-align: center; }
@@ -655,7 +607,7 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>通用大模型 <span class="api-wrap"><span class="accent-text">API</span><span class="hamster-wrap" id="hamsterWrap" aria-hidden="true"><span class="wheel2" id="wheel2"><span class="hamster2"><span class="h-head"><span class="h-ear l"></span><span class="h-ear r"></span><span class="h-eye l"></span><span class="h-eye r"></span><span class="h-nose"></span></span><span class="h-torso"></span><span class="h-leg fl"></span><span class="h-leg fr"></span><span class="h-leg bl"></span><span class="h-leg br"></span><span class="h-tail"></span></span></span></span></span> 导航站</h1>
+      <h1>通用大模型 <span class="accent">API</span> 导航站</h1>
       <p class="lede">优先收录对个人开发者友好、注册即拿 Key 的纯粹平台。大厂面向企业，流程繁琐，不收。零基础申请见 <a href="https://exam.955827.xyz/guides/api-key.html" target="_blank" rel="noopener">图文教程</a>。</p>
     </header>
     <p class="updated" style="text-align:center;">最后核对：<b>2026-08-28</b></p>
@@ -896,16 +848,6 @@
 
   <script>
   (function () {
-    // 仓鼠点击加速
-    var hamsterWrap = document.getElementById("hamsterWrap");
-    var wheel2 = document.getElementById("wheel2");
-    if (hamsterWrap && wheel2) {
-      hamsterWrap.addEventListener("click", function(e) {
-        e.stopPropagation();
-        wheel2.classList.add("speed-up");
-        setTimeout(function() { wheel2.classList.remove("speed-up"); }, 800);
-      });
-    }
     // FAQ 悬浮按钮开合
     var btn = document.getElementById("faqBtn");
     var panel = document.getElementById("faqPanel");
