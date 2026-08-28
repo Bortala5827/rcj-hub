@@ -1,6 +1,13 @@
 {
-  "updated": "2026-08-27",
+  "updated": "2026-08-28",
   "experiments": [
+    {
+      "date": "2026-08-28",
+      "title": "主导航隐藏资产库入口",
+      "summary": "从 6 个页面（index/assets/log/blog/principles/archive）的 hamburger 导航菜单中移除「资产库」链接；/assets URL 仍可直达，定位与 /blog 一致——自己用，不在公开导航暴露。",
+      "type": "refactor",
+      "tags": ["hub", "nav", "cleanup"]
+    },
     {
       "date": "2026-08-27",
       "title": "now 通勤实验冷启动优化",
