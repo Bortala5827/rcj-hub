@@ -154,20 +154,34 @@
     .featured-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     @media (max-width: 520px) { .featured-grid { grid-template-columns: 1fr; } }
     .featured-card {
-      background: linear-gradient(145deg, #fff 0%, #f0f4ff 100%);
-      border: 1px solid rgba(37,99,235,.18); border-radius: 16px;
-      padding: 20px 22px; box-shadow: 0 2px 12px rgba(37,99,235,.08);
+      --brand: #4D6BFE;
+      background: linear-gradient(145deg, #fff 0%, color-mix(in srgb, var(--brand) 5%, #f0f4ff) 100%);
+      border: 1px solid color-mix(in srgb, var(--brand) 16%, rgba(37,99,235,.18));
+      border-radius: 16px;
+      padding: 20px 22px 20px 28px;
+      box-shadow: 0 2px 12px color-mix(in srgb, var(--brand) 7%, rgba(37,99,235,.08));
       display: flex; flex-direction: column; gap: 10px;
-      transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s;
+      transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s, border-color .25s;
       position: relative; overflow: hidden;
+    }
+    .featured-card::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+      background: var(--brand); border-radius: 16px 0 0 16px;
     }
     .featured-card::after {
       content: ""; position: absolute; top: -40px; right: -40px; width: 100px; height: 100px;
-      background: radial-gradient(circle, rgba(124,58,237,.15), transparent 70%); border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--brand) 14%, transparent), transparent 70%); border-radius: 50%;
     }
-    .featured-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(37,99,235,.15); }
+    .featured-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px color-mix(in srgb, var(--brand) 16%, rgba(37,99,235,.15)); border-color: color-mix(in srgb, var(--brand) 32%, rgba(37,99,235,.3)); }
     .featured-card .fc-head { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
-    .featured-card .fc-name { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; letter-spacing: -0.01em; }
+    .featured-card .fc-brand { display: flex; align-items: center; gap: 10px; }
+    .featured-card .fc-mark {
+      width: 32px; height: 32px; border-radius: 9px; background: var(--brand); color: #fff;
+      font-size: 15px; font-weight: 800; font-family: var(--font-display);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      box-shadow: 0 2px 8px color-mix(in srgb, var(--brand) 35%, transparent);
+    }
+    .featured-card .fc-name { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
     .featured-card .fc-badge {
       font-size: 11px; font-weight: 700; color: #059669; background: rgba(16,185,129,.08);
       border: 1px solid rgba(16,185,129,.18); padding: 3px 10px; border-radius: 999px; cursor: default;
@@ -175,10 +189,10 @@
     .featured-card .fc-desc { font-size: 12.5px; color: var(--ink-2); line-height: 1.6; margin: 0; position: relative; z-index: 1; }
     .featured-card .fc-btn {
       display: inline-block; align-self: flex-start; font-size: 14px; font-weight: 700;
-      color: var(--primary); background: var(--primary-soft); border: 1px solid rgba(109,40,217,.15); text-decoration: none;
+      color: var(--brand); background: color-mix(in srgb, var(--brand) 8%, #fff); border: 1px solid color-mix(in srgb, var(--brand) 18%, rgba(109,40,217,.15)); text-decoration: none;
       padding: 9px 22px; border-radius: 999px; transition: transform .15s ease, background .2s, border-color .2s;
     }
-    .featured-card .fc-btn:hover { transform: translateY(-1px); background: #ede9fe; border-color: rgba(109,40,217,.3); }
+    .featured-card .fc-btn:hover { transform: translateY(-1px); background: color-mix(in srgb, var(--brand) 13%, #fff); border-color: color-mix(in srgb, var(--brand) 30%, rgba(109,40,217,.3)); }
     .featured-card .fc-btn:active { transform: translateY(1px) scale(.97); }
 
     /* 备选紧凑卡片 */
@@ -666,33 +680,45 @@
     <div class="key-subsection">
       <div class="key-group-title">⭐ 首推 <span class="sub">最稳，一个 Key 覆盖多数需求</span></div>
       <div class="featured-grid">
-        <div class="featured-card">
+        <div class="featured-card" style="--brand:#4D6BFE">
           <div class="fc-head">
-            <span class="fc-name">DeepSeek</span>
+            <div class="fc-brand">
+              <span class="fc-mark">D</span>
+              <span class="fc-name">DeepSeek</span>
+            </div>
             <span class="fc-badge">送额度</span>
           </div>
           <p class="fc-desc">推理能力强，代码/数学/多模态都能打。</p>
           <a class="fc-btn" href="https://platform.deepseek.com/" target="_blank" rel="noopener">申请 Key</a>
         </div>
-        <div class="featured-card">
+        <div class="featured-card" style="--brand:#7C3AED">
           <div class="fc-head">
-            <span class="fc-name">硅基流动</span>
+            <div class="fc-brand">
+              <span class="fc-mark">S</span>
+              <span class="fc-name">硅基流动</span>
+            </div>
             <span class="fc-badge">送体验金</span>
           </div>
           <p class="fc-desc">语音+对话+图像，一个 Key 全包。</p>
           <a class="fc-btn" href="https://cloud.siliconflow.cn/i/JXohBRlG" target="_blank" rel="noopener">申请 Key</a>
         </div>
-        <div class="featured-card">
+        <div class="featured-card" style="--brand:#FF6B35">
           <div class="fc-head">
-            <span class="fc-name">Kimi</span>
+            <div class="fc-brand">
+              <span class="fc-mark">K</span>
+              <span class="fc-name">Kimi</span>
+            </div>
             <span class="fc-badge">送 ¥15</span>
           </div>
           <p class="fc-desc">200 万字上下文，丢一整本书都能聊。</p>
           <a class="fc-btn" href="https://platform.moonshot.cn/" target="_blank" rel="noopener">申请 Key</a>
         </div>
-        <div class="featured-card">
+        <div class="featured-card" style="--brand:#00A65A">
           <div class="fc-head">
-            <span class="fc-name">智谱 GLM</span>
+            <div class="fc-brand">
+              <span class="fc-mark">G</span>
+              <span class="fc-name">智谱 GLM</span>
+            </div>
             <span class="fc-badge">免费档</span>
           </div>
           <p class="fc-desc">GLM-4 系列稳定，免费档每日有额度。</p>
