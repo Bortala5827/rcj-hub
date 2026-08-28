@@ -3,7 +3,6 @@ import {
   putRecording, getAllRecordings, deleteRecording, setFavorite, getMeta, putMeta,
 } from './db.js';
 import { Recorder } from './recorder.js?v=20260813b';
-import { renderWave, fitCanvas, lerpHex, mountLiveBars } from './waveform.js?v=20260816a';
 import { mountPlayer } from './player.js?v=20260813a';
 import { seedIfEmpty, getTopic, nextTopic, GREETING_JP, GREETING_CN } from './topics.js';
 import { getTodayGoal, addSpoken, getDailyGoalMin, setDailyGoalMin } from './goals.js';
@@ -17,7 +16,6 @@ const toastEl = document.getElementById('toast');
 let route = 'home';
 let currentTopic = null;
 let recorder = null;
-let liveStop = null;
 let recStartTs = 0;
 const players = new Set(); // 活跃 player，切页时销毁
 
@@ -107,7 +105,6 @@ async function renderHome() {
     </div>
 
     <div class="record-zone">
-      <canvas class="wave-canvas" id="liveWave"></canvas>
       <div class="vol-meter-live"><div class="vml-fill" id="volMeterFill"></div></div>
       <div class="rec-timer" id="recTimer">00:00</div>
       <button class="rec-btn" id="recBtn" aria-label="点击开始录音">●</button>
@@ -176,7 +173,6 @@ async function renderHome() {
   };
 
   const recBtn = document.getElementById('recBtn');
-  const liveWave = document.getElementById('liveWave');
   const timer = document.getElementById('recTimer');
 
   // 状态机：idle -> starting -> recording -> idle（防止快速点按竞态）
@@ -198,13 +194,7 @@ async function renderHome() {
       };
       // 启动录音引擎（同时创建 AudioContext + Analyser）
       await recorder.start();
-      // 全宽频谱柱状图（声纹可视化）
-      fitCanvas(liveWave, 80);
-      liveStop = mountLiveBars(liveWave, recorder.analyser, {
-        colorFn: (v) => lerpHex('#6f9b8a', '#e3a857', Math.min(1, v * 1.5)),
-      });
     } catch (e) {
-      if (liveStop) { try { liveStop(); } catch (_) {} liveStop = null; }
       toast('独声需要麦克风权限');
       recorder = null;
       recState = 'idle';
@@ -212,7 +202,6 @@ async function renderHome() {
     }
     // 启动期间用户已松开 -> 立即停
     if (recState === 'stopping') {
-      if (liveStop) { liveStop(); liveStop = null; }
       await recorder.stop();
       recorder = null;
       recState = 'idle';
@@ -238,7 +227,6 @@ async function renderHome() {
     if (recState === 'starting') { recState = 'stopping'; return; } // 等 start 完成后再停
     if (recState !== 'recording') return;
     recState = 'stopping';
-    if (liveStop) { liveStop(); liveStop = null; }
     clearTimeout(recorder._timer);
     const dur = Date.now() - recStartTs;
     const result = await recorder.stop();

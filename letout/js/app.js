@@ -1,7 +1,6 @@
 // app.js — LetOut 主逻辑（释放 / 库房 / 关于）
 import { putRelease, getAllReleases, deleteRelease } from './db.js?v=20260813a';
 import { Recorder } from './recorder.js?v=20260813b';
-import { mountLiveBars, fitCanvas } from './waveform.js?v=20260813a';
 import { mountPlayer, mountAudioPlayer } from './player.js?v=20260813a';
 import { openShareCard } from './sharecard.js?v=20260813a';
 import { startGhostGuide } from './ghost-guide.js?v=20260813a';
@@ -96,7 +95,6 @@ let route = 'home';
 let currentEmotion = EMOTIONS[0];
 let currentVoice = EMOTIONS[0].voices[0];
 let recorder = null;
-let liveStop = null;
 let recStartTs = 0;
 let keepAudio = false;
 let ghostStop = null;       // 轮换引导语计时器清除函数
@@ -148,7 +146,6 @@ function renderHome() {
     </div>
 
     <div class="release-zone" id="releaseZone">
-      <canvas class="wave-canvas" id="liveWave"></canvas>
       <div class="ghost-guide" id="ghostGuide">想到什么就说什么。</div>
       <div class="rec-timer" id="recTimer">00:00</div>
       <button class="rec-btn" id="recBtn" aria-label="开始释放">●</button>
@@ -230,7 +227,6 @@ function renderVoiceChips() {
 
 function wireRecord() {
   const recBtn = document.getElementById('recBtn');
-  const liveWave = document.getElementById('liveWave');
   const timer = document.getElementById('recTimer');
 
   let recState = 'idle';
@@ -258,25 +254,6 @@ function wireRecord() {
       return;
     }
     recState = 'recording';
-    fitCanvas(liveWave, 72);
-    // 波形：按情绪配色渐变 + 声纹微调（抖动/律动）
-    const wcfg = Object.assign({}, currentEmotion.wave, currentVoice.mod || {});
-    liveStop = mountLiveBars(liveWave, recorder.analyser, {
-      gradient: currentEmotion.grad,
-      wobble: wcfg.wobble || 0,
-      pulse: wcfg.pulse || 0,
-      alpha: wcfg.alpha != null ? wcfg.alpha : 0.9,
-      minBarHeight: wcfg.minBarHeight || 2,
-      smoothing: wcfg.smoothing != null ? wcfg.smoothing : 0.7,
-      bloom: wcfg.bloom != null ? wcfg.bloom : 0,
-      floorGlow: currentEmotion.glow,
-      mirror: wcfg.mirror !== false,
-      mirrorAsym: wcfg.mirrorAsym || 0,
-      barWidthRatio: wcfg.barWidthRatio || 1,
-      capStyle: wcfg.capStyle || 'soft',
-      wobbleKind: wcfg.wobbleKind || 'random',
-      onLevel: setLiveLevel,
-    });
     document.documentElement.dataset.rec = '1';
     if (window.__particles) window.__particles.pause(); // 录音时暂停粒子，省电/避免小米卡顿
     recBtn.classList.add('recording');
@@ -295,7 +272,6 @@ function wireRecord() {
     if (recState === 'starting') { recState = 'stopping'; return; }
     if (recState !== 'recording') return;
     recState = 'stopping';
-    if (liveStop) { liveStop(); liveStop = null; }
     delete document.documentElement.dataset.rec;
     if (window.__particles) window.__particles.resume();
     setLiveLevel(0);
