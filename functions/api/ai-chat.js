@@ -28,7 +28,7 @@ function getChannels(env) {
     },
     {
       id: "sensenova", name: "商汤日日新",
-      baseUrl: env.SENSENOVA_BASE || "https://api.sensenova.cn/v1",
+      baseUrl: env.SENSENOVA_BASE || "https://api.sensenova.cn/compatible-mode/v1",
       model: env.SENSENOVA_MODEL || "deepseek-chat",
       apiKey: env.SENSENOVA_API_KEY || "",
       status: "ok",
