@@ -43,6 +43,14 @@ function getChannels(env) {
       status: "ok",
       fallback: ["dots", "agnes", "sensenova"],
     },
+    {
+      id: "groq", name: "Groq",
+      baseUrl: "https://api.groq.com/openai/v1",
+      model: "openai/gpt-oss-120b",
+      apiKey: env.GROQ_API_KEY || "",
+      status: "ok",
+      fallback: ["dots", "agnes", "sensenova", "bai"],
+    },
   ];
 }
 
