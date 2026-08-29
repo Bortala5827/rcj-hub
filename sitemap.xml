@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- 主站 (仅 955827.xyz 自身页面；blog 为私人手记，已 noindex 且不收录) -->
+  <!-- 主站 (仅 955827.xyz 自身页面；blog 为私人手记 noindex 不收录；
+       FaceTalk 已迁至 facetalk.955827.xyz/sitemap.xml，此处不再放跨域 URL) -->
   <url>
     <loc>https://955827.xyz/</loc>
     <changefreq>weekly</changefreq>
@@ -28,19 +29,6 @@
   </url>
   <url>
     <loc>https://955827.xyz/commute/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <!-- FaceTalk (facetalk.955827.xyz，ms 为别名)
-       注：跨域 URL 严格应放入 facetalk 仓库自身的 sitemap；此处保留仅为兼容，建议后续在 facetalk 仓库建 sitemap.xml -->
-  <url>
-    <loc>https://facetalk.955827.xyz/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://ms.955827.xyz/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
