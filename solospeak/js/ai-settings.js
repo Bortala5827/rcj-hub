@@ -1,4 +1,4 @@
-// ai-settings.js — 复用辅警站 AI 设置架构（自备 Key，本地优先）
+﻿// ai-settings.js — 复用辅警站 AI 设置架构（自备 Key，本地优先）
 // 移植自 FuJingGITHUB/shared/app.js 的 AI 设置块：同样的存储结构 / 同样的调用方式。
 // 暴露 window.RCJ_AI：load() / save() / callLlm() / testConnection() / openSettings() / mountAiGuide()
 // 设计原则（与产品一致）：不收集、不上传，Key 只存在用户浏览器本地；分析在本机发起。
@@ -8,7 +8,7 @@
   var KEY = 'rcj_solospeak_ai_v1';
 
   function defaults() {
-    return { enabled: false, baseUrl: '', key: '', model: '' };
+    return { customEnabled: false, baseUrl: '', key: '', model: '' };
   }
 
   function load() {
@@ -43,12 +43,45 @@
     });
   }
 
-  // 调 LLM，返回纯文本（兼容 OpenAI / 硅基流动 / DeepSeek / 通义 等 /chat/completions 协议）
+  // 调 LLM，返回纯文本（默认走 RCJ 内置 AI；启用自定义后走用户自备 Key）
   function callLlm(opts) {
     var s = load();
-    if (!s.enabled || !s.key || !s.baseUrl || !s.model) {
-      return Promise.reject(new Error('AI 未配置：请点 ⚙️ 填入 API Base URL / Key / 模型名并启用。'));
+    if (s.customEnabled) {
+      if (!s.key || !s.baseUrl || !s.model) {
+        return Promise.reject(new Error('自定义 AI 未配置完整：请填 API Base URL / Key / 模型名，或取消勾选「启用自定义 AI 引导」用内置 AI。'));
+      }
+      return callCustomLlm(opts, s);
     }
+    return callBuiltinLlm(opts);
+  }
+
+  // 内置 AI：调用 RCJ 统一 api/ai-chat（免费体验，自动降级多模型）
+  function callBuiltinLlm(opts) {
+    var url = 'https://955827.xyz/api/ai-chat';
+    var body = {
+      provider: 'dots',
+      scene: 'solospeak',
+      messages: [
+        { role: 'system', content: opts.system || '' },
+        { role: 'user', content: opts.user || '' }
+      ]
+    };
+    return fetchWithTimeout(url, {
+      method: 'POST', mode: 'cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }, opts.timeout || 30000).then(function (r) {
+      if (!r.ok) return r.text().then(function (t) { throw new Error('HTTP ' + r.status + '：' + t.slice(0, 200)); });
+      return r.json();
+    }).then(function (data) {
+      var txt = data.reply || '';
+      if (!txt) throw new Error('内置 AI 返回为空，稍后重试或切换自定义模型。');
+      return txt;
+    });
+  }
+
+  // 自定义 AI：调用用户自备的 OpenAI 兼容 API
+  function callCustomLlm(opts, s) {
     var url = normalizeBaseUrl(s.baseUrl) + '/chat/completions';
     var body = {
       model: s.model,
@@ -112,12 +145,15 @@
     var s = load();
     var ov = document.getElementById('aiSettingsOverlay');
     if (!ov) return;
-    document.getElementById('aiEnabled').checked = !!s.enabled;
+    document.getElementById('aiEnabled').checked = !!s.customEnabled;
     document.getElementById('aiBaseUrl').value = s.baseUrl || '';
     document.getElementById('aiApiKey').value = s.key || '';
     document.getElementById('aiModel').value = s.model || '';
     var res = document.getElementById('aiTestResult');
     if (res) res.textContent = '';
+    // 自定义配置区域：勾选才显示
+    var cfg = document.getElementById('aiCustomConfig');
+    if (cfg) cfg.hidden = !s.customEnabled;
     ov.classList.add('show');
   }
   function closeSettings() {
@@ -151,6 +187,15 @@
         }
       });
     }
+    // 复选框 change：勾选自定义 AI 后显示配置区域
+    var aiEnabledCb = document.getElementById('aiEnabled');
+    if (aiEnabledCb) {
+      aiEnabledCb.addEventListener('change', function () {
+        var cfg = document.getElementById('aiCustomConfig');
+        if (cfg) cfg.hidden = !aiEnabledCb.checked;
+      });
+    }
+
     // API Key 显示/隐藏切换
     var keyToggleBtn = document.getElementById('aiApiKeyToggle');
     if (keyToggleBtn) {
@@ -165,14 +210,14 @@
 
     if (saveBtn) saveBtn.addEventListener('click', function () {
       var s = {
-        enabled: document.getElementById('aiEnabled').checked,
+        customEnabled: document.getElementById('aiEnabled').checked,
         baseUrl: document.getElementById('aiBaseUrl').value.trim(),
         key: document.getElementById('aiApiKey').value.trim(),
         model: document.getElementById('aiModel').value.trim()
       };
-      if (s.enabled && !s.baseUrl) { alert('已启用 AI 引导，但缺少 API Base URL'); return; }
-      if (s.enabled && !s.key) { alert('已启用 AI 引导，但缺少 API Key'); return; }
-      if (s.enabled && !s.model) { alert('已启用 AI 引导，但缺少模型名'); return; }
+      if (s.customEnabled && !s.baseUrl) { alert('已启用自定义 AI 引导，但缺少 API Base URL'); return; }
+      if (s.customEnabled && !s.key) { alert('已启用自定义 AI 引导，但缺少 API Key'); return; }
+      if (s.customEnabled && !s.model) { alert('已启用自定义 AI 引导，但缺少模型名'); return; }
       save(s);
       closeSettings();
     });
@@ -180,7 +225,7 @@
     if (testBtn) testBtn.addEventListener('click', function () {
       // 先把当前填写的临时值存一下再测（不强制用户点保存）
       var draft = {
-        enabled: document.getElementById('aiEnabled').checked,
+        customEnabled: document.getElementById('aiEnabled').checked,
         baseUrl: document.getElementById('aiBaseUrl').value.trim(),
         key: document.getElementById('aiApiKey').value.trim(),
         model: document.getElementById('aiModel').value.trim()
@@ -209,18 +254,10 @@
   // 把「AI 引导」挂到某个容器（如录音结束反馈卡）
   function mountAiGuide(el, ctx) {
     if (!el) return;
-    var s = load();
-    if (!s.enabled || !s.key || !s.baseUrl || !s.model) {
-      el.innerHTML = '<div class="ai-guide-locked">想让 AI 给你一点引导？' +
-        '<button class="link-btn" id="aiUnlock">填一个自备 Key</button>' +
-        '<div class="ai-guide-tip">数据不出本机，Key 只存在你浏览器里。</div></div>';
-      var ub = document.getElementById('aiUnlock');
-      if (ub) ub.addEventListener('click', openSettings);
-      return;
-    }
+    // 默认使用 RCJ 内置 AI，直接显示引导界面（启用自定义后走用户自备 Key）
     el.innerHTML = '' +
       '<div class="ai-guide-ready">' +
-      '<div class="ai-guide-title">✨ AI 引导（自备 Key · 不评分）</div>' +
+      '<div class="ai-guide-title">✨ AI 引导（内置免费 · 不评分）</div>' +
       '<textarea class="ai-note" id="aiNote" placeholder="想对 AI 说点什么？（可选：比如今天想练什么、卡在哪）"></textarea>' +
       '<button class="big-btn ai-go" id="aiGo">让 AI 引导一下</button>' +
       '<div class="ai-result" id="aiResult" hidden></div>' +
