@@ -188,6 +188,7 @@
       <div class="sb-item" data-page="commute"><span class="ico">🚇</span>此刻通勤</div>
       <div class="sb-item" data-page="commutechat"><span class="ico">💬</span>通勤聊天</div>
       <div class="sb-item" data-page="wall"><span class="ico">🗒️</span>留言墙</div>
+      <div class="sb-item" data-page="ai"><span class="ico">🤖</span>AI 监控</div>
     </nav>
     <div class="sb-foot">
       <div id="genTime">—</div>
@@ -297,6 +298,58 @@ function renderPage(p){
   else if(p==='commute') renderCommute();
   else if(p==='commutechat') renderCommuteChat();
   else if(p==='wall') renderWallMgmt();
+  else if(p==='ai') renderAI();
+}
+
+// ---------- AI 监控 ----------
+function renderAI(){
+  const d = DATA.ai || { total:0, ok:0, fail:0, successRate:0, byProject:{}, byProvider:{}, byDay:{} };
+  const content = document.getElementById('content');
+  document.getElementById('pageTitle').textContent = 'AI 监控';
+  let html = '';
+  html += '<div class="stats">';
+  html += '<div class="stat"><div class="stat-num">'+d.total+'</div><div class="stat-label">总调用量</div></div>';
+  html += '<div class="stat"><div class="stat-num" style="color:var(--ok)">'+d.ok+'</div><div class="stat-label">成功</div></div>';
+  html += '<div class="stat"><div class="stat-num" style="color:var(--danger)">'+d.fail+'</div><div class="stat-label">失败</div></div>';
+  html += '<div class="stat"><div class="stat-num">'+d.successRate+'%</div><div class="stat-label">成功率</div></div>';
+  html += '</div>';
+  function renderTable(title, tag, data){
+    let h = '<div class="panel"><h3>'+title+' <span class="tag">'+tag+'</span></h3>';
+    const keys = Object.keys(data || {});
+    if(!keys.length){ h += '<p class="small muted">暂无数据（部署后首次 AI 调用会自动建表并开始记录）</p>'; }
+    else {
+      h += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+      h += '<tr style="text-align:left;border-bottom:1px solid var(--line)"><th style="padding:8px">名称</th><th style="padding:8px">总量</th><th style="padding:8px">成功</th><th style="padding:8px">失败</th><th style="padding:8px">成功率</th></tr>';
+      keys.sort(function(a,b){return (data[b].total||0)-(data[a].total||0);}).forEach(function(k){
+        var s = data[k]; var rate = s.total ? Math.round(s.ok/s.total*100) : 0;
+        h += '<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px;font-weight:600">'+esc(k||'unknown')+'</td><td style="padding:8px">'+s.total+'</td><td style="padding:8px;color:var(--ok)">'+s.ok+'</td><td style="padding:8px;color:var(--danger)">'+s.fail+'</td><td style="padding:8px">'+rate+'%</td></tr>';
+      });
+      h += '</table>';
+    }
+    h += '</div>';
+    return h;
+  }
+  html += renderTable('各项目调用', '按 project 聚合', d.byProject);
+  html += renderTable('各渠道调用', '按 provider 聚合', d.byProvider);
+  // 最近 14 天趋势
+  html += '<div class="panel"><h3>最近 14 天趋势 <span class="tag">按日聚合</span></h3>';
+  var days = Object.keys(d.byDay || {}).sort();
+  if(!days.length){ html += '<p class="small muted">暂无数据</p>'; }
+  else {
+    var max = 1; days.forEach(function(day){ if((d.byDay[day].total||0)>max) max=d.byDay[day].total; });
+    html += '<div style="display:flex;align-items:flex-end;gap:4px;height:120px;margin-top:10px">';
+    days.forEach(function(day){
+      var s = d.byDay[day]; var h = Math.round((s.total||0)/max*100);
+      var rate = s.total ? Math.round(s.ok/s.total*100) : 0;
+      html += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px" title="'+day+': '+s.total+'次 '+rate+'%">';
+      html += '<div style="width:100%;background:var(--accent);border-radius:3px 3px 0 0;height:'+h+'%;min-height:'+(s.total?2:0)+'px"></div>';
+      html += '<span style="font-size:9px;color:var(--muted);transform:rotate(-45deg);white-space:nowrap">'+day.slice(5)+'</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  content.innerHTML = html;
 }
 
 // ---------- 概览 ----------

@@ -104,6 +104,8 @@ export async function onRequestGet({ request, env }) {
       d1(env, DBS.analytics, "SELECT site, day, SUM(n) s, 0 as total, 0 as u, 0 as d FROM visits GROUP BY site, day UNION ALL SELECT site, '' as day, SUM(n) as s, SUM(n) as total, COUNT(DISTINCT ip) as u, COUNT(DISTINCT day) as d FROM visits GROUP BY site ORDER BY site, day"),
       // [7] analytics: 最近 7 天访问明细（site/day/ip/n，供概览「最近访问」表）
       d1(env, DBS.analytics, "SELECT site, day, ip, n FROM visits WHERE day >= date('now','-6 day') ORDER BY day DESC, site, n DESC LIMIT 60"),
+      // [8] ai_calls: AI 调用聚合（按项目/provider/日期，表由 ai-track.js 首次调用时自动建）
+      d1(env, DBS.analytics, "SELECT 'by_project' as k, project as dim1, status as dim2, COUNT(*) c FROM ai_calls GROUP BY project, status UNION ALL SELECT 'by_provider', provider, status, COUNT(*) FROM ai_calls GROUP BY provider, status UNION ALL SELECT 'by_day', day, status, COUNT(*) FROM ai_calls WHERE day >= date('now','-13 day') GROUP BY day, status"),
     ]);
 
     const v = (i) => results[i].status === 'fulfilled' ? results[i].value : null;
@@ -116,6 +118,21 @@ export async function onRequestGet({ request, env }) {
     const ftWallRecent = v(3);
     const uniAll       = v(6); // 合并的趋势+汇总
     const recentVisits = v(7) || []; // 最近 7 天访问明细
+    const aiRaw        = v(8) || []; // AI 调用聚合（表不存在时为空）
+
+    // ── 解析 AI 调用聚合 ──
+    const aiByProject = {}, aiByProvider = {}, aiByDay = {};
+    let aiTotal = 0, aiOk = 0;
+    (aiRaw || []).forEach(r => {
+      const c = Number(r.c) || 0;
+      const bucket = r.k === 'by_project' ? aiByProject : r.k === 'by_provider' ? aiByProvider : r.k === 'by_day' ? aiByDay : null;
+      if (!bucket) return;
+      const key = r.dim1 || 'unknown';
+      if (!bucket[key]) bucket[key] = { total: 0, ok: 0, fail: 0 };
+      bucket[key].total += c;
+      if (r.dim2 === 'ok') bucket[key].ok += c; else bucket[key].fail += c;
+      if (r.k === 'by_project') { aiTotal += c; if (r.dim2 === 'ok') aiOk += c; }
+    });
 
     // ── 解析 facetalk 计数 ──
     const ftCounts = {};
@@ -176,6 +193,15 @@ export async function onRequestGet({ request, env }) {
         note: '辅警站点仅接入浏览统计（rcj-analytics-d1 · site=aux）；留言墙与信号匹配为 FaceTalk 专属功能，辅警未开通，故无互动数据。',
       },
       analytics: { allVisits, series: analyticsSeries, bySite },
+      ai: {
+        total: aiTotal,
+        ok: aiOk,
+        fail: aiTotal - aiOk,
+        successRate: aiTotal ? Math.round(aiOk / aiTotal * 100) : 0,
+        byProject: aiByProject,
+        byProvider: aiByProvider,
+        byDay: aiByDay,
+      },
       recentVisits,
       note: '数据源：mianshi-dazi-d1（FaceTalk 互动数据）+ rcj-analytics-d1（统一浏览统计，含 site=aux 辅警站点）。aux-police-exam-d1 已于 2026-08-17 并入 exam 后删除。',
       warns: warns.length ? warns : undefined,

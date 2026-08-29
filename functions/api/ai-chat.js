@@ -1,29 +1,47 @@
-// /api/ai-chat —— AI 对话代理（内置 dots/agnes/b.ai Key，支持自定义，多场景提示词）
-// Key 存在 Cloudflare Pages Secrets（环境变量），代码里不留明文。自定义模式由前端传参。
+// /api/ai-chat —— 统一 AI 对话入口（955827.xyz 平台聚合）
+// 设计：渠道配置表（按渠道登记，模型可热更新）+ scene 提示词表 + 自动 failover + 超时
+// 前端协议不变：POST {provider, scene, messages} → {reply, provider} / {error}
+// Key 存在 Cloudflare Pages Secrets（环境变量），代码不留明文。custom 由前端透传。
+// 新增渠道：往 CHANNELS 数组加一条；新增场景：往 SCENE_PROMPTS 加一条。均不改主逻辑。
 
-function getBuiltin(env) {
-  return {
-    dots: {
+// ── 渠道配置表 ──────────────────────────────────────────────
+// status: ok 可用 | unstable 不稳（可用但优先走备选）| disabled 停用
+// key 未配自动视为不可用。failover：主渠道失败时依次尝试备选。
+// 预留位：商汤日日新（原记作 deepseek）、groq 极速 —— 配 key 后加一条并改 status:'ok' 即可。
+function getChannels(env) {
+  return [
+    {
+      id: "dots", name: "小红书 dots3",
       baseUrl: "https://note3-prev-api.askdiandian.com/v1",
       model: "dots3-note-prev",
-      apiKey: env.DOTS_API_KEY || ""
+      apiKey: env.DOTS_API_KEY || "",
+      status: "ok",
+      fallback: ["agnes", "bai"],
     },
-    agnes: {
+    {
+      id: "agnes", name: "Agnes",
       baseUrl: "https://apihub.agnes-ai.com/v1",
       model: "agnes-2.5-flash",
-      apiKey: env.AGNES_API_KEY || ""
+      apiKey: env.AGNES_API_KEY || "",
+      status: "ok",
+      fallback: ["dots", "bai"],
     },
-    bai: {
+    {
+      id: "bai", name: "b.ai",
       baseUrl: "https://api.b.ai/v1",
       model: "deepseek-v4-flash",
-      apiKey: env.BAI_API_KEY || ""
-    }
-  };
+      apiKey: env.BAI_API_KEY || "",
+      status: "ok",
+      fallback: ["dots", "agnes"],
+    },
+  ];
 }
 
-function getSystemPrompt(scene) {
-  if (scene === "fj-sz") {
-    return `你是「深圳辅警备考助手」，扎根深圳，当前正值第十四批辅警面试期（2026年8月），帮考生吃透《深圳经济特区警务辅助人员条例》、搞定面试答题，也聊聊公安基层工作和职业成长。
+// ── scene 提示词表 ──────────────────────────────────────────
+// 新增场景只需加一条；未命中走默认（api 大模型导航）。
+// 预留：'learn'（你懂的并入时填）。
+const SCENE_PROMPTS = {
+  "fj-sz": `你是「深圳辅警备考助手」，扎根深圳，当前正值第十四批辅警面试期（2026年8月），帮考生吃透《深圳经济特区警务辅助人员条例》、搞定面试答题，也聊聊公安基层工作和职业成长。
 
 【深圳辅警条例核心】
 - 定位：公安机关统一招聘管理、非人民警察身份的警务辅助人员，分勤务辅警和文职辅警
@@ -79,10 +97,9 @@ function getSystemPrompt(scene) {
 - 想刷点有用的知识→ [你懂的·知识卡](https://exam.955827.xyz/learn/)（像刷小红书一样刷知识）
 - 想练其他结构化→ [结构化面试练习](https://exam.955827.xyz/structured.html)
 - 面试真题→ 当前页就是，点「🎲 随机抽题·开口练」直接练
-每次只推1个，看用户状态选最贴合的。`;
-  }
-  if (scene === "shop") {
-    return `你是「RCJ 定制服务顾问」，帮用户了解题库定制、建站与代托管服务，引导下单。
+每次只推1个，看用户状态选最贴合的。`,
+
+  "shop": `你是「RCJ 定制服务顾问」，帮用户了解题库定制、建站与代托管服务，引导下单。
 
 【服务内容】
 1. 题库定制（¥39 起，按城市/题量定价）
@@ -120,10 +137,11 @@ function getSystemPrompt(scene) {
 用户表达兴趣或问完后，自然推 1 个，融入末尾不硬广：
 - 想先体验刷题效果→ [深圳辅警面试真题](https://exam.955827.xyz/fj/sz/)
 - 想刷点有用的知识→ [你懂的·知识卡](https://exam.955827.xyz/learn/)
-每次只推 1 个。`;
-  }
-  // 默认：API 申请助手
-  return `你是「通用大模型 API 导航站」的助手，帮用户快速拿到适合自己的免费 API Key。
+每次只推 1 个。`,
+};
+
+// 默认场景：API 大模型导航助手
+const DEFAULT_SCENE_PROMPT = `你是「通用大模型 API 导航站」的助手，帮用户快速拿到适合自己的免费 API Key。
 
 页面收录的平台：
 - 首推：DeepSeek（deepseek-v3/r1）、硅基流动（Qwen/DeepSeek/GLM 托管）、Kimi（kimi-k3，1M token 上下文）、智谱 GLM（glm-4-flash 免费 / glm-4-plus）
@@ -154,8 +172,23 @@ function getSystemPrompt(scene) {
 引导：用户拿到 Key 或说"搞定了/谢谢"时，末尾自然带一句：
 Key 拿到了？可以去「你懂的」像刷小红书一样刷有用的知识 → [你懂的·知识卡](https://exam.955827.xyz/learn/)
 每次只推一个，不硬广。`;
+
+function getSystemPrompt(scene) {
+  return SCENE_PROMPTS[scene] || DEFAULT_SCENE_PROMPT;
 }
 
+// ── 场景分发规则（对内自用，不对外）──────────────────────────
+// 前端未指定 provider 时，按 scene 的渠道优先级依次尝试（failover）。
+// 高质量场景（fj-sz/learn）优先质量渠道；低需求场景（api/shop）可走固定/免费渠道。
+// 调整分发只需改这个表，不动主逻辑。
+const SCENE_ROUTING = {
+  "fj-sz": ["dots", "agnes", "bai"],   // 高质量：辅警备考
+  "learn": ["dots", "agnes", "bai"],    // 高质量：你懂的知识卡/发散
+  "api":   ["bai", "dots", "agnes"],    // 低需求：API 导航，免费优先
+  "shop":  ["dots"],                      // 固定：定制顾问
+};
+
+// ── 工具函数 ────────────────────────────────────────────────
 function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
     status,
@@ -167,6 +200,47 @@ function json(obj, status = 200) {
       "Access-Control-Allow-Headers": "Content-Type",
     },
   });
+}
+
+function findChannel(channels, id) {
+  return channels.find((c) => c.id === id);
+}
+
+// 渠道可用：status 非 disabled 且 key 已配
+function isUsable(ch) {
+  return !!ch && ch.status !== "disabled" && !!ch.apiKey;
+}
+
+// 调用单个渠道（带 30s 超时）
+async function callChannel(ch, messages) {
+  const baseClean = ch.baseUrl.replace(/\/+$/, "");
+  const url = /\/chat\/completions$/i.test(baseClean)
+    ? baseClean
+    : `${baseClean}/chat/completions`;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 30000);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${ch.apiKey}`,
+        "Cache-Control": "no-store",
+      },
+      body: JSON.stringify({ model: ch.model, messages, stream: false }),
+      signal: ctrl.signal,
+    });
+    const text = await res.text();
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 500)}`);
+    const data = JSON.parse(text);
+    const reply = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content
+      ? data.choices[0].message.content
+      : "";
+    if (!reply) throw new Error("返回内容为空");
+    return { reply };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function onRequestOptions() {
@@ -181,70 +255,128 @@ export async function onRequestOptions() {
   });
 }
 
-export async function onRequestPost({ request, env }) {
-  let body;
+// ── AI 调用统一埋点（异步 waitUntil，失败静默，不阻塞响应）──
+async function sendAITrack(url, info) {
   try {
-    body = await request.json();
-  } catch (e) {
-    return json({ error: "请求体不是合法 JSON" }, 400);
-  }
-
-  const provider = (body.provider || "").trim();
-  const messages = body.messages || [];
-
-  if (!Array.isArray(messages) || !messages.length) {
-    return json({ error: "消息不能为空" }, 400);
-  }
-
-  const scene = (body.scene || "api").trim();
-  const sysPrompt = getSystemPrompt(scene);
-  const sysMsg = { role: "system", content: sysPrompt };
-  const finalMessages = [sysMsg].concat(messages);
-
-  let baseUrl, model, apiKey;
-
-  if (provider === "dots" || provider === "agnes" || provider === "bai") {
-    const cfg = getBuiltin(env)[provider];
-    if (!cfg.apiKey) {
-      return json({ error: `${provider} 内置 Key 未配置，请联系站长` }, 500);
-    }
-    baseUrl = cfg.baseUrl;
-    model = cfg.model;
-    apiKey = cfg.apiKey;
-  } else if (provider === "custom") {
-    baseUrl = (body.baseUrl || "").trim();
-    model = (body.model || "").trim();
-    apiKey = (body.apiKey || "").trim();
-    if (!baseUrl || !model || !apiKey) {
-      return json({ error: "自定义模式需填接口地址、模型名、API Key" }, 400);
-    }
-  } else {
-    return json({ error: "未知模型" }, 400);
-  }
-
-  const baseClean = baseUrl.replace(/\/+$/, "");
-  const url = /\/chat\/completions$/i.test(baseClean)
-    ? baseClean
-    : `${baseClean}/chat/completions`;
-
-  try {
-    const res = await fetch(url, {
+    await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-        "Cache-Control": "no-store",
-      },
-      body: JSON.stringify({ model, messages: finalMessages, stream: false }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        project: info.project,
+        scene: info.scene || "",
+        provider: info.provider || "",
+        status: info.status,
+        latency_ms: info.latency || 0,
+        tokens: info.tokens || 0,
+      }),
     });
-    const text = await res.text();
-    if (!res.ok) {
-      return json({ error: `HTTP ${res.status}: ${text.slice(0, 500)}` }, res.status);
+  } catch (e) { /* 埋点失败不影响主流程 */ }
+}
+
+// scene → 埋点 project（后台按项目聚合）
+function sceneToProject(scene) {
+  if (scene === "fj-sz") return "fj-sz";
+  if (scene === "shop") return "shop";
+  if (scene === "api") return "api";
+  if (scene === "learn") return "learn";
+  return "other";
+}
+
+export async function onRequestPost({ request, env, context }) {
+  const startedAt = Date.now();
+  const trackUrl = new URL(request.url).origin + "/api/ai-track";
+  const track = { project: "other", scene: "", provider: "", status: "fail", latency: 0, tokens: 0 };
+  let out = null; // 成功：{reply, provider}；失败：{error, statusCode}
+
+  try {
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      out = { error: "请求体不是合法 JSON", statusCode: 400 };
+      throw new Error("bad json");
     }
-    const data = JSON.parse(text);
-    const reply = data.choices?.[0]?.message?.content || "";
-    return json({ reply });
-  } catch (err) {
-    return json({ error: err.message }, 500);
+
+    const provider = (body.provider || "").trim();
+    const messages = body.messages || [];
+    if (!Array.isArray(messages) || !messages.length) {
+      out = { error: "消息不能为空", statusCode: 400 };
+      throw new Error("empty messages");
+    }
+
+    const scene = (body.scene || "api").trim();
+    track.scene = scene;
+    track.project = sceneToProject(scene);
+
+    const sysPrompt = getSystemPrompt(scene);
+    const finalMessages = [{ role: "system", content: sysPrompt }].concat(messages);
+    const channels = getChannels(env);
+
+    // custom：用户自填 key，透传，不参与 failover
+    if (provider === "custom") {
+      const baseUrl = (body.baseUrl || "").trim();
+      const model = (body.model || "").trim();
+      const apiKey = (body.apiKey || "").trim();
+      if (!baseUrl || !model || !apiKey) {
+        out = { error: "自定义模式需填接口地址、模型名、API Key", statusCode: 400 };
+        throw new Error("custom missing");
+      }
+      track.provider = "custom";
+      const r = await callChannel({ baseUrl, model, apiKey }, finalMessages);
+      track.status = "ok";
+      out = { reply: r.reply, provider: "custom" };
+    } else {
+      // 内置渠道：前端指定 → 用指定的；未指定 → 按 SCENE_ROUTING 优先级选
+      let target;
+      if (provider) {
+        target = findChannel(channels, provider);
+        if (!target) { out = { error: "未知模型", statusCode: 400 }; throw new Error("unknown provider"); }
+        if (!isUsable(target)) { out = { error: `${provider} 渠道当前不可用（key 未配或已停用）`, statusCode: 500 }; throw new Error("unusable"); }
+      } else {
+        const priority = SCENE_ROUTING[scene] || ["dots", "agnes", "bai"];
+        target = null;
+        for (const id of priority) {
+          const ch = findChannel(channels, id);
+          if (isUsable(ch)) { target = ch; break; }
+        }
+        if (!target) { out = { error: "没有可用的内置渠道，请联系站长", statusCode: 500 }; throw new Error("no channel"); }
+      }
+
+      // 主渠道 + fallback 备选，依次尝试
+      const tryList = [target.id].concat(target.fallback || []);
+      let lastErr = null;
+      let success = null;
+      for (const id of tryList) {
+        const ch = findChannel(channels, id);
+        if (!ch || !isUsable(ch)) continue;
+        try {
+          const r = await callChannel(ch, finalMessages);
+          success = { reply: r.reply, provider: ch.id };
+          track.provider = ch.id;
+          break;
+        } catch (err) { lastErr = err; }
+      }
+      if (success) {
+        track.status = "ok";
+        out = success;
+      } else {
+        out = { error: lastErr ? lastErr.message : "所有渠道均失败", statusCode: 500 };
+        throw lastErr || new Error("all failed");
+      }
+    }
+  } catch (e) {
+    if (!out) out = { error: e.message, statusCode: 500 };
   }
+
+  // 统一埋点（异步，不阻塞响应）
+  track.latency = Date.now() - startedAt;
+  if (context && context.waitUntil) {
+    context.waitUntil(sendAITrack(trackUrl, track));
+  }
+
+  // 统一返回
+  if (out && out.reply != null) {
+    return json({ reply: out.reply, provider: out.provider });
+  }
+  return json({ error: (out && out.error) || "未知错误" }, (out && out.statusCode) || 500);
 }
