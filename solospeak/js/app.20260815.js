@@ -1,4 +1,4 @@
-// app.js — SPA 主逻辑（今天 / 声音日志 / 导出）
+﻿// app.js — SPA 主逻辑（今天 / 声音日志 / 导出）
 import {
   putRecording, getAllRecordings, deleteRecording, setFavorite, getMeta, putMeta,
 } from './db.js';
@@ -125,9 +125,9 @@ async function renderHome() {
     const txt = document.getElementById('topicText');
     if (!ai) return;
     const cfg = ai.load();
-    if (!cfg.enabled || !cfg.key || !cfg.baseUrl || !cfg.model) {
+    if (cfg.customEnabled && (!cfg.key || !cfg.baseUrl || !cfg.model)) {
       ai.openSettings();
-      toast('想用 AI 出题？先点右上角 ⚙ 填一个自备 Key');
+      toast('自定义 AI 未配置完整：请填 API Base URL / Key / 模型名，或取消勾选「启用自定义 AI 引导」用内置 AI');
       return;
     }
     if (btn) { btn.disabled = true; btn.textContent = '✨ 出题中…'; }
