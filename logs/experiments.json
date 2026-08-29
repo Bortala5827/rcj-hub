@@ -1,6 +1,13 @@
 {
-  "updated": "2026-08-28",
+  "updated": "2026-08-29",
   "experiments": [
+    {
+      "date": "2026-08-29",
+      "title": "两站浏览器标签/SEO 定位混乱修正",
+      "summary": "955827.xyz 原 title「考试题库与面试练习工具」越界到 Exam Hub 定位，改为「RCJ Lab · 个人产品实验室」+ 描述强调 SoloSpeak/LetOut/API/资产；exam.955827.xyz 原 title「深圳辅警面试真题题库」过窄，改为「RCJ Exam Hub · 公考辅警消防题库 + Learn 知识卡」+ 描述覆盖辅警/消防/国考/省考/事业编 + Learn。两站 JSON-LD schema 同步对齐。",
+      "type": "refactor",
+      "tags": ["seo", "brand", "title", "meta"]
+    },
     {
       "date": "2026-08-29",
       "title": "API 导航页加腾讯混元 + AI 助手选型能力升级",
@@ -48,7 +55,7 @@
       "title": "now 通勤实验冷启动优化",
       "summary": "主数字从「此刻正在通勤」（瞬时值，冷启动长期挂 0）改为「今日完成通勤」（累计值 doneToday）；瞬时 active 降级为副行，仅在 >0 时显示「此刻路上 N 人」；无人在途时副行显示今日平均时长；新增今日各小时完成人数迷你折线图（复用已有 m-spark 样式）；commute.js 改用文件名版本 commute-20260827.js 替代 ?v= 缓存参数。",
       "type": "feature",
-      "tags": ["hub", "commute", "ui"]
+      "tags": ["now", "commute", "ux"]
     },
     {
       "date": "2026-08-26",
