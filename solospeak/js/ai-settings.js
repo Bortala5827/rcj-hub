@@ -151,6 +151,17 @@
         }
       });
     }
+    // API Key 显示/隐藏切换
+    var keyToggleBtn = document.getElementById('aiApiKeyToggle');
+    if (keyToggleBtn) {
+      keyToggleBtn.addEventListener('click', function () {
+        var input = document.getElementById('aiApiKey');
+        if (!input) return;
+        var isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        keyToggleBtn.textContent = isPassword ? '🙈' : '👁';
+      });
+    }
 
     if (saveBtn) saveBtn.addEventListener('click', function () {
       var s = {

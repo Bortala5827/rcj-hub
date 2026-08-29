@@ -335,6 +335,14 @@ select { width: 100%; }
   font-size: 13px; color: var(--ink); font-family: inherit;
 }
 .ai-field input:focus { outline: none; border-color: var(--accent-soft); }
+.ai-key-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; margin-top: 5px; margin-left: 4px;
+  background: none; border: 1px solid var(--line); border-radius: 6px;
+  cursor: pointer; font-size: 12px; color: var(--muted);
+  transition: all .15s; vertical-align: top;
+}
+.ai-key-toggle:hover { border-color: var(--accent-soft); color: var(--ink); }
 .ai-tut { font-size: 12px; color: var(--muted); margin: 2px 0 12px; }
 .ai-tut a { color: var(--accent); text-decoration: none; }
 .ai-tut a:hover { text-decoration: underline; }
