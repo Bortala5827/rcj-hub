@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -384,7 +384,7 @@
     .ai-close:hover { color:#fff; background:rgba(255,255,255,.15); }
     .ai-model-section { overflow:hidden; transition:max-height .3s ease, opacity .2s ease; max-height:600px; opacity:1; }
     .ai-model-section.collapsed { max-height:0; opacity:0; }
-    .ai-model-grid { display:flex; flex-direction:column; gap:5px; padding:14px; justify-content:center; align-items:center; border-bottom:1px solid var(--line); }
+    .ai-model-grid { position:relative; display:grid; grid-template-columns:74px 74px; gap:5px; padding:14px 14px 8px; justify-content:center; border-bottom:1px solid var(--line); }
     .ai-model-row { display:flex; flex-direction:row; gap:5px; }
     .ai-model-card {
       width:74px; height:74px; outline:none; border:none; background:white;
@@ -396,7 +396,10 @@
     .ai-card-dots { border-radius:74px 5px 5px 5px; }
     .ai-card-agnes { border-radius:5px 74px 5px 5px; }
     .ai-card-bai { border-radius:5px 5px 5px 74px; }
-    .ai-card-custom { border-radius:5px 5px 74px 5px; }
+    .ai-card-sensenova { border-radius:5px 5px 74px 5px; }
+    .ai-card-sensenova .ai-card-text { color:#f59e0b; }
+    .ai-card-sensenova:hover, .ai-card-sensenova.active { background:#f59e0b; }
+    .ai-card-custom { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); border-radius:50%; width:58px; height:58px; z-index:2; box-shadow:rgba(50,50,93,.35) 0 4px 10px -1px, rgba(0,0,0,.4) 0 2px 5px -1px; }
     .ai-card-dots .ai-card-text { color:#667eea; }
     .ai-card-agnes .ai-card-text { color:#0ea5e9; }
     .ai-card-bai .ai-card-text { color:#6366f1; }
@@ -614,28 +617,12 @@
       </div>
       <div class="ai-model-section" id="aiModelSection">
       <div class="ai-model-grid">
-        <div class="ai-model-row">
-          <label class="ai-model-card ai-card-dots active" data-model="dots">
-            <span class="ai-card-text">dots</span>
-            <input type="radio" name="aiModel" value="dots" checked hidden>
-          </label>
-          <label class="ai-model-card ai-card-agnes" data-model="agnes">
-            <span class="ai-card-text">Agnes</span>
-            <input type="radio" name="aiModel" value="agnes" hidden>
-          </label>
-        </div>
-        <div class="ai-model-row">
-          <label class="ai-model-card ai-card-bai" data-model="bai">
-            <span class="ai-card-text">b.ai</span>
-            <input type="radio" name="aiModel" value="bai" hidden>
-          </label>
-          <label class="ai-model-card ai-card-custom" data-model="custom">
-            <span class="ai-card-text">DIY</span>
-            <input type="radio" name="aiModel" value="custom" hidden>
-          </label>
-        </div>
-      </div>
-      <div class="ai-custom-row" id="aiCustomRow" hidden>
+        <label class="ai-model-card ai-card-dots active" data-model="dots"><span class="ai-card-text">dots</span><input type="radio" name="aiModel" value="dots" checked hidden></label>
+        <label class="ai-model-card ai-card-agnes" data-model="agnes"><span class="ai-card-text">Agnes</span><input type="radio" name="aiModel" value="agnes" hidden></label>
+        <label class="ai-model-card ai-card-bai" data-model="bai"><span class="ai-card-text">b.ai</span><input type="radio" name="aiModel" value="bai" hidden></label>
+        <label class="ai-model-card ai-card-sensenova" data-model="sensenova"><span class="ai-card-text">SenseNova</span><input type="radio" name="aiModel" value="sensenova" hidden></label>
+        <label class="ai-model-card ai-card-custom" data-model="custom"><span class="ai-card-text">DIY</span><input type="radio" name="aiModel" value="custom" hidden></label>
+      </div><div class="ai-custom-row" id="aiCustomRow" hidden>
         <div class="ai-custom-inputs">
           <input type="text" id="aiBase" placeholder="接口地址 https://.../v1" autocomplete="off">
           <div class="ai-custom-row2">
@@ -738,7 +725,7 @@
           <a class="ac-btn" href="https://dots.ai/platform/apikeys" target="_blank" rel="noopener">申请</a>
         </div>
         <div class="alt-card">
-          <div class="ac-head"><span class="ac-name">商汤日日新</span><span class="ac-free">限时免费</span></div>
+          <div class="ac-head"><span class="ac-name">SenseNova</span><span class="ac-free">限时免费</span></div>
           <p class="ac-desc">SenseChat-5 系列，支持多模态，Token Plan 限时免费。</p>
           <a class="ac-btn" href="https://www.sensenova.cn/token-plan" target="_blank" rel="noopener">申请</a>
         </div>
@@ -945,7 +932,7 @@
     var aiCurrentModel = document.getElementById("aiCurrentModel");
     var aiSwitch = document.getElementById("aiSwitch");
     var aiHistory = [];
-    var MODEL_LABELS = { dots: "dots", agnes: "Agnes", bai: "b.ai", custom: "DIY" };
+    var MODEL_LABELS = { dots: "dots", agnes: "Agnes", bai: "b.ai", sensenova: "SenseNova", custom: "DIY" };
     (function restoreAi() {
       var c = aiGetConfig();
       if (c.model) {

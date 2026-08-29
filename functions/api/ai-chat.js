@@ -7,7 +7,7 @@
 // ── 渠道配置表 ──────────────────────────────────────────────
 // status: ok 可用 | unstable 不稳（可用但优先走备选）| disabled 停用
 // key 未配自动视为不可用。failover：主渠道失败时依次尝试备选。
-// 统一国内渠道：dots / agnes / 商汤日日新 / b.ai / custom（已删 Gemini、Groq）
+// 统一国内渠道：dots / agnes / SenseNova / b.ai / custom（已删 Gemini、Groq）
 function getChannels(env) {
   return [
     {
@@ -28,7 +28,7 @@ function getChannels(env) {
       fallback: ["dots", "sensenova", "bai"],
     },
     {
-      id: "sensenova", name: "商汤日日新",
+      id: "sensenova", name: "SenseNova",
       baseUrl: env.SENSENOVA_BASE || "https://token.sensenova.cn/v1",
       model: env.SENSENOVA_MODEL || "sensenova-6.8-flash-lite",
       apiKey: env.SENSENOVA_API_KEY || "",
