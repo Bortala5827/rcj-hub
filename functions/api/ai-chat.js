@@ -339,7 +339,16 @@ export async function onRequestPost({ request, env, context }) {
       if (provider) {
         target = findChannel(channels, provider);
         if (!target) { out = { error: "未知模型", statusCode: 400 }; throw new Error("unknown provider"); }
-        if (!isUsable(target)) { out = { error: `${provider} 渠道当前不可用（key 未配或已停用）`, statusCode: 500 }; throw new Error("unusable"); }
+        // 指定渠道不可用时，自动降级到场景默认渠道（不报错，用户无感知）
+        if (!isUsable(target)) {
+          const priority = SCENE_ROUTING[scene] || ["dots", "agnes", "bai"];
+          target = null;
+          for (const id of priority) {
+            const ch = findChannel(channels, id);
+            if (isUsable(ch)) { target = ch; break; }
+          }
+          if (!target) { out = { error: "没有可用的内置渠道，请联系站长", statusCode: 500 }; throw new Error("no channel"); }
+        }
       } else {
         const priority = SCENE_ROUTING[scene] || ["dots", "agnes", "bai"];
         target = null;
