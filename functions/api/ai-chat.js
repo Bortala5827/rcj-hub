@@ -7,7 +7,7 @@
 // ── 渠道配置表 ──────────────────────────────────────────────
 // status: ok 可用 | unstable 不稳（可用但优先走备选）| disabled 停用
 // key 未配自动视为不可用。failover：主渠道失败时依次尝试备选。
-// 预留位：商汤日日新（原记作 deepseek）、groq 极速 —— 配 key 后加一条并改 status:'ok' 即可。
+// 统一国内渠道：dots / agnes / 商汤日日新 / b.ai / custom（已删 Gemini、Groq）
 function getChannels(env) {
   return [
     {
@@ -16,7 +16,7 @@ function getChannels(env) {
       model: "dots3-note-prev",
       apiKey: env.DOTS_API_KEY || "",
       status: "ok",
-      fallback: ["agnes", "bai"],
+      fallback: ["agnes", "sensenova", "bai"],
     },
     {
       id: "agnes", name: "Agnes",
@@ -24,7 +24,15 @@ function getChannels(env) {
       model: "agnes-2.5-flash",
       apiKey: env.AGNES_API_KEY || "",
       status: "ok",
-      fallback: ["dots", "bai"],
+      fallback: ["dots", "sensenova", "bai"],
+    },
+    {
+      id: "sensenova", name: "商汤日日新",
+      baseUrl: env.SENSENOVA_BASE || "https://api.sensenova.cn/v1",
+      model: env.SENSENOVA_MODEL || "deepseek-chat",
+      apiKey: env.SENSENOVA_API_KEY || "",
+      status: "ok",
+      fallback: ["dots", "agnes", "bai"],
     },
     {
       id: "bai", name: "b.ai",
@@ -32,7 +40,7 @@ function getChannels(env) {
       model: "deepseek-v4-flash",
       apiKey: env.BAI_API_KEY || "",
       status: "ok",
-      fallback: ["dots", "agnes"],
+      fallback: ["dots", "agnes", "sensenova"],
     },
   ];
 }
@@ -182,10 +190,10 @@ function getSystemPrompt(scene) {
 // 高质量场景（fj-sz/learn）优先质量渠道；低需求场景（api/shop）可走固定/免费渠道。
 // 调整分发只需改这个表，不动主逻辑。
 const SCENE_ROUTING = {
-  "fj-sz": ["dots", "agnes", "bai"],   // 高质量：辅警备考
-  "learn": ["dots", "agnes", "bai"],    // 高质量：你懂的知识卡/发散
-  "api":   ["bai", "dots", "agnes"],    // 低需求：API 导航，免费优先
-  "shop":  ["dots"],                      // 固定：定制顾问
+  "fj-sz": ["dots", "agnes", "sensenova", "bai"],   // 高质量：辅警备考
+  "learn": ["dots", "agnes", "sensenova", "bai"],    // 高质量：你懂的知识卡/发散
+  "api":   ["bai", "dots", "agnes", "sensenova"],    // 低需求：API 导航，免费优先
+  "shop":  ["dots"],                                    // 固定：定制顾问
 };
 
 // ── 工具函数 ────────────────────────────────────────────────
