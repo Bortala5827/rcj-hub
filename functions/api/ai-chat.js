@@ -15,6 +15,7 @@ function getChannels(env) {
       baseUrl: "https://note3-prev-api.askdiandian.com/v1",
       model: "dots3-note-prev",
       apiKey: env.DOTS_API_KEY || "",
+      authType: "api-key",
       status: "ok",
       fallback: ["agnes", "sensenova", "bai"],
     },
@@ -228,13 +229,18 @@ async function callChannel(ch, messages) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 30000);
   try {
+    const headers = {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    };
+    if (ch.authType === "api-key") {
+      headers["api-key"] = ch.apiKey;
+    } else {
+      headers["Authorization"] = `Bearer ${ch.apiKey}`;
+    }
     const res = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${ch.apiKey}`,
-        "Cache-Control": "no-store",
-      },
+      headers,
       body: JSON.stringify({ model: ch.model, messages, stream: false }),
       signal: ctrl.signal,
     });
