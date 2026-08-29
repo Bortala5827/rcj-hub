@@ -1,4 +1,4 @@
-// /api/ai-chat —— 统一 AI 对话入口（955827.xyz 平台聚合）
+﻿// /api/ai-chat —— 统一 AI 对话入口（955827.xyz 平台聚合）
 // 设计：渠道配置表（按渠道登记，模型可热更新）+ scene 提示词表 + 自动 failover + 超时
 // 前端协议不变：POST {provider, scene, messages} → {reply, provider} / {error}
 // Key 存在 Cloudflare Pages Secrets（环境变量），代码不留明文。custom 由前端透传。
@@ -17,7 +17,7 @@ function getChannels(env) {
       apiKey: env.DOTS_API_KEY || "",
       authType: "api-key",
       status: "ok",
-      fallback: ["agnes", "sensenova", "bai"],
+      fallback: ["agnes", "sensenova", "bai", "groq"],
     },
     {
       id: "agnes", name: "Agnes",
@@ -25,7 +25,7 @@ function getChannels(env) {
       model: "agnes-2.5-flash",
       apiKey: env.AGNES_API_KEY || "",
       status: "ok",
-      fallback: ["dots", "sensenova", "bai"],
+      fallback: ["dots", "sensenova", "bai", "groq"],
     },
     {
       id: "sensenova", name: "SenseNova",
@@ -33,7 +33,7 @@ function getChannels(env) {
       model: env.SENSENOVA_MODEL || "sensenova-6.8-flash-lite",
       apiKey: env.SENSENOVA_API_KEY || "",
       status: "ok",
-      fallback: ["dots", "agnes", "bai"],
+      fallback: ["dots", "agnes", "bai", "groq"],
     },
     {
       id: "bai", name: "b.ai",
@@ -41,7 +41,7 @@ function getChannels(env) {
       model: "deepseek-v4-flash",
       apiKey: env.BAI_API_KEY || "",
       status: "ok",
-      fallback: ["dots", "agnes", "sensenova"],
+      fallback: ["dots", "agnes", "sensenova", "groq"],
     },
     {
       id: "groq", name: "Groq",
