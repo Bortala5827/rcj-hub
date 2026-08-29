@@ -388,3 +388,20 @@ export async function onRequestPost({ request, env, context }) {
   }
   return json({ error: (out && out.error) || "未知错误" }, (out && out.statusCode) || 500);
 }
+
+// GET：渠道状态 + 使用说明（直接访问 URL 时显示）
+export async function onRequestGet({ env }) {
+  const channels = getChannels(env).map(c => ({
+    id: c.id,
+    name: c.name,
+    hasKey: !!c.apiKey,
+    status: c.status,
+  }));
+  return json({
+    status: "ok",
+    message: "AI 统一对话端点（POST /api/ai-chat），国内渠道自动降级",
+    channels,
+    scenes: ["fj-sz（深圳辅警）", "learn（你懂的知识卡）", "api（大模型导航）", "shop（定制顾问）"],
+    usage: "POST body: { scene: 'fj-sz', message: '你好', history: [] }",
+  });
+}
