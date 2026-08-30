@@ -6,6 +6,28 @@
   <meta name="robots" content="noindex, nofollow">
   <title>RCJ Admin · 统一后台</title>
   <style>
+    /* ── 移动端客服面板底部安全区适配 ── */
+    @media (max-width: 768px) {
+      /* 确保底部不被手机浏览器下栏遮挡（iOS Safari 100vh 陷阱） */
+      .panel { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); }
+      #content { padding-bottom: env(safe-area-inset-bottom, 0px); }
+    }
+    /* 高亮滚动到目标会话 */
+    tr.conv-active-row td { background: #f0fdfa !important; border-left: 3px solid #0d9488; }
+    /* 访问分析重点板块 */
+    .traffic-focus { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:16px; }
+    .focus-card { background:linear-gradient(135deg,#f8fafc,#f1f5f9); border:1px solid #e5e7eb; border-radius:12px; padding:16px 18px; position:relative; overflow:hidden; }
+    .focus-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--fc,#0d9488); }
+    .focus-card .fc-name { font-size:13px; color:#6b7280; margin-bottom:6px; }
+    .focus-card .fc-num  { font-size:28px; font-weight:700; color:#111827; line-height:1; }
+    .focus-card .fc-sub  { font-size:11px; color:#9ca3af; margin-top:6px; }
+    .focus-card.hot { background:linear-gradient(135deg,#fef3c7,#fde68a); border-color:#f59e0b; }
+    .focus-card.hot .fc-num { color:#92400e; }
+    /* 通勤合并后的 tab */
+    .commute-tabs { display:flex; gap:8px; margin-bottom:14px; border-bottom:1px solid var(--line); padding-bottom:10px; }
+    .commute-tabs button { padding:6px 14px; border:1px solid var(--line); background:#fff; border-radius:20px; font-size:13px; cursor:pointer; }
+    .commute-tabs button.active { background:#0d9488; color:#fff; border-color:#0d9488; }
+
     :root{
       --bg:#f1f5f9; --surface:#fff; --text:#0f172a; --muted:#64748b; --line:#e2e8f0;
       --sb:#0f172a; --sb2:#1e293b; --sb-text:#cbd5e1; --sb-muted:#64748b;
@@ -185,11 +207,11 @@
       <div class="sb-item" data-page="facetalk"><span class="ico">💬</span>FaceTalk</div>
       <div class="sb-item" data-page="aux"><span class="ico">🛡️</span>辅警题库</div>
       <div class="sb-item" data-page="sites"><span class="ico">🌐</span>站点导航</div>
-      <div class="sb-item" data-page="commute"><span class="ico">🚇</span>此刻通勤</div>
-      <div class="sb-item" data-page="commutechat"><span class="ico">💬</span>通勤聊天</div>
+      <div class="sb-item" data-page="commute"><span class="ico">🚇</span>通勤（含聊天）</div>
+      <div class="sb-item" data-page="traffic"><span class="ico">📊</span>访问分析</div>
       <div class="sb-item" data-page="wall"><span class="ico">🗒️</span>留言墙</div>
-      <div class="sb-item" data-page="ai"><span class="ico">🤖</span>AI 监控</div>
-      <div class="sb-item" data-page="support"><span class="ico">💬</span>客服管理</div>
+      <div class="sb-item" data-page="ai"><span class="ico">🤖</span>AI 调用</div>
+      <div class="sb-item" data-page="support"><span class="ico">💬</span>客服系统</div>
     </nav>
     <div class="sb-foot">
       <div id="genTime">—</div>
@@ -296,11 +318,28 @@ function renderPage(p){
   else if(p==='facetalk') renderFaceTalk();
   else if(p==='aux') renderAux();
   else if(p==='sites') renderSites();
-  else if(p==='commute') renderCommute();
-  else if(p==='commutechat') renderCommuteChat();
+  else if(p==='commute') { if(commuteTab==='chat') renderCommuteChat(); else renderCommute(); }
   else if(p==='wall') renderWallMgmt();
   else if(p==='ai') renderAI();
   else if(p==='support') renderSupport();
+  else if(p==='traffic') renderTraffic();
+}
+
+// 邮件/直达链接：站外跳转进客服管理并定位到具体会话
+// ?conversation=xxx 或 ?page=support&conversation=xxx
+function handleDeepLink(){
+  const url = new URL(location.href);
+  const conv = url.searchParams.get('conversation');
+  const wantSupport = conv || url.searchParams.get('page') === 'support';
+  if (wantSupport) {
+    currentPage = 'support';
+    document.querySelectorAll('.sb-item').forEach(x => x.classList.toggle('active', x.dataset.page === 'support'));
+    document.getElementById('pageTitle').textContent = '客服管理';
+    renderSupport();
+    if (conv) {
+      window._pendingConvId = conv;
+    }
+  }
 }
 
 // ---------- AI 监控 ----------
@@ -582,8 +621,12 @@ async function renderCommute(){
   cards.forEach(x=>html+='<div class="stat '+x[0]+'"><div class="stat-num">'+x[1]+'</div><div class="stat-label">'+x[2]+'</div>'+(x[3]?'<div class="stat-sub">'+x[3]+'</div>':'')+'</div>');
   html+='</div>';
 
-  html+='<div class="panel"><h3>🚇 此刻通勤 · 数据管理</h3>'
-    +'<p class="small muted">场景名为 <code>commute</code>，主表存 rcj-analytics-d1 的 <code>moments</code>，连带 <code>commute_chat</code>（聊天）和 <code>commute_chat_rl</code>（限流）。清空会一并删除，<b>不可逆</b>。聊天逐条删除请去「💬 通勤聊天」。</p>'
+  html+='<div class="panel"><h3>🚇 通勤 · 此刻通勤数据</h3>'
+    +'<div class="commute-tabs">'
+    +'<button class="'+(commuteTab==='moment'?'active':'')+'" onclick="setCommuteTab(\'moment\')">此刻通勤数据</button>'
+    +'<button class="'+(commuteTab==='chat'?'active':'')+'" onclick="setCommuteTab(\'chat\')">通勤聊天</button>'
+    +'</div>'
+    +'<p class="small muted">场景名为 <code>commute</code>，主表存 rcj-analytics-d1 的 <code>moments</code>，连带 <code>commute_chat</code>（聊天）和 <code>commute_chat_rl</code>（限流）。清空会一并删除，<b>不可逆</b>。聊天逐条删除请切到「通勤聊天」tab。</p>'
     +'<div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">'
     +'<button class="btn" onclick="loadCommute()">↻ 刷新</button>'
     +'<button class="btn primary" onclick="clearCommute()">🗑 清空全部记录</button>'
@@ -670,6 +713,13 @@ async function delWall(id){
 
 // ---------- 通勤聊天（commute 页面 chat 表） ----------
 let _ccCache = [];
+// 通勤板块内的子视图：'moment'（此刻通勤数据） / 'chat'（通勤聊天）
+let commuteTab = 'moment';
+function setCommuteTab(tab){
+  commuteTab = tab;
+  if(tab === 'chat') renderCommuteChat();
+  else renderCommute();
+}
 async function renderCommuteChat(){
   const c=document.getElementById('content');
   c.innerHTML='<div class="loading">读取中…</div>';
@@ -686,7 +736,11 @@ async function renderCommuteChat(){
 function drawCommuteChat(){
   const c=document.getElementById('content');
   const list=_ccCache||[];
-  let html='<div class="panel"><h3>💬 通勤聊天</h3>'
+  let html='<div class="panel"><h3>🚇 通勤 · 聊天记录</h3>'
+    +'<div class="commute-tabs">'
+    +'<button class="'+(commuteTab==='moment'?'active':'')+'" onclick="setCommuteTab(\'moment\')">此刻通勤数据</button>'
+    +'<button class="'+(commuteTab==='chat'?'active':'')+'" onclick="setCommuteTab(\'chat\')">通勤聊天</button>'
+    +'</div>'
     +'<p class="small muted">commute 页「此刻同行」聊天记录，存 rcj-analytics-d1 · commute_chat 表，共 '+list.length+' 条（最近 100）。</p>'
     +'<div style="margin:14px 0;display:flex;gap:10px;flex-wrap:wrap">'
     +'<button class="btn" onclick="renderCommuteChat()">↻ 刷新</button>'
@@ -842,7 +896,7 @@ async function renderSupport(){
   html += '<div class="stat"><div class="stat-num" style="color:'+(healthOk?'var(--ok)':'var(--danger)')+'">'+(healthOk?'正常':'异常')+'</div><div class="stat-label">服务状态</div></div>';
   html += '<div class="stat"><div class="stat-num" id="supportConvCount">—</div><div class="stat-label">进行中会话</div></div>';
   html += '<div class="stat"><div class="stat-num" id="supportTodayCount">—</div><div class="stat-label">今日新增</div></div>';
-  html += '<div class="stat"><div class="stat-num"><a href="https://955827.xyz/admin" target="_blank" style="color:var(--accent)">完整后台 →</a></div><div class="stat-label">高级功能</div></div>';
+  html += '<div class="stat"><div class="stat-num"><a href="https://support.955827.xyz/admin.html" target="_blank" rel="noopener" style="color:var(--accent)">完整后台 →</a></div><div class="stat-label">客服独立后台</div></div>';
   html += '</div>';
   
   // 登录区域
@@ -889,7 +943,7 @@ async function supportLogin(){
       localStorage.setItem('rcj_support_token', supportToken);
       renderSupport();
     } else {
-      alert('登录失败：' + (data.error?.message || '未知错误'));
+      alert('登录失败：' + ((data.error && data.error.message) || '未知错误'));
     }
   } catch(e) {
     alert('登录失败：' + e.message);
@@ -923,10 +977,12 @@ async function loadSupportConversations(){
       return;
     }
     let html = '<table><thead><tr><th>访客</th><th>渠道</th><th>状态</th><th>最后消息</th><th>时间</th><th>操作</th></tr></thead><tbody>';
+    let pendingId = window._pendingConvId || '';
     supportConversations.forEach(conv => {
       const channelName = conv.channelAccountId.includes('telegram') ? 'Telegram' : '网页';
       const statusBadge = conv.status === 'open' ? '<span style="color:var(--ok)">进行中</span>' : '<span style="color:var(--muted)">已解决</span>';
-      html += '<tr>';
+      const isTarget = (pendingId && conv.id === pendingId);
+      html += '<tr class="conv-item' + (isTarget ? ' conv-active-row' : '') + '">';
       html += '<td>' + esc(conv.contactName || '匿名') + '</td>';
       html += '<td>' + channelName + '</td>';
       html += '<td>' + statusBadge + '</td>';
@@ -937,6 +993,14 @@ async function loadSupportConversations(){
     });
     html += '</tbody></table>';
     list.innerHTML = html;
+    // 深链定位：若有待定位会话，自动选中并展开聊天面板
+    if(pendingId){
+      const targetConv = supportConversations.find(c => c.id === pendingId);
+      if(targetConv){
+        supportSelectConv(pendingId);
+        window._pendingConvId = '';
+      }
+    }
   } catch(e) {
     document.getElementById('supportConvList').innerHTML = '<div class="err-box">加载失败：' + e.message + '</div>';
   }
@@ -998,6 +1062,105 @@ async function supportSendMessage(){
   } catch(e) {
     alert('发送失败：' + e.message);
   }
+}
+
+// ---------- 访问分析 ----------
+function renderTraffic(){
+  const d = DATA, AN = d.analytics || {series:[],allVisits:0};
+  const seriesMap = {};
+  (AN.series||[]).forEach(s => seriesMap[s.site] = s);
+  const getS = function(site){ const s = seriesMap[site]; return s ? s.total : 0; };
+  const getU = function(site){ const s = seriesMap[site]; return s ? s.u : 0; };
+  const getD = function(site){ const s = seriesMap[site]; return s ? s.d : 0; };
+  const esc2 = function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
+
+  // 重点板块：exam 系列（你懂的、辅警、shop 均归入 exam）、api 页、facetalk
+  var html = '';
+  html += '<div class="traffic-focus">';
+  // exam 系列（你懂的 / 辅警 / shop 共用 exam 统计）
+  html += '<div class="focus-card" style="--fc:#d81b60"><div class="fc-name">📚 Exam 系列（你懂的/辅警/shop）</div>'
+    + '<div class="fc-num">' + getS('exam') + '</div>'
+    + '<div class="fc-sub">' + getU('exam') + ' 访客 · ' + getD('exam') + ' 天 · 占全站 ' + (AN.allVisits ? Math.round(getS('exam')/AN.allVisits*100) : 0) + '%</div></div>';
+  // 辅警（aux）
+  html += '<div class="focus-card" style="--fc:#1e88e5"><div class="fc-name">🛡️ 辅警题库</div>'
+    + '<div class="fc-num">' + getS('aux') + '</div>'
+    + '<div class="fc-sub">' + getU('aux') + ' 访客 · ' + getD('aux') + ' 天</div></div>';
+  // API 页（无独立 site，从 hub 总流量中估算暂无独立统计）
+  html += '<div class="focus-card" style="--fc:#2e7d32"><div class="fc-name">🌐 RCJ Lab（含 API 页）</div>'
+    + '<div class="fc-num">' + getS('hub') + '</div>'
+    + '<div class="fc-sub">' + getU('hub') + ' 访客 · ' + getD('hub') + ' 天</div></div>';
+  // FaceTalk
+  html += '<div class="focus-card" style="--fc:#8e24aa"><div class="fc-name">💬 FaceTalk 面试搭子</div>'
+    + '<div class="fc-num">' + getS('facetalk') + '</div>'
+    + '<div class="fc-sub">' + getU('facetalk') + ' 访客 · ' + getD('facetalk') + ' 天</div></div>';
+  html += '</div>';
+
+  // 全站趋势图（复用原 overview 的 multiLineChart）
+  var ALL_SITES = ['aux','xf','facetalk','hub','solospeak','letout','training','exam'];
+  var fullSeries = [];
+  ALL_SITES.forEach(function(site){
+    if(seriesMap[site]) fullSeries.push(seriesMap[site]);
+    else fullSeries.push({site:site,points:[],total:0,u:0,d:0});
+  });
+  html += '<div class="panel"><div class="panel-hd"><h3>全站浏览趋势 <span class="tag">rcj-analytics-d1</span></h3>'
+    + '<span class="range-tabs">'
+    + '<button onclick="setTrendDays(7)" class="'+(trendDays===7?'active':'')+'">7天</button>'
+    + '<button onclick="setTrendDays(14)" class="'+(trendDays===14?'active':'')+'">14天</button>'
+    + '<button onclick="setTrendDays(30)" class="'+(trendDays===30?'active':'')+'">30天</button>'
+    + '</span></div>' + multiLineChart(fullSeries, trendDays) + '</div>';
+
+  // 各站点累计流量排序
+  var sorted = ALL_SITES.slice().sort(function(a,b){ return getS(b) - getS(a); });
+  html += '<div class="panel"><h3>各站点累计流量</h3><div class="site-stats">';
+  var any = false;
+  sorted.forEach(function(site){
+    var s = seriesMap[site]; if(!s || !s.total) return;
+    any = true;
+    var col = {'aux':'#1e88e5','xf':'#ef6c00','facetalk':'#8e24aa','hub':'#2e7d32','solospeak':'#00897b','letout':'#6d4c41','training':'#c0ca33','exam':'#d81b60'}[site]||'#64748b';
+    var label = {'aux':'辅警题库','xf':'消防题库','facetalk':'FaceTalk','hub':'RCJ Lab','solospeak':'SoloSpeak','letout':'LetOut','training':'RCJ Training','exam':'Exam Hub'}[site]||site;
+    html += '<div class="ss-item"><span class="ss-dot" style="background:'+col+'"></span><span class="ss-name">'+label+'</span><span class="ss-num">'+s.total+'</span><span class="ss-sub">'+s.u+' 访客 / '+s.d+' 天</span></div>';
+  });
+  if(!any) html += '<div class="empty">暂无浏览数据（埋点已部署，访问各站点后开始累计）</div>';
+  html += '</div></div>';
+
+  // 客服系统调用量（从 supportly D1 拉，但 data.js 未聚合，写个 KPI 卡片说明）
+  html += '<div class="panel"><h3>📞 客服系统</h3><p class="small muted">客服数据请前往侧栏「客服系统」页面查看详情（会话数、消息量、邮件提醒等）。此处汇总浏览数据不包含客服 API 调用量。</p>'
+    + '<div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">'
+    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px"><div class="fc-name">服务状态</div><div class="fc-num" style="font-size:22px;color:#0d9488">✅ 正常</div><div class="fc-sub">support.955827.xyz</div></div>'
+    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px"><div class="fc-name">管理后台</div><div class="fc-num" style="font-size:22px;color:#0d9488"><a href="https://support.955827.xyz/admin.html" target="_blank" style="text-decoration:none;color:inherit">进入 →</a></div><div class="fc-sub">独立客服后台</div></div>'
+    + '</div></div>';
+
+  // AI 调用数据（直接从 data.ai 取）
+  var ai = d.ai || {total:0,ok:0,fail:0,successRate:0,byProject:{},byProvider:{}};
+  html += '<div class="panel"><h3>🤖 AI 调用数据</h3><div class="stats">'
+    + '<div class="stat ft"><div class="stat-num">' + ai.total + '</div><div class="stat-label">总调用</div></div>'
+    + '<div class="stat ft"><div class="stat-num" style="color:var(--ok)">' + ai.ok + '</div><div class="stat-label">成功</div></div>'
+    + '<div class="stat ft"><div class="stat-num" style="color:var(--danger)">' + ai.fail + '</div><div class="stat-label">失败</div></div>'
+    + '<div class="stat ft"><div class="stat-num">' + ai.successRate + '%</div><div class="stat-label">成功率</div></div>'
+    + '</div>';
+
+  // 按项目/Provider 细分
+  function renderTable(title, data){
+    var h = '';
+    var keys = Object.keys(data || {});
+    if(!keys.length){ h += '<p class="small muted">暂无数据</p>'; return h; }
+    h += '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="text-align:left;border-bottom:1px solid var(--line)"><th style="padding:8px">名称</th><th style="padding:8px">总量</th><th style="padding:8px">成功</th><th style="padding:8px">失败</th><th style="padding:8px">成功率</th></tr>';
+    keys.sort(function(a,b){return (data[b].total||0)-(data[a].total||0);}).forEach(function(k){
+      var s = data[k]; var rate = s.total ? Math.round(s.ok/s.total*100) : 0;
+      h += '<tr style="border-bottom:1px solid var(--line)"><td style="padding:8px;font-weight:600">' + esc2(k||'unknown') + '</td><td style="padding:8px">' + s.total + '</td><td style="padding:8px;color:var(--ok)">' + s.ok + '</td><td style="padding:8px;color:var(--danger)">' + s.fail + '</td><td style="padding:8px">' + rate + '%</td></tr>';
+    });
+    h += '</table>';
+    return h;
+  }
+  html += '<div class="grid-2">';
+  html += '<div class="panel"><h4>按项目</h4><div class="panel-inset">' + renderTable('按项目', ai.byProject) + '</div></div>';
+  html += '<div class="panel"><h4>按 Provider</h4><div class="panel-inset">' + renderTable('按 Provider', ai.byProvider) + '</div></div>';
+  html += '</div></div>';
+
+  // 数据源说明
+  html += '<div class="panel"><h3>数据源</h3><p class="small muted">' + esc2(d.note) + '</p></div>';
+
+  document.getElementById('content').innerHTML = html;
 }
 
 // ---------- 工具 ----------
