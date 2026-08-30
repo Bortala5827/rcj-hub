@@ -1177,6 +1177,15 @@ function fmtTime(ts){ if(!ts)return '—'; let d; if(String(ts).length>12) d=new
 
 // ---------- 启动（只探测一次，成功直接渲染，不再重复拉取）----------
 (async function(){
+  // 深链优先：带 ?conversation= 或 ?page=support 时进客服管理并定位
+  const urlParams = new URLSearchParams(location.search);
+  if(urlParams.get('conversation') || urlParams.get('page') === 'support'){
+    currentPage = 'support';
+    document.querySelectorAll('.sb-item').forEach(x => x.classList.toggle('active', x.dataset.page === 'support'));
+    document.getElementById('pageTitle').textContent = '客服管理';
+    if(urlParams.get('conversation')) window._pendingConvId = urlParams.get('conversation');
+    document.getElementById('genSmall').textContent = '';
+  }
   const r=await apiGet('/data');
   if(r.ok && r.data && r.data.ok){
     DATA=r.data;
