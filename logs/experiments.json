@@ -1,6 +1,13 @@
 {
-  "updated": "2026-08-29",
+  "updated": "2026-08-30",
   "experiments": [
+    {
+      "date": "2026-08-30",
+      "title": "API 导航页智谱/火山方舟赠送额度更新",
+      "summary": "智谱 GLM 首推卡片徽章「免费档」改为「送 2000 万 Tokens」，描述补充新用户直送 2000 万、glm-4-flash 长期免费无限量；火山方舟备选卡片徽章「字节」改为「20+ 模型各赠 50 万」，描述补充 doubao-pro/DeepSeek-V3 等 20+ 款模型各送 50 万 Tokens、一个 Key 调全家桶。最后核对日期更新为 2026-08-30。",
+      "type": "content",
+      "tags": ["api", "zhipu", "volcano-ark", "free-tokens"]
+    },
     {
       "date": "2026-08-29",
       "title": "两站浏览器标签/SEO 定位混乱修正",
