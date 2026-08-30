@@ -17,7 +17,7 @@ function getChannels(env) {
       apiKey: env.DOTS_API_KEY || "",
       authType: "api-key",
       status: "ok",
-      fallback: ["agnes", "sensenova", "bai", "groq"],
+      fallback: ["groq", "agnes", "bai", "sensenova"],
     },
     {
       id: "agnes", name: "Agnes",
@@ -25,7 +25,7 @@ function getChannels(env) {
       model: "agnes-2.5-flash",
       apiKey: env.AGNES_API_KEY || "",
       status: "ok",
-      fallback: ["dots", "sensenova", "bai", "groq"],
+      fallback: ["groq", "bai", "dots", "sensenova"],
     },
     {
       id: "sensenova", name: "SenseNova",
@@ -33,7 +33,7 @@ function getChannels(env) {
       model: env.SENSENOVA_MODEL || "sensenova-6.8-flash-lite",
       apiKey: env.SENSENOVA_API_KEY || "",
       status: "ok",
-      fallback: ["dots", "agnes", "bai", "groq"],
+      fallback: ["groq", "agnes", "bai", "dots"],
     },
     {
       id: "bai", name: "b.ai",
@@ -41,7 +41,7 @@ function getChannels(env) {
       model: "deepseek-v4-flash",
       apiKey: env.BAI_API_KEY || "",
       status: "ok",
-      fallback: ["dots", "agnes", "sensenova", "groq"],
+      fallback: ["groq", "agnes", "dots", "sensenova"],
     },
     {
       id: "groq", name: "Groq",
@@ -49,7 +49,7 @@ function getChannels(env) {
       model: "openai/gpt-oss-120b",
       apiKey: env.GROQ_API_KEY || "",
       status: "ok",
-      fallback: ["dots", "agnes", "sensenova", "bai"],
+      fallback: ["bai", "agnes", "dots", "sensenova"],
     },
   ];
 }
@@ -199,10 +199,10 @@ function getSystemPrompt(scene) {
 // 高质量场景（fj-sz/learn）优先质量渠道；低需求场景（api/shop）可走固定/免费渠道。
 // 调整分发只需改这个表，不动主逻辑。
 const SCENE_ROUTING = {
-  "fj-sz": ["dots", "agnes", "sensenova", "bai"],   // 高质量：辅警备考
-  "learn": ["dots", "agnes", "sensenova", "bai"],    // 高质量：你懂的知识卡/发散
-  "api":   ["bai", "dots", "agnes", "sensenova"],    // 低需求：API 导航，免费优先
-  "shop":  ["dots"],                                    // 固定：定制顾问
+  "fj-sz": ["agnes", "groq", "dots", "bai", "sensenova"],   // 高质量：辅警备考，agnes质量好，groq快
+  "learn": ["agnes", "groq", "dots", "bai", "sensenova"],    // 高质量：你懂的知识卡/发散
+  "api":   ["groq", "bai", "agnes", "dots", "sensenova"],    // 低需求：API 导航，速度优先
+  "shop":  ["agnes", "groq", "dots"],                          // 定制顾问
 };
 
 // ── 工具函数 ────────────────────────────────────────────────
