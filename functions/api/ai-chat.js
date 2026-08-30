@@ -228,14 +228,14 @@ function isUsable(ch) {
   return !!ch && ch.status !== "disabled" && !!ch.apiKey;
 }
 
-// 调用单个渠道（带 30s 超时）
+// 调用单个渠道（带 15s 超时，快速失败快速切换）
 async function callChannel(ch, messages) {
   const baseClean = ch.baseUrl.replace(/\/+$/, "");
   const url = /\/chat\/completions$/i.test(baseClean)
     ? baseClean
     : `${baseClean}/chat/completions`;
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 30000);
+  const timer = setTimeout(() => ctrl.abort(), 15000);
   try {
     const headers = {
       "Content-Type": "application/json",
