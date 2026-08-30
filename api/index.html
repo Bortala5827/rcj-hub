@@ -639,7 +639,7 @@
       </div>
       </div>
       <div class="ai-messages" id="aiMessages">
-        <div class="ai-msg ai-msg-sys">我是 API 助手，帮你快速拿到各平台免费 Key。问我哪个平台适合你、怎么申请。</div>
+        <div class="ai-msg ai-msg-sys">我是 API 助手，帮你了解、选型和申请大模型 API。问我某个平台怎么样、和谁比、怎么申请 Key 都行。</div>
       </div>
       <div class="ai-input-row">
         <input type="text" id="aiInput" placeholder="输入消息…" maxlength="500" autocomplete="off">
@@ -1029,7 +1029,7 @@
     aiClose.addEventListener("click", aiHide);
     document.getElementById("aiClear").addEventListener("click", function() {
       aiHistory = [];
-      aiMessages.innerHTML = '<div class="ai-msg ai-msg-sys">我是 API 助手，帮你快速拿到各平台免费 Key。问我哪个平台适合你、怎么申请。</div>';
+      aiMessages.innerHTML = '<div class="ai-msg ai-msg-sys">我是 API 助手，帮你了解、选型和申请大模型 API。问我某个平台怎么样、和谁比、怎么申请 Key 都行。</div>';
     });
     aiPanel.addEventListener("click", function(e) { if (e.target === aiPanel) aiHide(); });
     function aiAddMsg(text, type) {
