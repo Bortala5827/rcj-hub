@@ -1,5 +1,5 @@
-{
-  "name": "rcj-hub",
+﻿{
+  "name": "rcj-lab",
   "version": "1.0.0",
   "private": true,
   "description": "RCJ Hub · 品牌枢纽/个人主页 — 标准 Web 自动化测试体系（Playwright + axe-core + Lighthouse CI）",

@@ -1,8 +1,8 @@
-# rcj-hub · Cloudflare Pages + D1 绑定配置（参考）
+﻿# rcj-hub · Cloudflare Pages + D1 绑定配置（参考）
 # 本机无 Cloudflare 凭证，无法 wrangler 部署；此文件供你在本地或 CI 使用。
 # 更简单的方式：直接在 CF 后台 Pages 项目 → Settings → Functions → D1 bindings 里加绑定（见交付说明）。
 
-name = "rcj-hub"
+name = "rcj-lab"
 pages_build_output_dir = "."
 compatibility_date = "2024-09-23"
 

@@ -1,9 +1,9 @@
-# RCJ Hub · 品牌枢纽 / 个人主页
+﻿# RCJ Hub · 品牌枢纽 / 个人主页
 
 RCJ 产品生态的总入口与作者主页。Cloudflare Pages 托管，极简单页。
 
 - **演示**：https://955827.xyz
-- **仓库**：`github.com/Bortala5827/rcj-hub`
+- **仓库**：`github.com/Bortala5827/rcj-lab`
 
 ## 产品矩阵
 
