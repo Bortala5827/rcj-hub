@@ -3,6 +3,20 @@
   "experiments": [
     {
       "date": "2026-08-31",
+      "title": "FaceTalk 精简为纯匹配工具：移除声纹暖场/结构化练习/AI点评/接口配置",
+      "summary": "用户要求 FaceTalk 保持纯粹的面试搭子匹配工具（菜单只留「关于」，AI 点评和接口全删）。index.html 汉堡菜单删「声纹暖场」与「结构化面试练习」外链，只留「关于」；删除声纹暖场全部链路（菜单按钮/vwarm 弹窗/音频 JS/内联 CSS/字典键）。pair.html 删除面试间(iv-card)区块及相关内联 JS、assets/interview.js、functions/api/interview.js 后端（git rm）。assets/settings.js 重写为纯「关于」弹窗，接口配置 tab/ASR/LLM/预设/测试连接全删。assets/i18n.js 删除 171 个未用键、新增 aboutMenu（dict 662→492）。assets/style.css 清理 iv-*/vwarm-*/bar-gear/set 配置死样式，保留关于弹窗样式与 .iv-callout。附带修复：settings.js 弹窗在语言切换重建后不再显示的问题（改为重建并保持打开）、bump-version.js 残留括号/版本正则 bug 并纳入 i18n.js 管理。版本统一 bump 至 20260831b。已验证：本机 Chrome 首页菜单只留 About、默认英文、中/英/日切换正常、About 弹窗打开正常、pair.html 无面试间且控制台无 JS 报错。提交 1ac8970 已推送部署。",
+      "type": "refactor",
+      "tags": ["facetalk", "cleanup", "i18n", "refactor"]
+    },
+    {
+      "date": "2026-08-31",
+      "title": "深圳/惠州辅警题目上的 AI 分析按钮全部移除",
+      "summary": "用户反馈深圳辅警每道题右上角都有「🤖 AI分析」按钮太冗余，明确要求深圳和惠州全部删掉。共用的 fj/shared/app.js 中删除：cardHtml 的 AI 分析按钮与 questionText/questionTextJson 变量、aiAnalyzeQuestion 函数、#questionsList 事件委托的 .ai-analyze-btn 分支、buildExamCard 面试/笔试两分支的 AI 分析按钮及 aiBtn 绑定、开头 AI 按钮样式注入；深圳 index.html 同步删除 rcj-ai-analyze 监听（死代码），悬浮 AI 备考助手（aiFab/aiPanel）按用户此前要求保留。惠州无独立 AI 代码，共用 app.js 自动生效。app.js 为 UTF-8 BOM+混合换行，Edit 工具无法匹配，改用 Python 正则处理。已 node --check 验证语法、本机 Chrome 渲染验证两站无按钮。提交 5508fc7、d3d6040（含版本号 20260831 刷新缓存）并部署 rcj-exam-hub。",
+      "type": "refactor",
+      "tags": ["exam", "fj", "sz", "hz", "ai-analyze", "cleanup"]
+    },
+    {
+      "date": "2026-08-31",
       "title": "FaceTalk 全站多语言：中/英/日三语切换",
       "summary": "facetalk.955827.xyz 面向海外可用的第一步——新增 assets/i18n.js 统一字典与切换引擎（zh/en/ja，localStorage 记忆，缺省回退 zh），index.html / pair.html 静态文案 data-i18n 标注、顶栏语言下拉切换，动态区经 FTI18N.onChange 重渲染（app.js boot、pair.html api/loadVoice/loadMsgs/badge）。修复 buildSwitcher 数组取值 bug（opts[j] → opts[j][0]/[1]）。管理后台 admin.html 按自用需求保持纯中文不参与多语。随后默认语言改为英文（海外优先）：首访无偏好即英文，可手动切中/日并记忆。已验证：本机 Chrome 三语切换正常、持久化正常、默认英文生效，线上 facetalk.955827.xyz 已部署。",
       "type": "feature",
@@ -154,6 +168,13 @@
       "summary": "recorder / waveform / player 拆分为独立模块，主应用通过 ES Module 导入。",
       "type": "refactor",
       "tags": ["solospeak", "refactor"]
+    },
+    {
+      "date": "2026-08-31",
+      "title": "辅警系列：移除邮箱与主页你懂的板块",
+      "summary": "彻底删除 fj 系列（主页/深圳/惠州/written）所有 Bortala5827@gmail.com 邮箱入口；删除 fj 主页「知识拓展-你懂的」板块及其 CSS，保留深圳/惠州卡片与 RCJ EXAM HUB 链接。commit 3d5d4c7 已部署。",
+      "type": "refactor",
+      "tags": ["fj", "footer", "cleanup"]
     }
   ]
 }
