@@ -29,7 +29,7 @@ async function verifyCookie(request, env) {
   if (!cookie) return false;
   const [ts, sig] = cookie.split('.');
   if (!ts || !sig) return false;
-  if (Date.now() / 1000 - Number(ts) > 60 * 60 * 24 * 7) return false; // 7 天过期
+  if (Date.now() - Number(ts) > 7 * 24 * 60 * 60 * 1000) return false; // 7 天过期（毫秒）
   return (await hmac(ts, pw)) === sig;
 }
 

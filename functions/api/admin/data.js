@@ -45,13 +45,13 @@ function getCookie(req, name) {
 async function verifyAuth(request, env) {
   const cookie = getCookie(request, 'rcj_admin');
   if (cookie && env.ADMIN_PASSWORD) {
-    const [p, s] = cookie.split('.');
-    if (p && s && (await hmac(p, env.ADMIN_PASSWORD)) === s) return true;
+    const [ts, sig] = cookie.split('.');
+    if (!ts || !sig) return false;
+    // 时间戳为毫秒（login.js 用 Date.now()），7 天内有效
+    if (Date.now() - Number(ts) > 7 * 24 * 60 * 60 * 1000) return false;
+    if ((await hmac(ts, env.ADMIN_PASSWORD)) === sig) return true;
   }
-  const url = new URL(request.url);
-  const pw = url.searchParams.get('password') || '';
-  if (pw && pw === env.ADMIN_PASSWORD) return true;
-  return false;
+  return false; // 不再支持 ?password= URL 明文参数（安全漏洞，旧链接一律要求 cookie）
 }
 
 async function d1(env, dbId, sql, ms = 6000) {

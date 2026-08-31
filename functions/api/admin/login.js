@@ -29,9 +29,9 @@ export async function onRequestPost({ request, env }) {
   if (!env.ADMIN_PASSWORD) return json({ error: 'ADMIN_PASSWORD 未配置。请在 Cloudflare Pages → rcj-hub → Settings → Functions → Environment variables 添加。' }, 500);
   if (pw !== env.ADMIN_PASSWORD) return json({ error: '密码错误' }, 401);
 
-  const payload = String(Date.now());
+  const payload = String(Date.now()); // 毫秒时间戳（data/health/wall/commute 均按毫秒校验）
   const sig = await hmac(payload, env.ADMIN_PASSWORD);
-  const cookie = `${COOKIE}=${encodeURIComponent(payload + '.' + sig)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${DAY * 7}`;
+  const cookie = `${COOKIE}=${encodeURIComponent(payload + '.' + sig)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${DAY}`; // 1 天有效期，到期需重新登录
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,
     headers: { 'Content-Type': 'application/json; charset=utf-8', 'Set-Cookie': cookie, 'Cache-Control': 'no-store' },
