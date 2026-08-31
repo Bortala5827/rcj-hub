@@ -3,6 +3,13 @@
   "experiments": [
     {
       "date": "2026-08-31",
+      "title": "FaceTalk 全站多语言：中/英/日三语切换",
+      "summary": "facetalk.955827.xyz 面向海外可用的第一步——新增 assets/i18n.js 统一字典与切换引擎（zh/en/ja，localStorage 记忆，缺省回退 zh），index.html / pair.html 静态文案 data-i18n 标注、顶栏语言下拉切换，动态区经 FTI18N.onChange 重渲染（app.js boot、pair.html api/loadVoice/loadMsgs/badge）。修复 buildSwitcher 数组取值 bug（opts[j] → opts[j][0]/[1]）。管理后台 admin.html 按自用需求保持纯中文不参与多语。已验证：本机 Chrome 三语切换正常、持久化正常，线上 facetalk.955827.xyz 已部署生效。",
+      "type": "feature",
+      "tags": ["facetalk", "i18n", "internationalization"]
+    },
+    {
+      "date": "2026-08-31",
       "title": "全站合规审计：硬编码凭据/底部链接超限修复",
       "summary": "admin.html 客服登录表单移除硬编码默认值（admin@example.com/admin123）；exam hub 首页底部链接从 3 个（Vibe Coding/定制服务/邮箱）减至 2 个（保留 Vibe Coding + 定制服务），邮箱链接移出页脚以符合「底部最多 2 个链接」铁律。同时记录：supportly 独立后台 admin.html 仍用 localStorage 存 token，与主站 HttpOnly cookie 策略不一致；支持系统 widget token 通过 URL 参数传递（document 文档有说明）。",
       "type": "refactor",
