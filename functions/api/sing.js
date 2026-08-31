@@ -98,7 +98,7 @@ export async function onRequest({ request, env }) {
     const audio = String(body.audio || '');
     const audioType = String(body.audioType || 'webm').slice(0, 10);
     if (!TIERS.includes(tier)) return json({ ok: false, error: '档位无效' }, 400);
-    if (!materials.length) return json({ ok: false, error: '请至少选一份想要的资料' }, 400);
+    // 用户侧不再选择具体资料，materials 改为可选
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ ok: false, error: '邮箱格式不对' }, 400);
     if (!audio) return json({ ok: false, error: '没收到录音，先唱一首吧 🎤' }, 400);
     // base64 → bytes
