@@ -139,6 +139,33 @@ export async function onRequest({ request, env }) {
 
     const ins = await d1(env, `INSERT INTO sing_requests (id, email, tier, materials, audio_key, status, created, ip) VALUES ('${id}','${email.replace(/'/g, "''")}','${tier}','${JSON.stringify(materials).replace(/'/g, "''")}','${audioKey}','pending',${now},'${ip}')`);
     if (ins && ins.error) return json({ ok: false, error: '存储失败' }, 500);
+
+    // 0元购报名 → 记 orders 表 + 通知站长（提醒我）
+    try {
+      await d1(env, `CREATE TABLE IF NOT EXISTS orders (
+        id TEXT PRIMARY KEY, source TEXT, item TEXT, sku TEXT,
+        payer_email TEXT, contact_email TEXT, amount REAL, currency TEXT,
+        paypal_order_id TEXT, status TEXT, note TEXT, created INTEGER
+      )`);
+      await d1(env, `INSERT OR REPLACE INTO orders (id, source, item, sku, payer_email, contact_email, amount, currency, paypal_order_id, status, note, created) VALUES ('${id}','sing','Sing to Me','sing','${email.replace(/'/g, "''")}','',0,'CNY','','enrolled','0元购报名',${now})`);
+      if (env.RESEND_API_KEY) {
+        const t = new Date(Date.now() + 8 * 3600 * 1000);
+        const p = n => String(n).padStart(2, '0');
+        const bt = `${t.getUTCFullYear()}-${p(t.getUTCMonth() + 1)}-${p(t.getUTCDate())} ${p(t.getUTCHours())}:${p(t.getUTCMinutes())}`;
+        try {
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json; charset=utf-8' },
+            body: JSON.stringify({
+              from: 'RCJ 商店 <noreply@955827.xyz>', to: ['1430115702@qq.com'],
+              subject: '【RCJ 0元购】有人来唱歌啦',
+              html: `<p>时间（北京）：${bt}</p><p>邮箱：${email}</p><p>档位：0元购 · Sing to Me</p><p>去 955827.xyz/admin → 订单提醒 审核语音。</p>`,
+            }),
+          });
+        } catch (e) {}
+      }
+    } catch (e) { /* 通知失败不影响报名成功 */ }
+
     return json({ ok: true, id, msg: '收到啦！我会听你唱的歌，然后给你送资料 🎁' });
   }
 

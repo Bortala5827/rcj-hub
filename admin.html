@@ -85,6 +85,10 @@
     .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:20px}
     .panel h3{font-size:15px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
     .panel h3 .tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--bg);color:var(--muted)}
+    .dt{width:100%;border-collapse:collapse;font-size:13px}
+    .dt th,.dt td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+    .dt th{color:var(--muted);font-weight:600;background:var(--bg)}
+    .dt tbody tr:hover{background:var(--bg)}
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 
     /* 趋势图 */
@@ -218,6 +222,7 @@
       <div class="sb-item" data-page="support"><span class="ico">💬</span>客服系统</div>
       <div class="sb-item" data-page="aux"><span class="ico">🛡️</span>辅警题库</div>
       <div class="sb-item" data-page="facetalk"><span class="ico">💬</span>FaceTalk</div>
+      <div class="sb-item" data-page="orders"><span class="ico">💰</span>订单提醒</div>
     </nav>
     <div class="sb-foot">
       <div id="genTime">—</div>
@@ -336,6 +341,7 @@ function renderPage(p){
   else if(p==='support') renderSupport();
   else if(p==='traffic') renderTraffic();
   else if(p==='sing') renderSingRequests();
+  else if(p==='orders') renderOrders();
 }
 
 // 邮件/直达链接：站外跳转进客服管理并定位到具体会话
@@ -1189,6 +1195,43 @@ async function supportSendMessage(){
   } catch(e) {
     alert('发送失败：' + e.message);
   }
+}
+
+// ---------- 订单提醒（PayPal 收款 + 0元购报名）----------
+function renderOrders(){
+  const orders = (DATA.orders || []);
+  const esc2 = function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
+  const fmt = function(ts){ if(!ts) return '—'; const d=new Date(Number(ts)); const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); };
+  const statColor = { paid:'#0d9488', enrolled:'#2563eb', pending:'#d97706' };
+
+  const paid = orders.filter(o=>o.status==='paid');
+  const sum = paid.reduce((a,o)=>a + (Number(o.amount)||0), 0);
+  let html = '';
+  html += '<div class="panel"><h3>收款概览</h3><div style="display:flex;gap:16px;flex-wrap:wrap">'
+    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">已收款(笔)</div><div class="fc-num" style="font-size:22px;color:#0d9488">'+paid.length+'</div></div>'
+    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">已收款(金额)</div><div class="fc-num" style="font-size:22px;color:#0d9488">¥'+sum.toFixed(2)+'</div></div>'
+    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">0元购报名</div><div class="fc-num" style="font-size:22px;color:#2563eb">'+orders.filter(o=>o.source==='sing').length+'</div></div>'
+    + '</div></div>';
+
+  html += '<div class="panel"><h3>明细（最近 '+orders.length+' 条）</h3>';
+  if(!orders.length){ html += '<p class="small muted">暂无订单或报名记录。</p>'; }
+  else {
+    html += '<div style="overflow-x:auto"><table class="dt"><thead><tr><th>时间</th><th>来源</th><th>项目</th><th>金额</th><th>付款邮箱</th><th>联系邮箱</th><th>状态</th></tr></thead><tbody>';
+    orders.forEach(function(o){
+      const c = statColor[o.status]||'#64748b';
+      html += '<tr><td>'+fmt(o.created)+'</td>'
+        + '<td>'+esc2(o.source==='sing'?'0元购':'PayPal')+'</td>'
+        + '<td>'+esc2(o.item)+'</td>'
+        + '<td>'+(o.source==='sing'?'0':'¥'+(Number(o.amount)||0).toFixed(2))+'</td>'
+        + '<td>'+esc2(o.payer_email||'—')+'</td>'
+        + '<td>'+esc2(o.contact_email||'—')+'</td>'
+        + '<td><span style="color:'+c+';font-weight:600">'+esc2(o.status)+'</span></td></tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+  html += '</div>';
+  document.getElementById('content').innerHTML = html;
+  document.getElementById('pageTitle').textContent = '订单提醒';
 }
 
 // ---------- 访问分析 ----------
