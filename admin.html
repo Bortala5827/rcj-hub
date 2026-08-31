@@ -1250,13 +1250,6 @@ function renderTraffic(){
   if(!any) html += '<div class="empty">暂无浏览数据（埋点已部署，访问各站点后开始累计）</div>';
   html += '</div></div>';
 
-  // 客服系统调用量（从 supportly D1 拉，但 data.js 未聚合，写个 KPI 卡片说明）
-  html += '<div class="panel"><h3>📞 客服系统</h3><p class="small muted">客服数据请前往侧栏「客服系统」页面查看详情（会话数、消息量、邮件提醒等）。此处汇总浏览数据不包含客服 API 调用量。</p>'
-    + '<div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">'
-    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px"><div class="fc-name">服务状态</div><div class="fc-num" style="font-size:22px;color:#0d9488">✅ 正常</div><div class="fc-sub">support.955827.xyz</div></div>'
-    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px"><div class="fc-name">管理后台</div><div class="fc-num" style="font-size:22px;color:#0d9488"><a href="https://support.955827.xyz/admin" target="_blank" style="text-decoration:none;color:inherit">进入 →</a></div><div class="fc-sub">独立客服后台</div></div>'
-    + '</div></div>';
-
   // AI 调用数据（直接从 data.ai 取）
   var ai = d.ai || {total:0,ok:0,fail:0,successRate:0,byProject:{},byProvider:{}};
   html += '<div class="panel"><h3>🤖 AI 调用数据</h3><div class="stats">'
