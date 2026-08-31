@@ -184,12 +184,6 @@ export async function onRequestGet({ request, env }) {
         messages: ftCounts.messages || 0,
         recentPairs: ftPairsRecent || [],
         recentWall: ftWallRecent || [],
-        // 产品亮点：用户得意之作，多个 AI 也给出高度评价，创意独特。
-        highlights: [
-          { label: '面试搭子匹配', desc: '双向匿名 + 信誉机制，按岗位/城市/模式智能撮合' },
-          { label: '留言墙', desc: '访客可匿名留言，多 AI 评价创意新颖、交互轻量' },
-          { label: '阅后即焚', desc: '会话/评价隐私优先，符合社交产品调性' },
-        ],
       },
       aux: {
         visits: auxVisits,
@@ -198,8 +192,6 @@ export async function onRequestGet({ request, env }) {
         // 来源：用户口述 —— 深圳辅警题库跑通售出 20+ 份，惠州辅警规划中。
         milestones: [
           { label: '深圳辅警题库', desc: '笔试 / 面试 / 体测一体化，已跑通售出 20+ 份', tag: '跑通', tone: 'ok' },
-          { label: '惠州辅警', desc: '题库规划中，后续随需求新增', tag: '规划', tone: 'warn' },
-          { label: '更多城市', desc: '按反馈持续新增辅警 / 消防等公职题库', tag: '扩展', tone: 'info' },
         ],
         // 辅警站点只接入浏览统计（rcj-analytics-d1 · site='aux'）。
         // 留言墙 / 信号匹配是 FaceTalk（mianshi-dazi-d1）专属功能，辅警从未开通，故不含 wallTotal/signalMatch 字段。

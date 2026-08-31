@@ -213,16 +213,10 @@
       <div><b>RCJ Admin</b><small>统一数据后台</small></div>
     </div>
     <nav class="sb-nav" id="nav">
-      <div class="sb-item active" data-page="overview"><span class="ico">📊</span>概览</div>
-      <div class="sb-item" data-page="health"><span class="ico">🩺</span>站点状态</div>
-      <div class="sb-item" data-page="facetalk"><span class="ico">💬</span>FaceTalk</div>
-      <div class="sb-item" data-page="aux"><span class="ico">🛡️</span>辅警题库</div>
-      <div class="sb-item" data-page="sites"><span class="ico">🌐</span>站点导航</div>
-      <div class="sb-item" data-page="commute"><span class="ico">🚇</span>通勤（含聊天）</div>
-      <div class="sb-item" data-page="traffic"><span class="ico">📊</span>访问分析</div>
-      <div class="sb-item" data-page="wall"><span class="ico">🗒️</span>留言墙</div>
-      <div class="sb-item" data-page="ai"><span class="ico">🤖</span>AI 调用</div>
+      <div class="sb-item active" data-page="health"><span class="ico">🩺</span>站点状态</div>
       <div class="sb-item" data-page="support"><span class="ico">💬</span>客服系统</div>
+      <div class="sb-item" data-page="aux"><span class="ico">🛡️</span>辅警题库</div>
+      <div class="sb-item" data-page="facetalk"><span class="ico">💬</span>FaceTalk</div>
     </nav>
     <div class="sb-foot">
       <div id="genTime">—</div>
@@ -236,7 +230,7 @@
       <span class="mb-menu" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</span>
     </div>
     <div class="topbar">
-      <h1 id="pageTitle">概览</h1>
+      <h1 id="pageTitle">站点状态</h1>
       <div class="acts">
         <span class="gen" id="genSmall"></span>
         <button class="btn" onclick="loadData()">↻ 刷新</button>
@@ -312,7 +306,7 @@ async function loadData(){
 }
 
 // ---------- 导航 ----------
-let currentPage='overview';
+let currentPage='health';
 document.getElementById('nav').addEventListener('click',e=>{
   const it=e.target.closest('.sb-item'); if(!it)return;
   document.querySelectorAll('.sb-item').forEach(x=>x.classList.toggle('active',x===it));
@@ -322,8 +316,12 @@ document.getElementById('nav').addEventListener('click',e=>{
   renderPage(currentPage);
 });
 
-// 程序化切换页面（供卡片内按钮跳转用，如留言墙「查看全部」）
-window.switchPage = function(p){ const it=document.querySelector('.sb-item[data-page="'+p+'"]'); if(it) it.click(); };
+// 程序化切换页面（供卡片内按钮跳转用，如留言墙「查看全部」、Sing to Me 审核）
+window.switchPage = function(p){
+  currentPage=p;
+  document.querySelectorAll('.sb-item').forEach(x=>x.classList.toggle('active', x.dataset.page===p));
+  renderPage(p);
+};
 
 function renderPage(p){
   if(!DATA){ document.getElementById('content').innerHTML='<div class="loading">读取中…</div>'; return; }  if(p==='overview') renderOverview();
@@ -336,6 +334,7 @@ function renderPage(p){
   else if(p==='ai') renderAI();
   else if(p==='support') renderSupport();
   else if(p==='traffic') renderTraffic();
+  else if(p==='sing') renderSingRequests();
 }
 
 // 邮件/直达链接：站外跳转进客服管理并定位到具体会话
@@ -632,8 +631,77 @@ async function renderHealth(){
   }
   html+='</div>';
 
+  // ===== Sing to Me 审核入口（0元购：用户为我唱歌，我送资料）=====
+  html+='<div class="panel" style="margin-top:16px"><h3>🎤 Sing to Me <span class="tag">0元购 · 用户为我唱歌</span></h3>'
+    +'<p class="small muted">用户在 shop 为我唱一首歌，我送她资料。点此审核录音、标记通过 / 已发。</p>'
+    +'<div style="margin-top:10px"><button class="btn" onclick="switchPage(\'sing\')">去审核 →</button></div></div>';
+
   html+='<div style="margin-top:14px"><button class="btn" onclick="renderHealth()">↻ 重新探测</button></div></div>';
   c.innerHTML=html;
+}
+
+// ---------- Sing to Me 审核 ----------
+async function renderSingRequests(){
+  const c=document.getElementById('content');
+  document.getElementById('pageTitle').textContent='Sing to Me 审核';
+  c.innerHTML='<div class="loading">加载 Sing to Me 请求…</div>';
+  let data;
+  try{
+    const r=await fetch('/api/sing?list=1',{cache:'no-store'});
+    data=await r.json();
+  }catch(e){ c.innerHTML='<div class="err-box">加载失败：'+e.message+'</div>'; return; }
+  if(!data.ok){ if(data.error==='未登录'){ showLogin(); return; } c.innerHTML='<div class="err-box">'+(data.error||'加载失败')+'</div>'; return; }
+  const list=data.list||[];
+  const matLabel={anki:'Anki卡组',app:'开源App',offline:'离线题库',ndd:'你懂的',jgh:'结构化',fj:'辅警题库',xf:'消防题库'};
+  const tierLabel={0:'0元 · 唱送资料',9.9:'9.9元',39:'39元',69:'69元'};
+  const stMap={pending:['待审核','var(--warn)'],approved:['已通过','var(--ok)'],rejected:['已拒绝','var(--danger)'],sent:['已发送','var(--accent)']};
+  let html='<div class="stats">'
+    +'<div class="stat"><div class="stat-num">'+list.length+'</div><div class="stat-label">总请求</div></div>'
+    +'<div class="stat"><div class="stat-num" style="color:var(--ok)">'+list.filter(x=>x.status==='pending').length+'</div><div class="stat-label">待审核</div></div>'
+    +'<div class="stat"><div class="stat-num">'+list.filter(x=>x.status==='sent').length+'</div><div class="stat-label">已发送</div></div>'
+    +'</div>';
+  html+='<div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h3>请求列表</h3><div><button class="btn" onclick="renderSingRequests()">↻ 刷新</button> <button class="btn" onclick="singClean()">清除30天前</button></div></div>';
+  if(!list.length){ html+='<div class="empty">暂无请求</div></div>'; c.innerHTML=html; return; }
+  html+='<div style="display:flex;flex-direction:column;gap:14px;margin-top:12px">';
+  list.forEach(function(x){
+    let mats=[]; try{ mats=JSON.parse(x.materials||'[]'); }catch(e){}
+    mats=mats.map(k=>matLabel[k]||k).join('、')||'—';
+    const sm=stMap[x.status]||[x.status,'var(--muted)'];
+    html+='<div style="border:1px solid var(--line);border-radius:var(--radius);padding:14px">';
+    html+='<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">';
+    html+='<div><b>'+esc(x.email)+'</b> <span class="tag">'+esc(tierLabel[x.tier]||x.tier)+'</span> <span style="color:'+sm[1]+'">'+sm[0]+'</span></div>';
+    html+='<span class="small muted">'+fmtTime(x.created)+'</span></div>';
+    html+='<div class="small" style="margin:6px 0">想要：'+esc(mats)+'</div>';
+    if(x.audioKey) html+='<audio controls preload="none" src="/api/sing/audio/'+encodeURIComponent(x.id)+'" style="width:100%;margin:6px 0"></audio>';
+    else html+='<div class="small muted">（无录音）</div>';
+    html+='<div style="display:flex;gap:8px;margin-top:6px">';
+    if(x.status==='pending'){
+      html+='<button class="btn" onclick="singAct(\''+x.id+'\',\'approve\')">通过</button>';
+      html+='<button class="btn" onclick="singAct(\''+x.id+'\',\'reject\')">拒绝</button>';
+    } else {
+      html+='<button class="btn" onclick="singAct(\''+x.id+'\',\'sent\')">标记已发</button>';
+    }
+    html+='</div></div>';
+  });
+  html+='</div></div>';
+  c.innerHTML=html;
+}
+async function singAct(id,action){
+  try{
+    const r=await fetch('/api/sing?id='+encodeURIComponent(id)+'&action='+action,{method:'POST',cache:'no-store'});
+    const d=await r.json();
+    if(!d.ok) alert('操作失败：'+(d.error||''));
+  }catch(e){ alert('操作失败：'+e.message); }
+  renderSingRequests();
+}
+async function singClean(){
+  if(!confirm('清除 30 天前已处理的请求及其语音？')) return;
+  try{
+    const r=await fetch('/api/sing?clean=1',{cache:'no-store'});
+    const d=await r.json();
+    alert(d.ok?('已清除 '+d.cleaned+' 条，删 R2 语音 '+d.r2Deleted+' 个'):('失败：'+(d.error||'')));
+  }catch(e){ alert('失败：'+e.message); }
+  renderSingRequests();
 }
 
 // ---------- 站点导航 ----------
@@ -1023,7 +1091,7 @@ async function loadSupportConversations(){
     supportConversations = data.data || [];
     
     // 更新统计
-    const today = new Date().toISOString().split('T')[0];
+    const bjNow = new Date(Date.now()+(new Date().getTimezoneOffset()*60000)+8*3600000); const p2=n=>n<10?'0'+n:''+n; const today = bjNow.getFullYear()+'-'+p2(bjNow.getMonth()+1)+'-'+p2(bjNow.getDate());
     const todayCount = supportConversations.filter(c => c.createdAt && c.createdAt.split('T')[0] === today).length;
     document.getElementById('supportConvCount').textContent = supportConversations.length;
     document.getElementById('supportTodayCount').textContent = todayCount;
@@ -1045,7 +1113,7 @@ async function loadSupportConversations(){
       html += '<td>' + channelName + '</td>';
       html += '<td>' + statusBadge + '</td>';
       html += '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(conv.lastMessage || '暂无') + '</td>';
-      html += '<td class="small mono">' + (conv.lastMessageAt || conv.createdAt || '').slice(0,16).replace('T',' ') + '</td>';
+      html += '<td class="small mono">' + fmtTime(conv.lastMessageAt || conv.createdAt) + '</td>';
       html += '<td><button class="btn" onclick="supportSelectConv(\'' + conv.id + '\')">查看</button></td>';
       html += '</tr>';
     });
@@ -1231,7 +1299,7 @@ function fmtDur(sec){
   return h+'h'+(m%60)+'′';
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function fmtTime(ts){ if(!ts)return '—'; let d; if(String(ts).length>12) d=new Date(Number(ts)); else d=new Date(Number(ts)*1000); if(isNaN(d))return '—'; const p=n=>n<10?'0'+n:''+n; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+function fmtTime(ts){ if(!ts)return '—'; const s=String(ts); let d; if(s.includes('T')||s.includes('-')) d=new Date(s); else if(s.length>12) d=new Date(Number(s)); else d=new Date(Number(s)*1000); if(isNaN(d))return '—'; const bj=new Date(d.getTime()+(d.getTimezoneOffset()*60000)+8*3600000); const p=n=>n<10?'0'+n:''+n; return bj.getFullYear()+'-'+p(bj.getMonth()+1)+'-'+p(bj.getDate())+' '+p(bj.getHours())+':'+p(bj.getMinutes())+' 北京'; }
 
 // ---------- 启动（只探测一次，成功直接渲染，不再重复拉取）----------
 (async function(){

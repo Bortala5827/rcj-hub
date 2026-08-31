@@ -6,6 +6,11 @@ name = "rcj-lab"
 pages_build_output_dir = "."
 compatibility_date = "2024-09-23"
 
+# Sing to Me 语音存储（用户录音）· 用户开通的 R2
+[[r2_buckets]]
+binding = "SING_R2"
+bucket_name = "rcj-sing"
+
 # 注意：rcj-hub 的 Functions 不通过 env.DB 绑定访问 D1，
 # 而是用硬编码的 D1 UUID + CF_API_TOKEN/CF_ACCOUNT_ID 经 CF API 直查
 # （见 functions/api/admin/data.js 的 DBS 对象、functions/api/track.js 的 ANALYTICS_DB）。
