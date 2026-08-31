@@ -1202,30 +1202,38 @@ function renderOrders(){
   const orders = (DATA.orders || []);
   const esc2 = function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
   const fmt = function(ts){ if(!ts) return '—'; const d=new Date(Number(ts)); const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); };
-  const statColor = { paid:'#0d9488', enrolled:'#2563eb', pending:'#d97706' };
+  const statColor = { paid:'#0d9488', enrolled:'#2563eb', pending:'#d97706', deposit:'#d97706' };
+  const statText = { paid:'已收款', enrolled:'已报名', pending:'待支付', deposit:'定金已付' };
+  const sCur = function(c){ return (c==='CNY') ? '¥' : '$'; };
+  const cnyOf = function(o){ return (o.cny_amount != null) ? Number(o.cny_amount) : (Number(o.amount)||0); };
 
   const paid = orders.filter(o=>o.status==='paid');
-  const sum = paid.reduce((a,o)=>a + (Number(o.amount)||0), 0);
+  const deposits = orders.filter(o=>o.status==='deposit');
+  const sum = paid.reduce((a,o)=>a + cnyOf(o), 0) + deposits.reduce((a,o)=>a + cnyOf(o), 0);
+  const pendingCount = orders.filter(o=>o.status==='pending').length;
   let html = '';
   html += '<div class="panel"><h3>收款概览</h3><div style="display:flex;gap:16px;flex-wrap:wrap">'
-    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">已收款(笔)</div><div class="fc-num" style="font-size:22px;color:#0d9488">'+paid.length+'</div></div>'
+    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">已收款(笔)</div><div class="fc-num" style="font-size:22px;color:#0d9488">'+(paid.length+deposits.length)+'</div></div>'
     + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">已收款(金额)</div><div class="fc-num" style="font-size:22px;color:#0d9488">¥'+sum.toFixed(2)+'</div></div>'
+    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">待支付</div><div class="fc-num" style="font-size:22px;color:#d97706">'+pendingCount+'</div></div>'
     + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">0元购报名</div><div class="fc-num" style="font-size:22px;color:#2563eb">'+orders.filter(o=>o.source==='sing').length+'</div></div>'
     + '</div></div>';
 
   html += '<div class="panel"><h3>明细（最近 '+orders.length+' 条）</h3>';
   if(!orders.length){ html += '<p class="small muted">暂无订单或报名记录。</p>'; }
   else {
-    html += '<div style="overflow-x:auto"><table class="dt"><thead><tr><th>时间</th><th>来源</th><th>项目</th><th>金额</th><th>付款邮箱</th><th>联系邮箱</th><th>状态</th></tr></thead><tbody>';
+    html += '<div style="overflow-x:auto"><table class="dt"><thead><tr><th>时间</th><th>来源</th><th>项目</th><th>金额(定金)</th><th>全款</th><th>余款</th><th>付款邮箱</th><th>联系邮箱</th><th>状态</th></tr></thead><tbody>';
     orders.forEach(function(o){
       const c = statColor[o.status]||'#64748b';
       html += '<tr><td>'+fmt(o.created)+'</td>'
         + '<td>'+esc2(o.source==='sing'?'0元购':'PayPal')+'</td>'
         + '<td>'+esc2(o.item)+'</td>'
-        + '<td>'+(o.source==='sing'?'0':'¥'+(Number(o.amount)||0).toFixed(2))+'</td>'
+        + '<td>'+(o.source==='sing'?'0':sCur(o.currency)+(Number(o.amount)||0).toFixed(2))+'</td>'
+        + '<td>'+(o.full_price?((sCur(o.currency))+(Number(o.full_price)||0).toFixed(2)):'—')+'</td>'
+        + '<td>'+(o.balance?((sCur(o.currency))+(Number(o.balance)||0).toFixed(2)):'—')+'</td>'
         + '<td>'+esc2(o.payer_email||'—')+'</td>'
         + '<td>'+esc2(o.contact_email||'—')+'</td>'
-        + '<td><span style="color:'+c+';font-weight:600">'+esc2(o.status)+'</span></td></tr>';
+        + '<td><span style="color:'+c+';font-weight:600">'+esc2(statText[o.status]||o.status)+'</span></td></tr>';
     });
     html += '</tbody></table></div>';
   }

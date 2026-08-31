@@ -97,7 +97,7 @@ export async function onRequestGet({ request, env }) {
       // [3] facetalk: 近期 wall（含 id/ip 便于后台区分来源与删除，放宽到 200 条供留言管理面板）
       d1(env, DBS.facetalk, "SELECT id, name, text, created_at, COALESCE(ip,'') AS ip FROM wall ORDER BY created_at DESC LIMIT 200"),
       // [4] 订单/报名提醒（PayPal 收款 + 0元购报名，表 orders 由支付/报名接口首次写入时自动建）
-      d1(env, DBS.analytics, "SELECT id, source, item, payer_email, contact_email, amount, currency, paypal_order_id, status, note, created FROM orders ORDER BY created DESC LIMIT 50"),
+      d1(env, DBS.analytics, "SELECT id, source, item, payer_email, contact_email, amount, full_price, balance, cny_amount, currency, paypal_order_id, status, note, created FROM orders ORDER BY created DESC LIMIT 50"),
       // [5] 辅警库已删除（2026-08-17 并入 exam 后下线），停止对其 D1 的查询；
       //         辅警站点浏览统计仍由 rcj-analytics-d1 的 site='aux' 承接（见下方 auxUni）。
       Promise.resolve(null),

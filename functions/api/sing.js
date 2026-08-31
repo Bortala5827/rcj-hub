@@ -115,9 +115,12 @@ export async function onRequest({ request, env }) {
     const id = 'sg_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     const now = Date.now();
 
-    // 限流：同 IP 最多 3 条待审核
+    // 限流1：同 IP 最多 3 条待审核
     const wait = await d1(env, `SELECT COUNT(*) c FROM sing_requests WHERE ip='${ip}' AND status='pending'`);
     if (wait && !wait.error && (wait[0] && wait[0].c || 0) >= 3) return json({ ok: false, error: '待审核太多啦，先等等前面处理完' }, 429);
+    // 限流2：同 IP 24 小时内最多报名 2 次（0元购防刷）
+    const r24 = await d1(env, `SELECT COUNT(*) c FROM sing_requests WHERE ip='${ip}' AND created > ${Date.now() - DAY}`);
+    if (r24 && !r24.error && (r24[0] && r24[0].c || 0) >= 2) return json({ ok: false, error: '同一网络 24 小时内限报名 2 次，换时间再来试试' }, 429);
 
     const r = await d1(env, `CREATE TABLE IF NOT EXISTS sing_requests (
       id TEXT PRIMARY KEY, email TEXT NOT NULL, tier TEXT NOT NULL DEFAULT '0',
@@ -145,9 +148,19 @@ export async function onRequest({ request, env }) {
       await d1(env, `CREATE TABLE IF NOT EXISTS orders (
         id TEXT PRIMARY KEY, source TEXT, item TEXT, sku TEXT,
         payer_email TEXT, contact_email TEXT, amount REAL, currency TEXT,
-        paypal_order_id TEXT, status TEXT, note TEXT, created INTEGER
+        full_price REAL, balance REAL, cny_amount REAL, paypal_order_id TEXT, status TEXT, note TEXT, created INTEGER
       )`);
-      await d1(env, `INSERT OR REPLACE INTO orders (id, source, item, sku, payer_email, contact_email, amount, currency, paypal_order_id, status, note, created) VALUES ('${id}','sing','Sing to Me','sing','${email.replace(/'/g, "''")}','',0,'CNY','','enrolled','0元购报名',${now})`);
+      // 幂等迁移：老表缺列则补齐
+      const probe = await d1(env, 'SELECT full_price FROM orders LIMIT 0');
+      if (probe && probe.error && /no such column/i.test(probe.error)) {
+        await d1(env, 'ALTER TABLE orders ADD COLUMN full_price REAL');
+        await d1(env, 'ALTER TABLE orders ADD COLUMN balance REAL');
+      }
+      const probe2 = await d1(env, 'SELECT cny_amount FROM orders LIMIT 0');
+      if (probe2 && probe2.error && /no such column/i.test(probe2.error)) {
+        await d1(env, 'ALTER TABLE orders ADD COLUMN cny_amount REAL');
+      }
+      await d1(env, `INSERT OR REPLACE INTO orders (id, source, item, sku, payer_email, contact_email, amount, currency, cny_amount, paypal_order_id, status, note, created) VALUES ('${id}','sing','Sing to Me','sing','${email.replace(/'/g, "''")}','',0,'CNY',0,'','enrolled','0元购报名',${now})`);
       if (env.RESEND_API_KEY) {
         const t = new Date(Date.now() + 8 * 3600 * 1000);
         const p = n => String(n).padStart(2, '0');
@@ -161,6 +174,20 @@ export async function onRequest({ request, env }) {
               subject: '【RCJ 0元购】有人来唱歌啦',
               html: `<p>时间（北京）：${bt}</p><p>邮箱：${email}</p><p>档位：0元购 · Sing to Me</p><p>去 955827.xyz/admin → 订单提醒 审核语音。</p>`,
             }),
+          });
+        } catch (e) {}
+      }
+      // Telegram 提醒（无密钥则跳过）
+      const tgToken = env.TG_BOT_TOKEN, tgChat = env.TG_CHAT_ID;
+      if (tgToken && tgChat) {
+        try {
+          const t2 = new Date(Date.now() + 8 * 3600 * 1000);
+          const p2 = n => String(n).padStart(2, '0');
+          const bt2 = `${t2.getUTCFullYear()}-${p2(t2.getUTCMonth() + 1)}-${p2(t2.getUTCDate())} ${p2(t2.getUTCHours())}:${p2(t2.getUTCMinutes())}`;
+          await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json; charset=utf-8' },
+            body: JSON.stringify({ chat_id: tgChat, text: `【RCJ 0元购】有人来唱歌啦 🎤\n🕒 ${bt2}\n邮箱：${email}\n档位：0元购 · Sing to Me\n去 955827.xyz/admin → 订单提醒 审核语音。`, parse_mode: 'HTML' }),
           });
         } catch (e) {}
       }
