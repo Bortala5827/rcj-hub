@@ -161,6 +161,17 @@
     .hc-sum b{font-variant-numeric:tabular-nums}
     .hc-sum .okn{color:#166534} .hc-sum .badn{color:#991b1b}
 
+    /* 业务概览卡（站点状态页） */
+    .biz-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+    .biz-hd{font-weight:700;font-size:15px;margin-bottom:10px;color:var(--text)}
+    .biz-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line)}
+    .biz-row span{color:var(--muted)} .biz-row b{font-variant-numeric:tabular-nums;font-size:15px}
+    .biz-ms{font-size:12.5px;margin-top:9px;padding:8px 10px;border-radius:8px;line-height:1.5;background:var(--bg)}
+    .biz-ms b{color:var(--text)} .biz-ms.ms-ok{background:rgba(22,163,74,.08)} .biz-ms.ms-ok b{color:#166534}
+    .biz-ms.ms-warn{background:rgba(217,119,6,.1)} .biz-ms.ms-warn b{color:#b45309}
+    .biz-ms.ms-info{background:rgba(37,99,235,.07)} .biz-ms.ms-info b{color:#1d4ed8}
+    .biz-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--accent);color:#fff;margin-left:6px;vertical-align:middle}
+
     /* 趋势天数切换 */
     .range-tabs{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-left:auto}
     .range-tabs button{border:none;background:var(--surface);color:var(--muted);font-size:12px;font-weight:600;padding:4px 12px;cursor:pointer}
@@ -311,9 +322,11 @@ document.getElementById('nav').addEventListener('click',e=>{
   renderPage(currentPage);
 });
 
+// 程序化切换页面（供卡片内按钮跳转用，如留言墙「查看全部」）
+window.switchPage = function(p){ const it=document.querySelector('.sb-item[data-page="'+p+'"]'); if(it) it.click(); };
+
 function renderPage(p){
-  if(!DATA){ document.getElementById('content').innerHTML='<div class="loading">读取中…</div>'; return; }
-  if(p==='overview') renderOverview();
+  if(!DATA){ document.getElementById('content').innerHTML='<div class="loading">读取中…</div>'; return; }  if(p==='overview') renderOverview();
   else if(p==='health') renderHealth();
   else if(p==='facetalk') renderFaceTalk();
   else if(p==='aux') renderAux();
@@ -525,6 +538,12 @@ function renderFaceTalk(){
   html+='</div>';
   html+='</div>';
 
+  if(F.highlights && F.highlights.length){
+    html+='<div class="panel"><h3>✨ 产品亮点 <span class="tag">得意之作</span></h3><div style="display:flex;flex-direction:column;gap:10px">';
+    F.highlights.forEach(function(h){ html+='<div class="biz-ms ms-info"><b>'+esc(h.label)+'</b> · '+esc(h.desc)+'</div>'; });
+    html+='</div></div>';
+  }
+
   html+='<div class="panel"><h3>原生后台（深度操作）</h3><a class="site-card" href="https://facetalk.955827.xyz/admin" target="_blank" rel="noopener"><div class="sc-ico">💬</div><div class="sc-name">FaceTalk 管理后台</div><div class="sc-url">facetalk.955827.xyz/admin</div><div class="sc-desc">匹配详情、信誉、留言墙审核等深度操作（独立密码）。</div></a></div>';
 
   document.getElementById('content').innerHTML=html;
@@ -539,6 +558,14 @@ function renderAux(){
   html+='</div>';
 
   html+='<div class="panel"><p class="small muted">'+esc(A.note||'')+'</p></div>';
+
+  if(A.milestones && A.milestones.length){
+    html+='<div class="panel"><h3>🏆 业务里程碑 <span class="tag">运营数据</span></h3><div style="display:flex;flex-direction:column;gap:10px">';
+    A.milestones.forEach(function(m){
+      html+='<div class="biz-ms ms-'+m.tone+'"><b>'+esc(m.label)+'</b> · '+esc(m.desc)+' <span class="biz-tag">'+esc(m.tag)+'</span></div>';
+    });
+    html+='</div><p class="small muted" style="margin-top:10px">注：里程碑为线下运营数据（非系统自动统计），由运营维护。</p></div>';
+  }
 
   html+='<div class="panel"><h3>近 14 日浏览趋势 <span class="tag">rcj-analytics-d1</span></h3><div class="chart-wrap">'+lineChart(A.visitTrend)+'</div></div>';
 
@@ -574,7 +601,38 @@ async function renderHealth(){
       +'<div class="hc-status '+(up?'up':'down')+'">'+(up?('正常 · HTTP '+s.status):(s.status===0?('异常 · '+(s.error||'不可达')):('HTTP '+s.status)))+'</div>'
       +'</div></div>';
   });
-  html+='</div><div style="margin-top:14px"><button class="btn" onclick="renderHealth()">↻ 重新探测</button></div></div>';
+  html+='</div>';
+
+  // ===== 业务概览（各站点核心指标，与在线状态并列）=====
+  const F=DATA.facetalk||{}, A=DATA.aux||{};
+  html+='<div class="panel" style="margin-top:16px"><h3>📌 业务概览 <span class="tag">核心站点</span></h3><div class="grid-2">';
+  // 辅警题库
+  html+='<div class="biz-card"><div class="biz-hd">🛡️ 辅警题库</div>'
+    +'<div class="biz-row"><span>浏览量</span><b>'+A.visits.s+'</b></div>'
+    +'<div class="biz-row"><span>独立访客</span><b>'+A.visits.u+'</b></div>'
+    +(A.milestones||[]).map(function(m){ return '<div class="biz-ms ms-'+m.tone+'"><b>'+esc(m.label)+'</b> · '+esc(m.desc)+' <span class="biz-tag">'+esc(m.tag)+'</span></div>'; }).join('')
+    +'</div>';
+  // FaceTalk
+  html+='<div class="biz-card"><div class="biz-hd">💬 FaceTalk</div>'
+    +'<div class="biz-row"><span>匹配对</span><b>'+F.pairsTotal+'</b></div>'
+    +'<div class="biz-row"><span>留言墙</span><b>'+F.wall+'</b></div>'
+    +'<div class="biz-row"><span>评分</span><b>'+F.ratings+'</b></div>'
+    +(F.highlights||[]).map(function(h){ return '<div class="biz-ms ms-info"><b>'+esc(h.label)+'</b> · '+esc(h.desc)+'</div>'; }).join('')
+    +'</div>';
+  html+='</div></div>';
+
+  // ===== 留言墙聚合（融为一体：主后台统一管 FaceTalk 留言墙）=====
+  const wall=(F.recentWall||[]).slice(0,5);
+  html+='<div class="panel" style="margin-top:16px"><h3>🗒️ 留言墙 <span class="tag">来自 FaceTalk · 已融入主后台</span></h3>';
+  if(!wall.length) html+='<div class="empty">暂无留言</div>';
+  else{
+    html+='<div style="display:flex;flex-direction:column;gap:8px">';
+    wall.forEach(function(w){ html+='<div style="border-bottom:1px dashed var(--line);padding-bottom:8px"><div class="small"><b>'+esc(w.name||'匿名')+'</b> <span class="muted">'+fmtTime(w.created_at)+'</span></div><div class="small">'+esc(w.text||'')+'</div></div>'; });
+    html+='</div><div style="margin-top:10px"><button class="btn" onclick="switchPage(\'wall\')">查看全部 / 管理 →</button></div>';
+  }
+  html+='</div>';
+
+  html+='<div style="margin-top:14px"><button class="btn" onclick="renderHealth()">↻ 重新探测</button></div></div>';
   c.innerHTML=html;
 }
 
