@@ -1,6 +1,13 @@
 {
-  "updated": "2026-08-30",
+  "updated": "2026-08-31",
   "experiments": [
+    {
+      "date": "2026-08-31",
+      "title": "全站合规审计：硬编码凭据/底部链接超限修复",
+      "summary": "admin.html 客服登录表单移除硬编码默认值（admin@example.com/admin123）；exam hub 首页底部链接从 3 个（Vibe Coding/定制服务/邮箱）减至 2 个（保留 Vibe Coding + 定制服务），邮箱链接移出页脚以符合「底部最多 2 个链接」铁律。同时记录：supportly 独立后台 admin.html 仍用 localStorage 存 token，与主站 HttpOnly cookie 策略不一致；支持系统 widget token 通过 URL 参数传递（document 文档有说明）。",
+      "type": "refactor",
+      "tags": ["admin", "exam", "compliance", "security"]
+    },
     {
       "date": "2026-08-30",
       "title": "API 导航页 AI 助手提示词解绑「只讲注册」",

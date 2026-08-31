@@ -1036,8 +1036,8 @@ async function renderSupport(){
   if(!supportToken){
     html += '<div class="panel"><h3>客服系统登录</h3>';
     html += '<div style="display:flex;gap:10px;max-width:400px">';
-    html += '<input type="email" id="supportEmail" placeholder="管理员邮箱" value="admin@example.com" style="flex:1;padding:8px 12px;border:1px solid var(--line);border-radius:8px">';
-    html += '<input type="password" id="supportPassword" placeholder="密码" value="admin123" style="flex:1;padding:8px 12px;border:1px solid var(--line);border-radius:8px">';
+    html += '<input type="email" id="supportEmail" placeholder="管理员邮箱" style="flex:1;padding:8px 12px;border:1px solid var(--line);border-radius:8px">';
+    html += '<input type="password" id="supportPassword" placeholder="密码" style="flex:1;padding:8px 12px;border:1px solid var(--line);border-radius:8px">';
     html += '<button class="btn" onclick="supportLogin()">登录</button>';
     html += '</div></div>';
   } else {
