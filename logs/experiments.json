@@ -1,200 +1,324 @@
 {
   "updated": "2026-09-01",
   "experiments": [
-      {
-        "date": "2026-09-01",
-        "title": "exam shop 支付：美元户账号 CNY 回落 USD，中/英/日三语均可付款",
-        "summary": "发现并修复一个会导致中文用户 100% 付款失败的 bug：PayPal 为海外注册的美元户，不支持 CNY，而 shop 的货币跟随语言（zh→CNY），实测 POST /api/paypal/create-order 带 lang=zh 直接返回 CURRENCY_NOT_SUPPORTED，中文版形同虚设；且切 live 后 paypalCurrency() 默认返回 CNY，会放大成全站故障。修复：_lib.js 新增 accountSupportsCNY(env) 与 resolveCurrency(env, cur)（CNY 不被支持时回落 USD，开关 PAYPAL_CNY_ENABLED / PAYPAL_CURRENCY），create-order.js 与 capture.js 统一走 resolveCurrency（避免「建单 USD、校验 CNY」金额不符被拦截），config.js 新增 cnyEnabled 供前端判断；shop/index.html 读取 cnyEnabled，中文界面仍按人民币标价但价签追加「（≈$x.xx）」、支付弹窗按美元显示，cur() 同步回落。已部署 rcj-exam-hub 并验证：zh→USD $0.54（题库定金¥3.9）、en/ja→USD 正常（建站定金 $0.96、托管 $1.38），config 返回 cnyEnabled:False。提交 0bc2fa9 已推送。注：本次提交误将 .wrangler/ 缓存（含账号信息）入库，已 git rm --cached 并写入 .gitignore 后 amend。",
-        "type": "bugfix",
-        "tags": ["exam", "shop", "paypal", "currency", "i18n", "bugfix"]
-      },
-      {
-        "date": "2026-09-01",
-        "title": "FaceTalk 海外版收口：删留言板/外链、修互评后屏闪退出、岗位与题库国际化",
-        "summary": "按用户 4 点要求收口 FaceTalk（海外优先、英文为主）：①彻底删除房间留言板（pair.html msg-card 区块+JS、style.css 死样式、i18n msg* 键 16 个），保留 SSE pair 事件实时通道（messages.js 修复 remaining 误发房间过期 1 天→会话 20 分钟）；互留会议号/备注走 info-card（每人一条实时变动），试音通过自动滚动到联机信息卡。②修复互评后单方屏闪无法自动退出：render() else 分支不再在会话结束后反复隐藏评价卡（rateWaitShown && (remain>0||myRated) 才隐藏）+ meet/mode/other-rep/infoPeer 字段守卫（SSE 部分数据不覆盖完整渲染）+ tick() 会话未结束隐藏 expired 提示。③清理外链：pair.html 顶部 series-bar（RCJ Lab/Speak Series/SoloSpeak）全删，index/pair 两页底部只留 Exam Hub。④岗位类别国际化：首页岗位去掉辅警/消防/书记员/社区/三支一扶，改为公务员/企业商务/科技互联网/教师教育/医疗医护/其他（默认其他并配合备注字段）；随机题库 voice.js 从 20 条辅警/公职/执法题改为按语言 zh/en/ja 各 15 条通用结构化+AI/科技观点题，前端 vGet/vPost 传 lang。版本 bump 20260901a。已验证：本机 Chrome 首页岗位英文显示/底部仅 Exam Hub/无 series-bar、pair.html 无留言板、node --check 全过、内联 JS 语法通过。",
-        "type": "refactor",
-        "tags": [
-          "facetalk",
-          "cleanup",
-          "i18n",
-          "bugfix",
-          "internationalization"
-        ]
-      },
+    {
+      "date": "2026-09-01",
+      "title": "FaceTalk 删除试音录音时声纹双轨波形可视化（柱形+折线波动）",
+      "summary": "按用户要求删除试音互评录音时底部实时波形可视化（左=实时波形线 ftWaveLine、右=频率柱 ftWave），判定\"毫无价值未达预期\"。pair.html 删 ft-wave-row 两 canvas HTML、ftAudioCtx/ftAnalyser/ftWaveStop/ftWaveLineStop 录音波形启动与清理逻辑、assets/ftwave.js 引入；style.css 删 .ft-wave/.ft-wave-row/.rec-wave 波形样式；删除 assets/ftwave.js（RCJWave 波形库 15KB）。保留录音计时/进度条/停止提交等核心录音功能与互评流程不受影响。版本 bump 20260901b。已验证：pair.html 内联 JS node --check 通过、ftWave/ft-wave/RCJWave 残留扫描 0、git 推送 1d038a9 已部署 CF Pages。",
+      "type": "refactor",
+      "tags": [
+        "facetalk",
+        "cleanup",
+        "ui",
+        "waveform"
+      ]
+    },
+    {
+      "date": "2026-09-01",
+      "title": "exam shop 支付：美元户账号 CNY 回落 USD，中/英/日三语均可付款",
+      "summary": "发现并修复一个会导致中文用户 100% 付款失败的 bug：PayPal 为海外注册的美元户，不支持 CNY，而 shop 的货币跟随语言（zh→CNY），实测 POST /api/paypal/create-order 带 lang=zh 直接返回 CURRENCY_NOT_SUPPORTED，中文版形同虚设；且切 live 后 paypalCurrency() 默认返回 CNY，会放大成全站故障。修复：_lib.js 新增 accountSupportsCNY(env) 与 resolveCurrency(env, cur)（CNY 不被支持时回落 USD，开关 PAYPAL_CNY_ENABLED / PAYPAL_CURRENCY），create-order.js 与 capture.js 统一走 resolveCurrency（避免「建单 USD、校验 CNY」金额不符被拦截），config.js 新增 cnyEnabled 供前端判断；shop/index.html 读取 cnyEnabled，中文界面仍按人民币标价但价签追加「（≈$x.xx）」、支付弹窗按美元显示，cur() 同步回落。已部署 rcj-exam-hub 并验证：zh→USD $0.54（题库定金¥3.9）、en/ja→USD 正常（建站定金 $0.96、托管 $1.38），config 返回 cnyEnabled:False。提交 0bc2fa9 已推送。注：本次提交误将 .wrangler/ 缓存（含账号信息）入库，已 git rm --cached 并写入 .gitignore 后 amend。",
+      "type": "bugfix",
+      "tags": [
+        "exam",
+        "shop",
+        "paypal",
+        "currency",
+        "i18n",
+        "bugfix"
+      ]
+    },
+    {
+      "date": "2026-09-01",
+      "title": "FaceTalk 海外版收口：删留言板/外链、修互评后屏闪退出、岗位与题库国际化",
+      "summary": "按用户 4 点要求收口 FaceTalk（海外优先、英文为主）：①彻底删除房间留言板（pair.html msg-card 区块+JS、style.css 死样式、i18n msg* 键 16 个），保留 SSE pair 事件实时通道（messages.js 修复 remaining 误发房间过期 1 天→会话 20 分钟）；互留会议号/备注走 info-card（每人一条实时变动），试音通过自动滚动到联机信息卡。②修复互评后单方屏闪无法自动退出：render() else 分支不再在会话结束后反复隐藏评价卡（rateWaitShown && (remain>0||myRated) 才隐藏）+ meet/mode/other-rep/infoPeer 字段守卫（SSE 部分数据不覆盖完整渲染）+ tick() 会话未结束隐藏 expired 提示。③清理外链：pair.html 顶部 series-bar（RCJ Lab/Speak Series/SoloSpeak）全删，index/pair 两页底部只留 Exam Hub。④岗位类别国际化：首页岗位去掉辅警/消防/书记员/社区/三支一扶，改为公务员/企业商务/科技互联网/教师教育/医疗医护/其他（默认其他并配合备注字段）；随机题库 voice.js 从 20 条辅警/公职/执法题改为按语言 zh/en/ja 各 15 条通用结构化+AI/科技观点题，前端 vGet/vPost 传 lang。版本 bump 20260901a。已验证：本机 Chrome 首页岗位英文显示/底部仅 Exam Hub/无 series-bar、pair.html 无留言板、node --check 全过、内联 JS 语法通过。",
+      "type": "refactor",
+      "tags": [
+        "facetalk",
+        "cleanup",
+        "i18n",
+        "bugfix",
+        "internationalization"
+      ]
+    },
     {
       "date": "2026-08-31",
       "title": "FaceTalk 精简为纯匹配工具：移除声纹暖场/结构化练习/AI点评/接口配置",
       "summary": "用户要求 FaceTalk 保持纯粹的面试搭子匹配工具（菜单只留「关于」，AI 点评和接口全删）。index.html 汉堡菜单删「声纹暖场」与「结构化面试练习」外链，只留「关于」；删除声纹暖场全部链路（菜单按钮/vwarm 弹窗/音频 JS/内联 CSS/字典键）。pair.html 删除面试间(iv-card)区块及相关内联 JS、assets/interview.js、functions/api/interview.js 后端（git rm）。assets/settings.js 重写为纯「关于」弹窗，接口配置 tab/ASR/LLM/预设/测试连接全删。assets/i18n.js 删除 171 个未用键、新增 aboutMenu（dict 662→492）。assets/style.css 清理 iv-*/vwarm-*/bar-gear/set 配置死样式，保留关于弹窗样式与 .iv-callout。附带修复：settings.js 弹窗在语言切换重建后不再显示的问题（改为重建并保持打开）、bump-version.js 残留括号/版本正则 bug 并纳入 i18n.js 管理。版本统一 bump 至 20260831b。已验证：本机 Chrome 首页菜单只留 About、默认英文、中/英/日切换正常、About 弹窗打开正常、pair.html 无面试间且控制台无 JS 报错。提交 1ac8970 已推送部署。",
       "type": "refactor",
-      "tags": ["facetalk", "cleanup", "i18n", "refactor"]
+      "tags": [
+        "facetalk",
+        "cleanup",
+        "i18n",
+        "refactor"
+      ]
     },
     {
       "date": "2026-08-31",
       "title": "深圳/惠州辅警题目上的 AI 分析按钮全部移除",
       "summary": "用户反馈深圳辅警每道题右上角都有「🤖 AI分析」按钮太冗余，明确要求深圳和惠州全部删掉。共用的 fj/shared/app.js 中删除：cardHtml 的 AI 分析按钮与 questionText/questionTextJson 变量、aiAnalyzeQuestion 函数、#questionsList 事件委托的 .ai-analyze-btn 分支、buildExamCard 面试/笔试两分支的 AI 分析按钮及 aiBtn 绑定、开头 AI 按钮样式注入；深圳 index.html 同步删除 rcj-ai-analyze 监听（死代码），悬浮 AI 备考助手（aiFab/aiPanel）按用户此前要求保留。惠州无独立 AI 代码，共用 app.js 自动生效。app.js 为 UTF-8 BOM+混合换行，Edit 工具无法匹配，改用 Python 正则处理。已 node --check 验证语法、本机 Chrome 渲染验证两站无按钮。提交 5508fc7、d3d6040（含版本号 20260831 刷新缓存）并部署 rcj-exam-hub。",
       "type": "refactor",
-      "tags": ["exam", "fj", "sz", "hz", "ai-analyze", "cleanup"]
+      "tags": [
+        "exam",
+        "fj",
+        "sz",
+        "hz",
+        "ai-analyze",
+        "cleanup"
+      ]
     },
     {
       "date": "2026-08-31",
       "title": "FaceTalk 全站多语言：中/英/日三语切换",
       "summary": "facetalk.955827.xyz 面向海外可用的第一步——新增 assets/i18n.js 统一字典与切换引擎（zh/en/ja，localStorage 记忆，缺省回退 zh），index.html / pair.html 静态文案 data-i18n 标注、顶栏语言下拉切换，动态区经 FTI18N.onChange 重渲染（app.js boot、pair.html api/loadVoice/loadMsgs/badge）。修复 buildSwitcher 数组取值 bug（opts[j] → opts[j][0]/[1]）。管理后台 admin.html 按自用需求保持纯中文不参与多语。随后默认语言改为英文（海外优先）：首访无偏好即英文，可手动切中/日并记忆。已验证：本机 Chrome 三语切换正常、持久化正常、默认英文生效，线上 facetalk.955827.xyz 已部署。",
       "type": "feature",
-      "tags": ["facetalk", "i18n", "internationalization"]
+      "tags": [
+        "facetalk",
+        "i18n",
+        "internationalization"
+      ]
     },
     {
       "date": "2026-08-31",
       "title": "全站合规审计：硬编码凭据/底部链接超限修复",
       "summary": "admin.html 客服登录表单移除硬编码默认值（admin@example.com/admin123）；exam hub 首页底部链接从 3 个（Vibe Coding/定制服务/邮箱）减至 2 个（保留 Vibe Coding + 定制服务），邮箱链接移出页脚以符合「底部最多 2 个链接」铁律。同时记录：supportly 独立后台 admin.html 仍用 localStorage 存 token，与主站 HttpOnly cookie 策略不一致；支持系统 widget token 通过 URL 参数传递（document 文档有说明）。",
       "type": "refactor",
-      "tags": ["admin", "exam", "compliance", "security"]
+      "tags": [
+        "admin",
+        "exam",
+        "compliance",
+        "security"
+      ]
     },
     {
       "date": "2026-08-30",
       "title": "API 导航页 AI 助手提示词解绑「只讲注册」",
       "summary": "后端 DEFAULT_SCENE_PROMPT 原写死「只聊 API 申请、选型、配置」，导致问「Groq 如何」等只回注册步骤。重写为：定位升级为「了解/选型/对比/申请/配置」全场景助手；新增「平台事实速查」覆盖首推4+备选+海外（Groq LPU 极快/llama-3.3-70b/需海外上网 等）；明确规则——问「XX 怎么样/特点/速度/额度/对比」先给实质信息再给链接，不先讲注册；与前端数据对齐（智谱 2000 万、火山 20+ 各 50 万）。前端两处欢迎语同步放宽。",
       "type": "content",
-      "tags": ["api", "ai-assistant", "prompt", "system-prompt"]
+      "tags": [
+        "api",
+        "ai-assistant",
+        "prompt",
+        "system-prompt"
+      ]
     },
     {
       "date": "2026-08-30",
       "title": "API 导航页智谱/火山方舟赠送额度更新",
       "summary": "智谱 GLM 首推卡片徽章「免费档」改为「送 2000 万 Tokens」，描述补充新用户直送 2000 万、glm-4-flash 长期免费无限量；火山方舟备选卡片徽章「字节」改为「20+ 模型各赠 50 万」，描述补充 doubao-pro/DeepSeek-V3 等 20+ 款模型各送 50 万 Tokens、一个 Key 调全家桶。最后核对日期更新为 2026-08-30。",
       "type": "content",
-      "tags": ["api", "zhipu", "volcano-ark", "free-tokens"]
+      "tags": [
+        "api",
+        "zhipu",
+        "volcano-ark",
+        "free-tokens"
+      ]
     },
     {
       "date": "2026-08-29",
       "title": "两站浏览器标签/SEO 定位混乱修正",
       "summary": "955827.xyz 原 title「考试题库与面试练习工具」越界到 Exam Hub 定位，改为「RCJ Lab · 个人产品实验室」+ 描述强调 SoloSpeak/LetOut/API/资产；exam.955827.xyz 原 title「深圳辅警面试真题题库」过窄，改为「RCJ Exam Hub · 公考辅警消防题库 + Learn 知识卡」+ 描述覆盖辅警/消防/国考/省考/事业编 + Learn。两站 JSON-LD schema 同步对齐。",
       "type": "refactor",
-      "tags": ["seo", "brand", "title", "meta"]
+      "tags": [
+        "seo",
+        "brand",
+        "title",
+        "meta"
+      ]
     },
     {
       "date": "2026-08-29",
       "title": "API 导航页加腾讯混元 + AI 助手选型能力升级",
       "summary": "备选区新增腾讯混元（hunyuan-turbos/lite，TokenHub 平台，新用户 100 万 Tokens / 90 天免费）。AI 助手 system prompt 优化：平台列表同步补充混元和模型名；新增第 4 项能力——被问到选型时给简短建议（写代码→DeepSeek、长文→Kimi、免费→glm-4-flash、多模态→Gemini 等）。",
       "type": "content",
-      "tags": ["api", "ai-assistant", "hunyuan", "prompt"]
+      "tags": [
+        "api",
+        "ai-assistant",
+        "hunyuan",
+        "prompt"
+      ]
     },
     {
       "date": "2026-08-29",
       "title": "API 导航页自建中转站补充 One API + Cloudflare AI Gateway",
       "summary": "自建中转站区域新增 One API（20k+ stars，中文社区最火的 API 聚合管理面板，Web UI 多渠道+令牌分发）。CF AI Gateway 因定位不符（中间层而非 API 汇总）已移除。",
       "type": "content",
-      "tags": ["api", "selfhosted", "one-api", "cloudflare"]
+      "tags": [
+        "api",
+        "selfhosted",
+        "one-api",
+        "cloudflare"
+      ]
     },
     {
       "date": "2026-08-29",
       "title": "API 导航页全卡片描述加模型名",
       "summary": "17 张卡片描述从泛泛而谈改为带具体模型名：首推 4 张（DeepSeek-V3/R1、Qwen/DeepSeek/GLM 托管、moonshot-v1-128k、glm-4-flash/plus）+ 备选 7 张（dots-llk、SenseChat-5、MiMo-7B、step-2、abab6.5、doubao-pro 等）+ 海外 6 张（gemini-2.0-flash、llama-3.3-70b、deepseek-r1 等）。用户拿到 Key 后直接知道该填什么模型名。",
       "type": "content",
-      "tags": ["api", "content", "model-names"]
+      "tags": [
+        "api",
+        "content",
+        "model-names"
+      ]
     },
     {
       "date": "2026-08-28",
       "title": "API 导航页首推卡片品牌色视觉升级",
       "summary": "4 张首推卡片从统一蓝紫色改为各品牌色身份系统：DeepSeek 蓝(#4D6BFE)、硅基流动 紫(#7C3AED)、Kimi 橙(#FF6B35)、智谱GLM 绿(#00A65A)。每张卡片新增品牌色左侧条 + 字母标记(D/S/K/G) + 品牌色微染背景 + 品牌色按钮，使用 CSS color-mix + 自定义属性实现。",
       "type": "design",
-      "tags": ["api", "visual", "brand-color"]
+      "tags": [
+        "api",
+        "visual",
+        "brand-color"
+      ]
     },
     {
       "date": "2026-08-28",
       "title": "API 导航页窄屏适配 + 清理无效 meta",
       "summary": "featured-grid 在 ≤520px 窄屏下从 2 列降为 1 列，避免首推卡片挤压；删除 3 行无效的 http-equiv Cache-Control/Pragma/Expires（浏览器基本忽略 HTTP meta，真实 header 由 Cloudflare Pages 控制）。",
       "type": "refactor",
-      "tags": ["api", "responsive", "cleanup"]
+      "tags": [
+        "api",
+        "responsive",
+        "cleanup"
+      ]
     },
     {
       "date": "2026-08-28",
       "title": "主导航隐藏资产库入口",
       "summary": "从 6 个页面（index/assets/log/blog/principles/archive）的 hamburger 导航菜单中移除「资产库」链接；/assets URL 仍可直达，定位与 /blog 一致——自己用，不在公开导航暴露。",
       "type": "refactor",
-      "tags": ["hub", "nav", "cleanup"]
+      "tags": [
+        "hub",
+        "nav",
+        "cleanup"
+      ]
     },
     {
       "date": "2026-08-27",
       "title": "now 通勤实验冷启动优化",
       "summary": "主数字从「此刻正在通勤」（瞬时值，冷启动长期挂 0）改为「今日完成通勤」（累计值 doneToday）；瞬时 active 降级为副行，仅在 >0 时显示「此刻路上 N 人」；无人在途时副行显示今日平均时长；新增今日各小时完成人数迷你折线图（复用已有 m-spark 样式）；commute.js 改用文件名版本 commute-20260827.js 替代 ?v= 缓存参数。",
       "type": "feature",
-      "tags": ["now", "commute", "ux"]
+      "tags": [
+        "now",
+        "commute",
+        "ux"
+      ]
     },
     {
       "date": "2026-08-26",
       "title": "首页赘述清理与 Exam 埋点修复",
       "summary": "移除与产品卡完全重复的 marquee 滚动带（8 链接，链接数 27→11）；修复损坏的 </div 标签；删除 exam-entry/playground-sub/closing-eyebrow 等约 50 行死 CSS；修复 exam 站 8 个页面埋点 fetch 引号错误（method:/POST/），恢复访问统计。",
       "type": "refactor",
-      "tags": ["hub", "exam", "cleanup"]
+      "tags": [
+        "hub",
+        "exam",
+        "cleanup"
+      ]
     },
     {
       "date": "2026-08-26",
       "title": "FaceTalk 移除 GSAP，首屏瘦身约 100KB",
       "summary": "用原生 CSS+JS 重写 Hero 入场动画、入口卡磁吸和滚动淡化，删除 GSAP 依赖；留言墙空态文案重写。",
       "type": "refactor",
-      "tags": ["facetalk", "performance"]
+      "tags": [
+        "facetalk",
+        "performance"
+      ]
     },
     {
       "date": "2026-08-26",
       "title": "API 汇总页安全头与连通性测试优化",
       "summary": "修正 API 连通性测试表述为「仅用于本次测试转发，不存储不记录」；增加 X-Content-Type-Options 和 Referrer-Policy 安全头。",
       "type": "feature",
-      "tags": ["hub", "api", "security"]
+      "tags": [
+        "hub",
+        "api",
+        "security"
+      ]
     },
     {
       "date": "2026-08-25",
       "title": "API 汇总页精简与风险提示",
       "summary": "删除未实测的 OmniRoute/One API，增加一键复制和错误码速查；自建中转站加风险提示和小白劝退说明。",
       "type": "feature",
-      "tags": ["hub", "api"]
+      "tags": [
+        "hub",
+        "api"
+      ]
     },
     {
       "date": "2026-08-24",
       "title": "Learn 知识卡接入 Groq AI 关联源",
       "summary": "新增 Groq 极速 AI 关联源（worker 反代），悬浮 AI 助手支持 dots/DeepSeek/Groq/自定义四源切换；标签体系从 171 收敛到 30。",
       "type": "feature",
-      "tags": ["exam", "learn", "ai"]
+      "tags": [
+        "exam",
+        "learn",
+        "ai"
+      ]
     },
     {
       "date": "2026-08-24",
       "title": "Learn 新增 12 张知识卡",
       "summary": "覆盖利率、基金、投资心态、灵活就业社保、税收、预制菜、直播电商、下沉市场、数据要素等主题。",
       "type": "feature",
-      "tags": ["exam", "learn", "content"]
+      "tags": [
+        "exam",
+        "learn",
+        "content"
+      ]
     },
     {
       "date": "2026-08-22",
       "title": "Learn 桌面端适配与首页按钮优化",
       "summary": "拓宽主容器与瀑布流列数，避免大屏内容截断；Vibe Coding 按钮改金属胶囊风格，强化按压感。",
       "type": "feature",
-      "tags": ["exam", "learn", "ui"]
+      "tags": [
+        "exam",
+        "learn",
+        "ui"
+      ]
     },
     {
       "date": "2026-08-18",
       "title": "主站信息架构升级",
       "summary": "产品卡片增加差异化徽章与关键差异点；汉堡菜单新增 LOG 实验日志入口；底部新增收尾场景。",
       "type": "feature",
-      "tags": ["hub", "info-arch"]
+      "tags": [
+        "hub",
+        "info-arch"
+      ]
     },
     {
       "date": "2026-08-18",
       "title": "SoloSpeak IndexedDB 旧缓存报错修复",
       "summary": "排查线上 NotFoundError 报错，确认为旧版 schema 残留；清理后控制台零错误。",
       "type": "bugfix",
-      "tags": ["solospeak", "indexeddb"]
+      "tags": [
+        "solospeak",
+        "indexeddb"
+      ]
     },
     {
       "date": "2026-08-15",
       "title": "SoloSpeak 录音引擎模块化拆分",
       "summary": "recorder / waveform / player 拆分为独立模块，主应用通过 ES Module 导入。",
       "type": "refactor",
-      "tags": ["solospeak", "refactor"]
+      "tags": [
+        "solospeak",
+        "refactor"
+      ]
     },
     {
       "date": "2026-08-31",
       "title": "辅警系列：移除邮箱与主页你懂的板块",
       "summary": "彻底删除 fj 系列（主页/深圳/惠州/written）所有 Bortala5827@gmail.com 邮箱入口；删除 fj 主页「知识拓展-你懂的」板块及其 CSS，保留深圳/惠州卡片与 RCJ EXAM HUB 链接。commit 3d5d4c7 已部署。",
       "type": "refactor",
-      "tags": ["fj", "footer", "cleanup"]
+      "tags": [
+        "fj",
+        "footer",
+        "cleanup"
+      ]
     }
   ]
 }
