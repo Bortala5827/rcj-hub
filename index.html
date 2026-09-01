@@ -38,6 +38,10 @@
     .series-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
     .series-label { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
     .series-sub { font-size: 13px; color: var(--ink-2); }
+    .playground-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 26px 18px; border-style: solid; border-color: var(--line); background: var(--bg-soft); color: var(--ink); transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease; text-decoration: none; }
+    .playground-card:hover { border-color: var(--ink-4); background: var(--bg); transform: translateY(-1px); }
+    .playground-eyebrow { font-size: 12px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; }
+    a.playground-card { max-width: 180px; margin: 0 auto; padding: 14px 18px; }
 
 
     /* 滚动进入视口逐块浮现（由 RCJMotion.revealOnScroll 接管 opacity 动画；
@@ -223,7 +227,15 @@
       </div>
     </section>
 
-          </main>
+            <!-- ============== Store ============== -->
+    <section class="directions">
+      <div class="container">
+        <a class="playground-card reveal" href="https://shop.955827.xyz/" target="_blank" rel="noopener" aria-label="Store">
+          <span class="playground-eyebrow">Store</span>
+        </a>
+      </div>
+    </section>
+  </main>
 
   <!-- ============== CLOSING SCENE ============== -->
   <section class="closing reveal" aria-label="收尾">
