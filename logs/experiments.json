@@ -3,6 +3,18 @@
   "experiments": [
     {
       "date": "2026-09-01",
+      "title": "SoloSpeak v3.0：三语国际化（中/英/日）+ 清空预设话题与台词",
+      "summary": "用户要求 SoloSpeak 改成日/英/中三语切换，话题全部删除，台词（功夫熊猫/雷军/余承东等）\"很low\"全部清空。实施：①新增 js/i18n.js 三语字典（默认英文，切换存 localStorage，自动替换 [data-i18n]）；②index.html 加语言切换 select（EN/中/日），所有硬编码中文加 data-i18n；③app.js 所有 UI 文本改用 t()，移除首页话题卡（topic-card）、名言区（quote）、AI 出题按钮、反馈卡今日金句，加语言切换事件（切换后重新渲染当前路由）；④topics.js 清空 SEED（60条中文预设话题全删，保留接口返回 null）；⑤quotes.js 清空 QUOTES(23条)+LANGUAGE_QUOTES(25条)，保留接口；⑥app.css 加 lang-select 样式。本地浏览器验证三语切换正常（英/中/日动态内容正确切换），首页无话题卡/名言区。提交 5cbfc82 已推送 CF Pages。",
+      "type": "feature",
+      "tags": [
+        "solospeak",
+        "i18n",
+        "cleanup",
+        "feature"
+      ]
+    },
+    {
+      "date": "2026-09-01",
       "title": "FaceTalk 修复英文版首页\"发布你的意图\"标题硬编码中文",
       "summary": "用户反馈英文版页面折叠面板标题仍显示中文\"📋 发布你的意图\"。根因：index.html 该 span 缺 data-i18n 属性，i18n 字典 pubTitle 已有英/日翻译（en: 📋 Post Your Intent / ja: 📋 あなたの意図を投稿）但未生效。补上 data-i18n=\"pubTitle\"，默认文本改为英文。版本 bump 20260901d，提交 0ee1cb3 已推送 CF Pages，线上验证通过。",
       "type": "bugfix",
