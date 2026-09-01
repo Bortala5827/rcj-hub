@@ -295,10 +295,10 @@ function enterApp(){
 document.getElementById('pwInput').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
 // ---------- 数据加载 ----------
-async function loadData(){
+async function loadData(force){
   const c=document.getElementById('content');
   c.innerHTML='<div class="loading">读取中…</div>';
-  const r=await apiGet('/data');
+  const r=await apiGet('/data'+(force?'?nocache=1':''));
   if(r.status===401){ showLogin(); return; }
   if(!r.ok || !r.data || !r.data.ok){
     const msg=(r.data && r.data.error) || r.error || ('HTTP ' + r.status) || '加载失败';
@@ -1198,33 +1198,67 @@ async function supportSendMessage(){
 }
 
 // ---------- 订单提醒（PayPal 收款 + 0元购报名）----------
+let orderKeyword = '';
+let orderStatusFilter = 'all';
+const RCJ_RATE = 7.2; // 与 shop / _lib.js 一致
 function renderOrders(){
-  const orders = (DATA.orders || []);
+  const all = (DATA.orders || []);
   const esc2 = function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
   const fmt = function(ts){ if(!ts) return '—'; const d=new Date(Number(ts)); const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); };
   const statColor = { paid:'#0d9488', enrolled:'#2563eb', pending:'#d97706', deposit:'#d97706' };
   const statText = { paid:'已收款', enrolled:'已报名', pending:'待支付', deposit:'定金已付' };
   const sCur = function(c){ return (c==='CNY') ? '¥' : '$'; };
   const cnyOf = function(o){ return (o.cny_amount != null) ? Number(o.cny_amount) : (Number(o.amount)||0); };
+  const fullCny = function(o){ return (o.currency==='CNY') ? (Number(o.full_price)||0) : (Number(o.full_price)||0)*RCJ_RATE; };
 
-  const paid = orders.filter(o=>o.status==='paid');
-  const deposits = orders.filter(o=>o.status==='deposit');
-  const sum = paid.reduce((a,o)=>a + cnyOf(o), 0) + deposits.reduce((a,o)=>a + cnyOf(o), 0);
-  const pendingCount = orders.filter(o=>o.status==='pending').length;
+  // 汇总：已收款按全款计，定金按已收定金计
+  const sum = all.reduce(function(a,o){ return a + (o.status==='paid' ? fullCny(o) : cnyOf(o)); }, 0);
+  const paidN = all.filter(o=>o.status==='paid').length;
+  const depN = all.filter(o=>o.status==='deposit').length;
+  const pendingCount = all.filter(o=>o.status==='pending').length;
+  const singN = all.filter(o=>o.source==='sing').length;
+
+  // 筛选
+  const kw = orderKeyword.trim().toLowerCase();
+  const list = all.filter(function(o){
+    if(orderStatusFilter!=='all' && (o.status||'')!==orderStatusFilter) return false;
+    if(kw){
+      const hay = [o.id,o.source,o.item,o.payer_email,o.contact_email,o.paypal_order_id].join(' ').toLowerCase();
+      if(hay.indexOf(kw)===-1) return false;
+    }
+    return true;
+  });
+
   let html = '';
   html += '<div class="panel"><h3>收款概览</h3><div style="display:flex;gap:16px;flex-wrap:wrap">'
-    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">已收款(笔)</div><div class="fc-num" style="font-size:22px;color:#0d9488">'+(paid.length+deposits.length)+'</div></div>'
+    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">已收款(笔)</div><div class="fc-num" style="font-size:22px;color:#0d9488">'+(paidN+depN)+'</div></div>'
     + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">已收款(金额)</div><div class="fc-num" style="font-size:22px;color:#0d9488">¥'+sum.toFixed(2)+'</div></div>'
     + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">待支付</div><div class="fc-num" style="font-size:22px;color:#d97706">'+pendingCount+'</div></div>'
-    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">0元购报名</div><div class="fc-num" style="font-size:22px;color:#2563eb">'+orders.filter(o=>o.source==='sing').length+'</div></div>'
+    + '<div class="stat-card" style="flex:1;min-width:120px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px"><div class="fc-name">0元购报名</div><div class="fc-num" style="font-size:22px;color:#2563eb">'+singN+'</div></div>'
     + '</div></div>';
 
-  html += '<div class="panel"><h3>明细（最近 '+orders.length+' 条）</h3>';
-  if(!orders.length){ html += '<p class="small muted">暂无订单或报名记录。</p>'; }
+  // 工具条：搜索 + 状态筛选 + 导出
+  html += '<div class="panel"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'
+    + '<input id="orderSearch" placeholder="搜索 邮箱 / 订单号 / 项目" value="'+esc2(orderKeyword)+'" oninput="orderKeyword=this.value;renderOrders()" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)">'
+    + '<select id="orderStatus" onchange="orderStatusFilter=this.value;renderOrders()" style="padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)">'
+    + '<option value="all">全部状态</option>'
+    + '<option value="deposit"'+((orderStatusFilter==='deposit')?' selected':'')+'>定金已付</option>'
+    + '<option value="paid"'+((orderStatusFilter==='paid')?' selected':'')+'>已收款</option>'
+    + '<option value="pending"'+((orderStatusFilter==='pending')?' selected':'')+'>待支付</option>'
+    + '</select>'
+    + '<button class="btn" onclick="exportOrdersCSV()">⬇ 导出 CSV</button>'
+    + '<span class="small muted">共 '+list.length+' 条</span>'
+    + '</div>';
+
+  if(!list.length){ html += '<p class="small muted">暂无匹配订单或报名记录。</p>'; }
   else {
-    html += '<div style="overflow-x:auto"><table class="dt"><thead><tr><th>时间</th><th>来源</th><th>项目</th><th>金额(定金)</th><th>全款</th><th>余款</th><th>付款邮箱</th><th>联系邮箱</th><th>状态</th></tr></thead><tbody>';
-    orders.forEach(function(o){
+    html += '<div style="overflow-x:auto"><table class="dt"><thead><tr><th>时间</th><th>来源</th><th>项目</th><th>金额(定金)</th><th>全款</th><th>余款</th><th>付款邮箱</th><th>联系邮箱</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+    list.forEach(function(o){
       const c = statColor[o.status]||'#64748b';
+      const isDeposit = (o.status==='deposit');
+      const actHtml = isDeposit
+        ? '<button class="btn small" onclick="orderAct(\''+esc2(o.id)+'\',\'collect\')">收余款</button>'
+        : '<span class="small muted">—</span>';
       html += '<tr><td>'+fmt(o.created)+'</td>'
         + '<td>'+esc2(o.source==='sing'?'0元购':'PayPal')+'</td>'
         + '<td>'+esc2(o.item)+'</td>'
@@ -1233,13 +1267,38 @@ function renderOrders(){
         + '<td>'+(o.balance?((sCur(o.currency))+(Number(o.balance)||0).toFixed(2)):'—')+'</td>'
         + '<td>'+esc2(o.payer_email||'—')+'</td>'
         + '<td>'+esc2(o.contact_email||'—')+'</td>'
-        + '<td><span style="color:'+c+';font-weight:600">'+esc2(statText[o.status]||o.status)+'</span></td></tr>';
+        + '<td><span style="color:'+c+';font-weight:600">'+esc2(statText[o.status]||o.status)+'</span></td>'
+        + '<td>'+actHtml+'</td></tr>';
     });
     html += '</tbody></table></div>';
   }
   html += '</div>';
   document.getElementById('content').innerHTML = html;
   document.getElementById('pageTitle').textContent = '订单提醒';
+}
+
+async function orderAct(id, action){
+  if(action==='collect' && !confirm('确认标记该订单「余款已收」？状态将变为「已收款」，余款清零。')) return;
+  try{
+    const r = await fetch('/api/admin/order', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id, action }) });
+    const d = await r.json().catch(()=>({}));
+    if(!r.ok || !d.ok){ alert('操作失败：'+(d.error||('HTTP '+r.status))); }
+  }catch(e){ alert('操作失败：'+e.message); }
+  loadData(true); // 强制绕过缓存刷新
+}
+
+function exportOrdersCSV(){
+  const all = (DATA.orders || []);
+  const head = ['时间','来源','项目','定金','全款','余款','币种','付款邮箱','联系邮箱','状态','PayPal单号'];
+  const rows = all.map(function(o){
+    const d = new Date(Number(o.created)); const p=n=>String(n).padStart(2,'0');
+    const t = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+    return [t, o.source==='sing'?'0元购':'PayPal', o.item||'', o.amount||'', o.full_price||'', o.balance||'', o.currency||'', o.payer_email||'', o.contact_email||'', o.status||'', o.paypal_order_id||''];
+  });
+  const csv = [head].concat(rows).map(function(r){ return r.map(function(c){ c=String(c==null?'':c); return /[",\n]/.test(c)?('"'+c.replace(/"/g,'""')+'"'):c; }).join(','); }).join('\n');
+  const blob = new Blob(['﻿'+csv], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'rcj-orders-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
 }
 
 // ---------- 访问分析 ----------

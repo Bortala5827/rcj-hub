@@ -76,8 +76,10 @@ export async function onRequestGet({ request, env }) {
     return json({ error: 'CF_API_TOKEN / CF_ACCOUNT_ID 未配置。请在 rcj-hub Pages → Settings → Functions → Environment variables 添加这两个变量。' }, 500);
   }
 
-  // ── 缓存命中直接返回 ──
-  const hit = getCached();
+  // ── 缓存命中直接返回（?nocache=1 强制绕过，用于操作后即时刷新）──
+  const url = new URL(request.url);
+  const nocache = url.searchParams.get('nocache') === '1';
+  const hit = (!nocache) && getCached();
   if (hit) {
     const body = JSON.parse(hit); // 浅拷贝避免污染
     body.generatedAt = new Date().toISOString(); // 更新时间戳
