@@ -3,6 +3,17 @@
   "experiments": [
     {
       "date": "2026-09-01",
+      "title": "主站首页：now 卡片替换为 shop 入口",
+      "summary": "用户认为 /commute/（此刻通勤）毫无价值，要求删掉首页 now 板块。随后改为将 now 卡片替换为 shop 入口，指向 https://exam.955827.xyz/shop/ 。Section 标题从 Playground 改为 Shop，卡片保持极简风格（eyebrow: Store, title: shop），新窗口打开。commute/ 目录暂保留。提交 4026dfe 已推送。",
+      "type": "chore",
+      "tags": [
+        "hub",
+        "shop",
+        "cleanup"
+      ]
+    },
+    {
+      "date": "2026-09-01",
       "title": "LetOut v2.0：三语国际化（中/英/日）+ 大道至简精简",
       "summary": "用户要求 LetOut 和 SoloSpeak 一样做日/英/中三语，越轻量越好，大道至简。LetOut 比较特殊——波形可视化、粒子背景、声纹变体是为情绪释放服务的，保留。实施：①新增 js/i18n.js 三语字典（默认英文，含4种情绪+20种声纹+16条引导语）；②index.html 加语言切换 select，删顶部 series-bar，底部只留 Exam Hub；③app.js 重写：EMOTIONS/声纹 label 改 i18n key，所有中文用 t()，引导语从 i18n 取（内联轮换逻辑），删分享卡片（openShareCard），about 页精简；④删孤儿文件 ghost-guide.js、sharecard.js；⑤app.css 加 lang-select 样式。本地浏览器验证三语切换正常（英 Burn/Release/Settle/Quiet，中 燃/释放/沉淀/安静，日 燃/解放/沈静/静，声纹和引导语同步切换）。",
       "type": "feature",
