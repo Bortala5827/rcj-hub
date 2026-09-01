@@ -250,8 +250,8 @@
 
 <script>
 const API = '/api/admin';
-const SITE_COLORS = { aux:'#1e88e5', xf:'#ef6c00', facetalk:'#8e24aa', hub:'#2e7d32', solospeak:'#00897b', letout:'#6d4c41', training:'#c0ca33', exam:'#d81b60' };
-const SITE_LABELS = { aux:'辅警刷题站', xf:'消防刷题站', facetalk:'FaceTalk', hub:'RCJ Lab', solospeak:'SoloSpeak', letout:'LetOut', training:'RCJ Training', exam:'Exam Hub' };
+const SITE_COLORS = { aux:'#1e88e5', xf:'#ef6c00', facetalk:'#8e24aa', hub:'#2e7d32', solospeak:'#00897b', letout:'#6d4c41', training:'#c0ca33', exam:'#d81b60', shop:'#f59e0b' };
+const SITE_LABELS = { aux:'辅警刷题站', xf:'消防刷题站', facetalk:'FaceTalk', hub:'RCJ Lab', solospeak:'SoloSpeak', letout:'LetOut', training:'RCJ Training', exam:'Exam Hub', shop:'Shop 商店' };
 let DATA = null;
 // 登录态由 HttpOnly cookie（rcj_admin）接管，1 天过期；不存任何密码于 localStorage
 
@@ -417,7 +417,7 @@ let trendDays = 14; // 趋势图天数（7/14/30 切换）
 function renderOverview(){
   const d=DATA, F=d.facetalk, A=d.aux, AN=d.analytics||{series:[],allVisits:0};
   // 补全已知站点（没数据的也显示 0 平线）
-  const ALL_SITES=['aux','xf','facetalk','hub','solospeak','letout','training','exam'];
+  const ALL_SITES=['aux','xf','facetalk','hub','solospeak','letout','training','exam','shop'];
   const seriesMap={};
   (AN.series||[]).forEach(s=>seriesMap[s.site]=s);
   ALL_SITES.forEach(s=>{ if(!seriesMap[s]) seriesMap[s]={site,s,points:[],total:0,u:0,d:0}; });
@@ -1311,13 +1311,18 @@ function renderTraffic(){
   const getD = function(site){ const s = seriesMap[site]; return s ? s.d : 0; };
   const esc2 = function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
 
-  // 重点板块：exam 系列（你懂的、辅警、shop 均归入 exam）、api 页、facetalk
+  // 重点板块：exam 系列、shop 商店、api 页、facetalk
   var html = '';
   html += '<div class="traffic-focus">';
-  // exam 系列（你懂的 / 辅警 / shop 共用 exam 统计）
-  html += '<div class="focus-card" style="--fc:#d81b60"><div class="fc-name">📚 Exam 系列（你懂的/辅警/shop）</div>'
+  // exam 系列（你懂的 / 辅警）
+  html += '<div class="focus-card" style="--fc:#d81b60"><div class="fc-name">📚 Exam 系列（你懂的/辅警）</div>'
     + '<div class="fc-num">' + getS('exam') + '</div>'
     + '<div class="fc-sub">' + getU('exam') + ' 访客 · ' + getD('exam') + ' 天 · 占全站 ' + (AN.allVisits ? Math.round(getS('exam')/AN.allVisits*100) : 0) + '%</div></div>';
+  // Shop 商店（独立 site，含浏览 + 订单）
+  var shopOrders = (d.orders||[]).filter(function(o){ return o.source==='paypal'; }).length;
+  html += '<div class="focus-card" style="--fc:#f59e0b"><div class="fc-name">🛒 Shop 商店</div>'
+    + '<div class="fc-num">' + getS('shop') + '</div>'
+    + '<div class="fc-sub">' + getU('shop') + ' 访客 · ' + getD('shop') + ' 天 · 订单 ' + shopOrders + ' 笔</div></div>';
   // 辅警（aux）
   html += '<div class="focus-card" style="--fc:#1e88e5"><div class="fc-name">🛡️ 辅警题库</div>'
     + '<div class="fc-num">' + getS('aux') + '</div>'
@@ -1333,7 +1338,7 @@ function renderTraffic(){
   html += '</div>';
 
   // 全站趋势图（复用原 overview 的 multiLineChart）
-  var ALL_SITES = ['aux','xf','facetalk','hub','solospeak','letout','training','exam'];
+  var ALL_SITES = ['aux','xf','facetalk','hub','solospeak','letout','training','exam','shop'];
   var fullSeries = [];
   ALL_SITES.forEach(function(site){
     if(seriesMap[site]) fullSeries.push(seriesMap[site]);
@@ -1353,8 +1358,8 @@ function renderTraffic(){
   sorted.forEach(function(site){
     var s = seriesMap[site]; if(!s || !s.total) return;
     any = true;
-    var col = {'aux':'#1e88e5','xf':'#ef6c00','facetalk':'#8e24aa','hub':'#2e7d32','solospeak':'#00897b','letout':'#6d4c41','training':'#c0ca33','exam':'#d81b60'}[site]||'#64748b';
-    var label = {'aux':'辅警题库','xf':'消防题库','facetalk':'FaceTalk','hub':'RCJ Lab','solospeak':'SoloSpeak','letout':'LetOut','training':'RCJ Training','exam':'Exam Hub'}[site]||site;
+    var col = {'aux':'#1e88e5','xf':'#ef6c00','facetalk':'#8e24aa','hub':'#2e7d32','solospeak':'#00897b','letout':'#6d4c41','training':'#c0ca33','exam':'#d81b60','shop':'#f59e0b'}[site]||'#64748b';
+    var label = {'aux':'辅警题库','xf':'消防题库','facetalk':'FaceTalk','hub':'RCJ Lab','solospeak':'SoloSpeak','letout':'LetOut','training':'RCJ Training','exam':'Exam Hub','shop':'Shop 商店'}[site]||site;
     html += '<div class="ss-item"><span class="ss-dot" style="background:'+col+'"></span><span class="ss-name">'+label+'</span><span class="ss-num">'+s.total+'</span><span class="ss-sub">'+s.u+' 访客 / '+s.d+' 天</span></div>';
   });
   if(!any) html += '<div class="empty">暂无浏览数据（埋点已部署，访问各站点后开始累计）</div>';
