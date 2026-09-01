@@ -385,33 +385,9 @@ async function renderAbout() {
         <p class="promise-leave">${esc(t('promise4'))}</p>
       </section>
 
-      <section class="story">
-        <p>${esc(t('story1'))}</p>
-        <p>${esc(t('story2'))}</p>
-        <p>${esc(t('story3'))}</p>
-      </section>
-
-      <section class="gourmet">
-        <h2 class="gourmet-title">${esc(t('gourmetTitle'))}</h2>
-        <p>${esc(t('gourmet1'))}</p>
-        <p>${esc(t('gourmet2'))}</p>
-      </section>
-
       <section class="about-foot">
         <p class="about-foot-note">${esc(t('aboutFoot'))}</p>
       </section>
-
-      <details class="faq">
-        <summary class="faq-q">${esc(t('faqQ'))}</summary>
-        <div class="faq-a">
-          <p>${esc(t('faqA1'))}</p>
-          <ul>
-            <li><b>${esc(t('faqA2'))}</b></li>
-            <li><b>${esc(t('faqA3'))}</b></li>
-            <li><b>${esc(t('faqA4'))}</b></li>
-          </ul>
-        </div>
-      </details>
     </div>
   `;
 }
