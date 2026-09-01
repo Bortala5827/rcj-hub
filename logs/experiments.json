@@ -3,6 +3,18 @@
   "experiments": [
     {
       "date": "2026-09-01",
+      "title": "FaceTalk 修复房间页 expired 提示误显（remain>0 时仍显示\"已过期\"）",
+      "summary": "联调中发现 pair.html tick() 在 remain>0 分支把 expired 提示设为显示（hidden=false），导致房间还剩大量剩余时间时也一直挂着 \"Practice time is up and the room expired\" 提示（此前 room remaining=1073 秒仍显示已过期）。修复：remain>0 分支改为 hidden=true（隐藏过期提示），remain<=0 分支保持不变（显示）。另确认联调链路全部走通：大厅可见→匹配→进房→英文新题→录音互评→双方愿意→联机信息互见（每人一条实时变动）→互评完成→autoClose 倒计时→自动跳回首页无屏闪（bug #2 屏闪修复验证通过）。版本 bump 20260901c，提交 9319912 已推送 CF Pages。",
+      "type": "bugfix",
+      "tags": [
+        "facetalk",
+        "bugfix",
+        "ui",
+        "expired"
+      ]
+    },
+    {
+      "date": "2026-09-01",
       "title": "FaceTalk 删除试音录音时声纹双轨波形可视化（柱形+折线波动）",
       "summary": "按用户要求删除试音互评录音时底部实时波形可视化（左=实时波形线 ftWaveLine、右=频率柱 ftWave），判定\"毫无价值未达预期\"。pair.html 删 ft-wave-row 两 canvas HTML、ftAudioCtx/ftAnalyser/ftWaveStop/ftWaveLineStop 录音波形启动与清理逻辑、assets/ftwave.js 引入；style.css 删 .ft-wave/.ft-wave-row/.rec-wave 波形样式；删除 assets/ftwave.js（RCJWave 波形库 15KB）。保留录音计时/进度条/停止提交等核心录音功能与互评流程不受影响。版本 bump 20260901b。已验证：pair.html 内联 JS node --check 通过、ftWave/ft-wave/RCJWave 残留扫描 0、git 推送 1d038a9 已部署 CF Pages。",
       "type": "refactor",
