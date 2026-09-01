@@ -1,6 +1,19 @@
 {
-  "updated": "2026-08-31",
+  "updated": "2026-09-01",
   "experiments": [
+      {
+        "date": "2026-09-01",
+        "title": "FaceTalk 海外版收口：删留言板/外链、修互评后屏闪退出、岗位与题库国际化",
+        "summary": "按用户 4 点要求收口 FaceTalk（海外优先、英文为主）：①彻底删除房间留言板（pair.html msg-card 区块+JS、style.css 死样式、i18n msg* 键 16 个），保留 SSE pair 事件实时通道（messages.js 修复 remaining 误发房间过期 1 天→会话 20 分钟）；互留会议号/备注走 info-card（每人一条实时变动），试音通过自动滚动到联机信息卡。②修复互评后单方屏闪无法自动退出：render() else 分支不再在会话结束后反复隐藏评价卡（rateWaitShown && (remain>0||myRated) 才隐藏）+ meet/mode/other-rep/infoPeer 字段守卫（SSE 部分数据不覆盖完整渲染）+ tick() 会话未结束隐藏 expired 提示。③清理外链：pair.html 顶部 series-bar（RCJ Lab/Speak Series/SoloSpeak）全删，index/pair 两页底部只留 Exam Hub。④岗位类别国际化：首页岗位去掉辅警/消防/书记员/社区/三支一扶，改为公务员/企业商务/科技互联网/教师教育/医疗医护/其他（默认其他并配合备注字段）；随机题库 voice.js 从 20 条辅警/公职/执法题改为按语言 zh/en/ja 各 15 条通用结构化+AI/科技观点题，前端 vGet/vPost 传 lang。版本 bump 20260901a。已验证：本机 Chrome 首页岗位英文显示/底部仅 Exam Hub/无 series-bar、pair.html 无留言板、node --check 全过、内联 JS 语法通过。",
+        "type": "refactor",
+        "tags": [
+          "facetalk",
+          "cleanup",
+          "i18n",
+          "bugfix",
+          "internationalization"
+        ]
+      },
     {
       "date": "2026-08-31",
       "title": "FaceTalk 精简为纯匹配工具：移除声纹暖场/结构化练习/AI点评/接口配置",
