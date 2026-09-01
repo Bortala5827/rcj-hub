@@ -3,6 +3,18 @@
   "experiments": [
     {
       "date": "2026-09-01",
+      "title": "FaceTalk 修复英文版首页\"发布你的意图\"标题硬编码中文",
+      "summary": "用户反馈英文版页面折叠面板标题仍显示中文\"📋 发布你的意图\"。根因：index.html 该 span 缺 data-i18n 属性，i18n 字典 pubTitle 已有英/日翻译（en: 📋 Post Your Intent / ja: 📋 あなたの意図を投稿）但未生效。补上 data-i18n=\"pubTitle\"，默认文本改为英文。版本 bump 20260901d，提交 0ee1cb3 已推送 CF Pages，线上验证通过。",
+      "type": "bugfix",
+      "tags": [
+        "facetalk",
+        "bugfix",
+        "i18n",
+        "ui"
+      ]
+    },
+    {
+      "date": "2026-09-01",
       "title": "FaceTalk 修复房间页 expired 提示误显（remain>0 时仍显示\"已过期\"）",
       "summary": "联调中发现 pair.html tick() 在 remain>0 分支把 expired 提示设为显示（hidden=false），导致房间还剩大量剩余时间时也一直挂着 \"Practice time is up and the room expired\" 提示（此前 room remaining=1073 秒仍显示已过期）。修复：remain>0 分支改为 hidden=true（隐藏过期提示），remain<=0 分支保持不变（显示）。另确认联调链路全部走通：大厅可见→匹配→进房→英文新题→录音互评→双方愿意→联机信息互见（每人一条实时变动）→互评完成→autoClose 倒计时→自动跳回首页无屏闪（bug #2 屏闪修复验证通过）。版本 bump 20260901c，提交 9319912 已推送 CF Pages。",
       "type": "bugfix",
