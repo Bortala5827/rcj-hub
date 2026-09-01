@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * RCJ Hub · 标准 Web 自动化测试配置
+ * RCJ Lab · 标准 Web 自动化测试配置
  * ---------------------------------------------------------------
  * 浏览器策略（关键）：
  *  - 本地（WorkBuddy / 你本机）：使用你已安装的「真实 Google Chrome」

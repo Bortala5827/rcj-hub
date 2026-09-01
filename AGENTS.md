@@ -1,4 +1,4 @@
-# RCJ Hub · 仓库规则
+# RCJ Lab · 仓库规则
 
 主站 955827.xyz，含 SoloSpeak、LetOut、API 汇总页、资产库、实验日志。
 

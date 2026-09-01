@@ -23,4 +23,4 @@
 
 ---
 
-RCJ Speak Series 之一 · 总站 [RCJ Hub](https://955827.xyz)
+RCJ Speak Series 之一 · 总站 [RCJ Lab](https://955827.xyz)

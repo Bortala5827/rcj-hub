@@ -1,11 +1,11 @@
-﻿# RCJ Hub · Multilingual Brand & Product Portal
+﻿# RCJ Lab · Multilingual Brand & Product Portal
 
-> English · 日本語 · 中文 — a minimal, fast personal brand hub and product portal,
+> English · 日本語 · 中文 — a minimal, fast personal brand lab and product portal,
 > built on Cloudflare Pages. The single entry point to the RCJ product ecosystem.
 
 **Live site:** https://955827.xyz
 
-RCJ Hub is the homepage and navigation hub for a small family of focused web tools.
+RCJ Lab is the homepage and navigation portal for a small family of focused web tools.
 It is fully localized in **English, Japanese, and Chinese**, so visitors from
 anywhere can use it without a language barrier — no account or region lock.
 
@@ -13,7 +13,7 @@ anywhere can use it without a language barrier — no account or region lock.
 
 | Product | Path | What it does |
 | --- | --- | --- |
-| **RCJ Hub** | `/` | Brand hub, personal homepage, and AI / LLM API navigation |
+| **RCJ Lab** | `/` | Brand lab, personal homepage, and AI / LLM API navigation |
 | **LetOut** (大声说) | `/letout` | "Speak out" — a private emotional voice outlet & journal |
 | **SoloSpeak** (独声) | `/solospeak` | "Solo voice" — a speaking & pronunciation practice tool for yourself |
 | **API Portal** | `/api` | Curated navigation of large-model / LLM API providers |
