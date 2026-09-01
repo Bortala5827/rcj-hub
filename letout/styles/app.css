@@ -449,3 +449,31 @@ html[data-rec="1"] .rec-timer {
   }
   .shadow-zone { grid-column: 1 / -1; }
 }
+
+
+/* ===== 语言切换（2026-09-01） ===== */
+.lang-select {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.85);
+  font-size: 13px;
+  padding: 3px 6px;
+  cursor: pointer;
+  font-family: inherit;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  min-width: 42px;
+}
+.lang-select:hover {
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.06);
+}
+.lang-select:focus {
+  border-color: rgba(255,255,255,0.5);
+}
+@media (max-width: 480px) {
+  .lang-select { font-size: 12px; padding: 2px 4px; min-width: 36px; }
+}
