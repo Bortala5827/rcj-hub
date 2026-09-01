@@ -39,13 +39,6 @@
     .series-label { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
     .series-sub { font-size: 13px; color: var(--ink-2); }
 
-    .playground-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 26px 18px; border-style: solid; border-color: var(--line); background: var(--bg-soft); color: var(--ink); transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease; }
-    .playground-card:hover { border-color: var(--ink-4); background: var(--bg); transform: translateY(-1px); }
-    .playground-eyebrow { font-size: 12px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; }
-    .playground-title { font-size: 18px; font-weight: 700; color: var(--ink); }
-    /* 极简 playground：只放「此刻」两字，小而克制 */
-    a.playground-card { max-width: 180px; margin: 0 auto; padding: 14px 18px; }
-    a.playground-card .playground-title { font-size: 15px; }
 
     /* 滚动进入视口逐块浮现（由 RCJMotion.revealOnScroll 接管 opacity 动画；
        clearProps 完成后不回退；无 JS 时引擎内部 showAll 设 inline opacity:1 兜底） */
@@ -230,19 +223,7 @@
       </div>
     </section>
 
-        <!-- ============== Shop ============== -->
-    <section class="directions">
-      <div class="container">
-        <header class="section-head reveal">
-          <h2>Shop</h2>
-        </header>
-        <a class="playground-card reveal" href="https://shop.955827.xyz/" target="_blank" rel="noopener" aria-label="Shop">
-          <span class="playground-eyebrow">Store</span>
-          <span class="playground-title">shop</span>
-        </a>
-      </div>
-    </section>
-  </main>
+          </main>
 
   <!-- ============== CLOSING SCENE ============== -->
   <section class="closing reveal" aria-label="收尾">
