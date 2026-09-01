@@ -29,4 +29,4 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           # 纯静态 Pages 项目（pages_build_output_dir="."），从仓库根目录直接发布
           # 排除不属站点内容的目录，避免把 .git/tests/logs 等传上去
-          command: pages deploy . --project-name=rcj-lab --branch=main --exclude ".git,tests,node_modules,.github,workers,logs"
+          command: pages deploy . --project-name=rcj-lab --branch=main
