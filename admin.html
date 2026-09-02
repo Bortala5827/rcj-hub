@@ -1021,13 +1021,11 @@ function multiLineChart(series, days = 14){
 async function renderSupport(){
   const c = document.getElementById('content');
   document.getElementById('pageTitle').textContent = '客服管理';
-  c.innerHTML = '
+  c.innerHTML = `
     <div class="panel"><h3>RCJ 在线客服</h3>
       <p class="small muted">人工客服统一在 RCJ Supportly 处理（仅 shop 渠道使用）。</p>
       <a class="btn" href="https://support.955827.xyz/admin" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px">打开客服后台 →</a>
-    </div>';
-}
-
+    </div>`;
 }
 
 // ---------- 订单提醒（PayPal 收款 + 0元购报名）----------
@@ -1089,9 +1087,10 @@ function renderOrders(){
     list.forEach(function(o){
       const c = statColor[o.status]||'#64748b';
       const isDeposit = (o.status==='deposit');
-      const actHtml = isDeposit
-        ? '<button class="btn small" onclick="orderAct(\''+esc2(o.id)+'\',\'collect\')">收余款</button>'
-        : '<span class="small muted">—</span>';
+      const actHtml = (isDeposit
+        ? '<button class="btn small" onclick="orderAct(\''+esc2(o.id)+'\',\'collect\')">收余款</button> '
+        : '')
+        + '<button class="btn small" style="color:var(--danger)" onclick="if(confirm(\'确认删除该订单？不可恢复\')) orderAct(\''+esc2(o.id)+'\',\'delete\')">删除</button>';
       html += '<tr><td>'+fmt(o.created)+'</td>'
         + '<td>'+esc2(o.source==='sing'?'0元购':'PayPal')+'</td>'
         + '<td>'+esc2(o.item)+'</td>'

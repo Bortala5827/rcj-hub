@@ -3,6 +3,7 @@
 // 用法：
 //   POST /api/admin/order  body: { id:<订单id>, action:'collect' }  把定金订单标记为「余款已收」(status→paid, balance→0)
 //   POST /api/admin/order  body: { id:<订单id>, action:'setStatus', status:'paid'|'deposit'|'pending' }
+//   POST /api/admin/order  body: { id:<订单id>, action:'delete' }  删除订单（不可逆）
 const ANALYTICS_DB = 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828'; // rcj-analytics-d1
 
 function hmac(key, msg) {
@@ -78,6 +79,13 @@ export async function onRequest(context) {
       if (res && res.error) return bad('更新失败：' + res.error, 500);
       const changes = (res && res[0] && res[0].meta && res[0].meta.changes) || 0;
       return json({ ok: true, changes, id, status });
+    }
+    if (action === 'delete') {
+      // 删除订单（测试数据清理/误单撤销，不可逆）
+      const res = await d1(env, ANALYTICS_DB, `DELETE FROM orders WHERE id='${esc(id)}'`);
+      if (res && res.error) return bad('删除失败：' + res.error, 500);
+      const changes = (res && res[0] && res[0].meta && res[0].meta.changes) || 0;
+      return json({ ok: true, changes, id });
     }
     return bad('未知 action');
   } catch (e) {
