@@ -389,6 +389,18 @@
         "refactor",
         "all-repos"
       ]
+    },
+    {
+      "date": "2026-09-02",
+      "title": "rcj-lab / facetalk 管理后台进不去修复（JS 语法错误 + loadData 数组 bug）",
+      "summary": "用户反馈 955827.xyz/admin 与 facetalk 管理后台进不去。排查：①rcj-lab/admin.html 的 renderSupport() 用单引号包裹多行字符串（JS 非法）+ 残留多余大括号，导致整个内联脚本解析失败（Uncaught SyntaxError），后台完全不可用；②同文件订单删除按钮 esc2(o.id) 被写坏成裸变量 e；③facetalk/admin.html loadData() 误把 Promise.all 结果当单对象用（res.list 恒为空），登录后各列表全空；且认证失败调用了未定义的 logout（应为 doLogout）。修复：rcj-lab 多行字符串改模板字符串、删多余大括号、恢复 esc2(o.id)；facetalk 按数组索引取 list、authErr 仅 forbidden 触发、logout→doLogout。本地 node --check 全部通过，浏览器实测两个后台登录流程正常（错误密码分别显示'密码错误'/'forbidden'）。commit：rcj-lab 63f9c37、facetalk 91dadbb + 0e124b9，均已推送并部署成功。",
+      "type": "fix",
+      "tags": [
+        "admin",
+        "facetalk",
+        "bugfix",
+        "rcj-lab"
+      ]
     }
   ]
 }
