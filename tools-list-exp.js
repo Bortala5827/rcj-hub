@@ -1,8 +1,8 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const parse = (s) => { const b = s.charCodeAt(0) === 0xFEFF ? s.slice(1) : s; return JSON.parse(b); };
-const headRaw = execSync('git -C C:/Users/小样儿/Desktop/products/_repos/rcj-hub show HEAD:logs/experiments.json', { encoding: 'utf8' });
-const curRaw = fs.readFileSync('C:/Users/小样儿/Desktop/products/_repos/rcj-hub/logs/experiments.json', 'utf8');
+const headRaw = execSync('git -C C:/Users/小样儿/Desktop/products/_repos/rcj-lab show HEAD:logs/experiments.json', { encoding: 'utf8' });
+const curRaw = fs.readFileSync('C:/Users/小样儿/Desktop/products/_repos/rcj-lab/logs/experiments.json', 'utf8');
 const head = parse(headRaw);
 const cur = parse(curRaw);
 console.log('HEAD entries:', head.experiments.length, '| current:', cur.experiments.length);

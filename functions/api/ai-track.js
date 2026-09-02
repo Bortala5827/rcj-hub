@@ -1,4 +1,4 @@
-// rcj-hub · AI 调用统一埋点接收端（公开，无需登录）
+// rcj-lab · AI 调用统一埋点接收端（公开，无需登录）
 // POST /api/ai-track  body: {project, scene, provider, status, latency_ms, tokens}
 //   → 写入 rcj-analytics-d1.ai_calls（与 visits 同库，统一后台可查）
 // 各 AI 端点（ai-chat / gemini 等）在调用完成后异步 fire-and-forget 发到这里，

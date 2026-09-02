@@ -1,4 +1,4 @@
-// rcj-hub · 统一后台登出
+// rcj-lab · 统一后台登出
 // POST → 清除 rcj_admin cookie
 
 const COOKIE = 'rcj_admin';

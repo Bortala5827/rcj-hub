@@ -1,5 +1,5 @@
 const fs = require('fs');
-const p = 'C:/Users/小样儿/Desktop/products/_repos/rcj-hub/logs/experiments.json';
+const p = 'C:/Users/小样儿/Desktop/products/_repos/rcj-lab/logs/experiments.json';
 const raw = fs.readFileSync(p, 'utf8');
 const hasBom = raw.charCodeAt(0) === 0xFEFF;
 const body = hasBom ? raw.slice(1) : raw;

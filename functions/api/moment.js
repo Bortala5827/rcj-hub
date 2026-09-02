@@ -1,4 +1,4 @@
-// rcj-hub · 「天涯共此时」此刻实验后端
+// rcj-lab · 「天涯共此时」此刻实验后端
 // 复用 rcj-analytics-d1（与 track.js / notes.js 同一库、同一套 CF_API_TOKEN+CF_ACCOUNT_ID 直连）
 // 第一版场景固定：commute（通勤）
 //

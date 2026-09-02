@@ -1,4 +1,4 @@
-// rcj-hub · Sing to Me（0元购）端点
+// rcj-lab · Sing to Me（0元购）端点
 // 玩法：用户在 shop 页为我唱一首歌（录音）→ 我（管理员）送她资料。
 // 链路：shop 录音 + 选档位(0/9.9/39/69) + 选资料 + 邮箱
 //       → POST /api/sing（语音存 R2 rcj-sing，元数据存 rcj-analytics-d1.sing_requests）
@@ -161,7 +161,7 @@ export async function onRequest({ request, env }) {
       const rows = (r && r[0] && r[0].results) || [];
       return json({ ok: true, list: rows.map(x => ({
         id: x.id, email: x.email, tier: x.tier, materials: (x.materials || '[]'),
-        status: x.status, created: x.created | 0, decidedAt: x.decided_at | 0, audioKey: x.audio_key || '',
+        status: x.status, created: Number(x.created), decidedAt: Number(x.decided_at), audioKey: x.audio_key || '',
       })) });
     }
     // 审核操作

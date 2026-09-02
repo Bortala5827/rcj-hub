@@ -1,4 +1,4 @@
-// rcj-hub · 站点健康状态
+// rcj-lab · 站点健康状态
 // GET /api/admin/health  (需登录；15s 短缓存)
 // 对生产域名做 HEAD 探测，返回各站点在线状态（红绿灯）。
 // 用 HTTP 探测而非 CF API：直接反映用户真实可访问性，且不依赖额外 token 权限。

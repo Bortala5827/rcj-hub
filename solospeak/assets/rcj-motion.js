@@ -47,7 +47,7 @@
 
   /* ============================================================
    * 1) ENTRANCE — fade + slight rise + optional scale
-   *    Grounded in rcj-hub hero h1/eyebrow entrance.
+   *    Grounded in rcj-lab hero h1/eyebrow entrance.
    * ============================================================ */
   RCJ.entrance = function (target, opts) {
     opts = opts || {};
@@ -70,7 +70,7 @@
 
   /* ============================================================
    * 2) TEXT — SplitText line-mask reveal
-   *    Grounded in rcj-hub hero h1 SplitText(lines, mask:'lines').
+   *    Grounded in rcj-lab hero h1 SplitText(lines, mask:'lines').
    *    Falls back to plain fade when SplitText is unavailable.
    * ============================================================ */
   RCJ.textReveal = function (el, opts) {
@@ -99,7 +99,7 @@
 
   /* ============================================================
    * 3) SCROLL — reveal-on-scroll (y + opacity + blur), ScrollTrigger
-   *    Grounded in rcj-hub .reveal fromTo with blur(10px).
+   *    Grounded in rcj-lab .reveal fromTo with blur(10px).
    * ============================================================ */
   RCJ.revealOnScroll = function (target, opts) {
     opts = opts || {};
@@ -118,7 +118,7 @@
   };
 
   /* 3b) PARALLAX — scrub parallax tied to scroll position
-   *     Grounded in rcj-hub hero-inner yPercent:-26 scrub. */
+   *     Grounded in rcj-lab hero-inner yPercent:-26 scrub. */
   RCJ.parallax = function (el, opts) {
     opts = opts || {};
     el = typeof el === 'string' ? document.querySelector(el) : el;
@@ -138,7 +138,7 @@
 
   /* ============================================================
    * 4) INTERACTION — magnetic pointer follow
-   *    Grounded in rcj-hub magnetic button (gsap.quickTo x/y).
+   *    Grounded in rcj-lab magnetic button (gsap.quickTo x/y).
    * ============================================================ */
   RCJ.magnetic = function (el, opts) {
     opts = opts || {};
@@ -157,7 +157,7 @@
   };
 
   /* 4b) PRESS — tactile scale on pointer down/up
-   *     Grounded in rcj-hub pointerdown scale:0.97 / up scale:1. */
+   *     Grounded in rcj-lab pointerdown scale:0.97 / up scale:1. */
   RCJ.press = function (el, opts) {
     opts = opts || {};
     el = typeof el === 'string' ? document.querySelector(el) : el;
@@ -190,7 +190,7 @@
 
   /* ============================================================
    * 5) TIMELINE — orchestrate a hero/section sequence
-   *    Grounded in rcj-hub staggered hero entrance chain.
+   *    Grounded in rcj-lab staggered hero entrance chain.
    * ============================================================ */
   RCJ.sequence = function (map, opts) {
     opts = opts || {};

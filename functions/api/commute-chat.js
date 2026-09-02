@@ -1,4 +1,4 @@
-// rcj-hub · 「此刻通勤」实时留言（轻聊天）
+// rcj-lab · 「此刻通勤」实时留言（轻聊天）
 // 复用 rcj-analytics-d1（与 moment / track / notes 同一库、同一套 CF_API_TOKEN+CF_ACCOUNT_ID 直连）
 //
 // 设计约束（用户要求，克制优先）：

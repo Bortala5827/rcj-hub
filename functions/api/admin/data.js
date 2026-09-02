@@ -1,4 +1,4 @@
-// rcj-hub · 统一后台数据聚合
+// rcj-lab · 统一后台数据聚合
 // GET /api/admin/data  (需登录：签名 cookie 或 ?password=)
 // 服务端用 CF_API_TOKEN + CF_ACCOUNT_ID 读取各 D1 库，聚合后返回 JSON。
 // token 仅存于服务端 env，绝不下发浏览器。
@@ -73,7 +73,7 @@ async function d1(env, dbId, sql, ms = 6000) {
 export async function onRequestGet({ request, env }) {
   if (!(await verifyAuth(request, env))) return json({ error: '未登录' }, 401);
   if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) {
-    return json({ error: 'CF_API_TOKEN / CF_ACCOUNT_ID 未配置。请在 rcj-hub Pages → Settings → Functions → Environment variables 添加这两个变量。' }, 500);
+    return json({ error: 'CF_API_TOKEN / CF_ACCOUNT_ID 未配置。请在 rcj-lab Pages → Settings → Functions → Environment variables 添加这两个变量。' }, 500);
   }
 
   // ── 缓存命中直接返回（?nocache=1 强制绕过，用于操作后即时刷新）──

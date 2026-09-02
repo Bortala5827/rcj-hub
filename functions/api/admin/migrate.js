@@ -1,4 +1,4 @@
-// rcj-hub · 一次性迁移：把辅警库历史 visit_counts 并入统一库（site='aux'）
+// rcj-lab · 一次性迁移：把辅警库历史 visit_counts 并入统一库（site='aux'）
 // GET /api/admin/migrate  (需后台登录)
 // 幂等：INSERT OR REPLACE，重复执行安全。仅管理员可触发。
 

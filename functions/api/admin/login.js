@@ -1,4 +1,4 @@
-// rcj-hub · 统一后台登录
+// rcj-lab · 统一后台登录
 // POST { password } → 校验 ADMIN_PASSWORD → 签发 HMAC 签名 cookie
 // cookie 名称 rcj_admin = "<timestamp>.<hmac>"，用 ADMIN_PASSWORD 作 HMAC key
 
@@ -26,7 +26,7 @@ export async function onRequestPost({ request, env }) {
   let body;
   try { body = await request.json(); } catch { return json({ error: 'JSON 格式错误' }, 400); }
   const pw = body.password || '';
-  if (!env.ADMIN_PASSWORD) return json({ error: 'ADMIN_PASSWORD 未配置。请在 Cloudflare Pages → rcj-hub → Settings → Functions → Environment variables 添加。' }, 500);
+  if (!env.ADMIN_PASSWORD) return json({ error: 'ADMIN_PASSWORD 未配置。请在 Cloudflare Pages → rcj-lab → Settings → Functions → Environment variables 添加。' }, 500);
   if (pw !== env.ADMIN_PASSWORD) return json({ error: '密码错误' }, 401);
 
   const payload = String(Date.now()); // 毫秒时间戳（data/health/wall/commute 均按毫秒校验）
