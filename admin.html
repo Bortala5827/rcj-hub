@@ -648,6 +648,15 @@ async function renderHealth(){
 }
 
 // ---------- Sing to Me 审核 ----------
+// 录音加载失败时给出可见提示，避免"点了没反应/闪退"无从判断
+window.__singAudioErr=function(el){
+  el.style.display='none';
+  var d=document.createElement('div');
+  d.className='small';
+  d.style.color='var(--danger)';
+  d.textContent='录音加载失败：可能已被清除，或登录已过期（请重新登录后再试）';
+  if(el.parentNode) el.parentNode.insertBefore(d, el.nextSibling);
+};
 async function renderSingRequests(){
   const c=document.getElementById('content');
   document.getElementById('pageTitle').textContent='Sing to Me 审核';
@@ -679,12 +688,12 @@ async function renderSingRequests(){
     html+='<div><b>'+esc(x.email)+'</b> <span class="tag">'+esc(tierLabel[x.tier]||x.tier)+'</span> <span style="color:'+sm[1]+'">'+sm[0]+'</span></div>';
     html+='<span class="small muted">'+fmtTime(x.created)+'</span></div>';
     html+='<div class="small" style="margin:6px 0">想要：'+esc(mats)+'</div>';
-    if(x.audioKey) html+='<audio controls preload="none" src="/api/sing/audio/'+encodeURIComponent(x.id)+'" style="width:100%;margin:6px 0"></audio>';
-    else html+='<div class="small muted">（无录音）</div>';
+    if(x.audioKey) html+='<audio controls preload="none" src="/api/sing/audio/'+encodeURIComponent(x.id)+'" style="width:100%;margin:6px 0" onerror="__singAudioErr(this)"></audio>';
+    else html+='<div class="small muted">（无录音 · 已清除）</div>';
     html+='<div style="display:flex;gap:8px;margin-top:6px">';
     if(x.status==='pending'){
       html+='<button class="btn" onclick="singAct(\''+x.id+'\',\'approve\')">通过</button>';
-      html+='<button class="btn" onclick="singAct(\''+x.id+'\',\'reject\')">拒绝</button>';
+      html+='<button class="btn" onclick="singAct(\''+x.id+'\',\'reject\')">不满意 · 拒绝并清除录音</button>';
     } else {
       html+='<button class="btn" onclick="singAct(\''+x.id+'\',\'sent\')">标记已发</button>';
     }

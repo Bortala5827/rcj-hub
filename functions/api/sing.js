@@ -8,9 +8,13 @@
 //
 // POST /api/sing                 公共提交 {email,tier,materials[],audio(base64),audioType}
 // GET  /api/sing?list=1[&only=pending]  需登录，列出
-// GET  /api/sing/audio/<id>             需登录，播放语音
-// POST /api/sing?id=<id>&action=approve|reject|sent  需登录
+// POST /api/sing?id=<id>&action=approve|reject|sent  需登录（reject 会自动删 R2 语音）
 // GET  /api/sing?clean=1         需登录，清除 30 天前已处理 + 删 R2
+//
+// 播放语音 GET /api/sing/audio/<id> 由独立路由处理：functions/api/sing/audio/[id].js
+//   Pages Functions 按文件路径路由，sing.js 匹配不到该子路径（会回退到静态首页）。
+
+import { cors, json, verifyAuth } from './sing/_auth.js';
 
 const ANALYTICS_DB = 'b3198ef2-6e7c-424e-8a0f-a7b21afc1828'; // rcj-analytics-d1
 const DAY = 24 * 60 * 60 * 1000;
@@ -18,19 +22,6 @@ const TIERS = ['0', '9.9', '39', '69'];
 const MATERIALS = ['anki', 'app', 'offline', 'ndd', 'jgh', 'fj', 'xf'];
 const MAX_AUDIO = 6 * 1024 * 1024; // 6MB 上限，防滥用
 
-function cors() {
-  return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-  };
-}
-function json(o, status = 200) {
-  return new Response(JSON.stringify(o), {
-    status,
-    headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...cors() },
-  });
-}
 async function d1(env, sql) {
   if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID) return { error: 'NO_CRED' };
   const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/d1/database/${ANALYTICS_DB}/query`, {
@@ -42,51 +33,12 @@ async function d1(env, sql) {
   if (!j.success) return { error: (j.errors && j.errors[0] && j.errors[0].message) || 'D1_FAIL' };
   return j.result || [];
 }
-async function hmac(value, secret) {
-  const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const buf = await crypto.subtle.sign('HMAC', key, enc.encode(value));
-  const b = new Uint8Array(buf);
-  let s = '';
-  for (const x of b) s += String.fromCharCode(x);
-  return btoa(s);
-}
-function getCookie(req, name) {
-  const c = req.headers.get('Cookie') || '';
-  const m = c.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
-  return m ? decodeURIComponent(m[1]) : null;
-}
-async function verifyAuth(request, env) {
-  const cookie = getCookie(request, 'rcj_admin');
-  if (cookie && env.ADMIN_PASSWORD) {
-    const [ts, sig] = cookie.split('.');
-    if (!ts || !sig) return false;
-    if (Date.now() - Number(ts) > 7 * DAY) return false; // 毫秒过期
-    if ((await hmac(ts, env.ADMIN_PASSWORD)) === sig) return true;
-  }
-  return false;
-}
-
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: cors() });
 }
 
 export async function onRequest({ request, env }) {
   const url = new URL(request.url);
-  const path = url.pathname; // /api/sing 或 /api/sing/audio/<id>
-
-  // ── 播放语音（需登录）──
-  let m = path.match(/^\/api\/sing\/audio\/(.+)$/);
-  if (m) {
-    if (!(await verifyAuth(request, env))) return json({ ok: false, error: '未登录' }, 401);
-    const key = decodeURIComponent(m[1]) + '.webm';
-    if (!env.SING_R2) return json({ ok: false, error: 'R2 未绑定' }, 500);
-    const obj = await env.SING_R2.get(key);
-    if (!obj) return new Response('not found', { status: 404 });
-    return new Response(obj.body, {
-      headers: { 'Content-Type': (obj.httpMetadata && obj.httpMetadata.contentType) || 'audio/webm', 'Cache-Control': 'no-store' },
-    });
-  }
 
   // ── 公共提交 ──
   if (request.method === 'POST' && !url.searchParams.get('id') && !url.searchParams.get('list') && !url.searchParams.get('clean')) {
@@ -218,7 +170,20 @@ export async function onRequest({ request, env }) {
       const action = String(url.searchParams.get('action') || '').trim();
       const now = Date.now();
       if (action === 'approve') { const r = await d1(env, `UPDATE sing_requests SET status='approved', decided_at=${now} WHERE id='${id}'`); if (r && r.error) return json({ ok: false, error: r.error }, 500); return json({ ok: true, status: 'approved' }); }
-      if (action === 'reject') { const r = await d1(env, `UPDATE sing_requests SET status='rejected', decided_at=${now} WHERE id='${id}'`); if (r && r.error) return json({ ok: false, error: r.error }, 500); return json({ ok: true, status: 'rejected' }); }
+      if (action === 'reject') {
+        // 不满意 → 自动清除语音：立即删 R2 音频，记录留档（清空 audio_key）以防刷
+        // 无需等 30 天手动清理，拒绝即释放存储
+        let r2Deleted = false;
+        try {
+          const rows = await d1(env, `SELECT audio_key FROM sing_requests WHERE id='${id}'`);
+          const rr = rows && rows[0] && rows[0].results;
+          const ak = rr && rr[0] && rr[0].audio_key;
+          if (ak && env.SING_R2) { await env.SING_R2.delete(ak); r2Deleted = true; }
+        } catch (e) { /* 删音频失败不阻断状态更新 */ }
+        const r = await d1(env, `UPDATE sing_requests SET status='rejected', decided_at=${now}, audio_key='' WHERE id='${id}'`);
+        if (r && r.error) return json({ ok: false, error: r.error }, 500);
+        return json({ ok: true, status: 'rejected', r2Deleted });
+      }
       if (action === 'sent') { const r = await d1(env, `UPDATE sing_requests SET status='sent', decided_at=${now} WHERE id='${id}'`); if (r && r.error) return json({ ok: false, error: r.error }, 500); return json({ ok: true, status: 'sent' }); }
       return json({ ok: false, error: '未知操作' }, 400);
     }
