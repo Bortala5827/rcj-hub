@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-01",
+  "updated": "2026-09-02",
   "experiments": [
     {
       "date": "2026-09-01",
@@ -377,6 +377,17 @@
         "fj",
         "footer",
         "cleanup"
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "title": "全仓库冗余清理（豆包报告复核后落地 P0）",
+      "summary": "基于《全局冗余分析报告-2026-09-02.md》复核后执行清理：facetalk 删 wall-tables.sql（与 schema.sql 重复）+ 91 个未跟踪 tools 一次性脚本 + 诊断图；rcj-shop 删 widget.js（0 引用死代码）；rcj-supportly 删 result.ts/d1.ts/pnpm-workspace.yaml（0 引用）；rcj-exam-hub 删 xf 重复的 recorder-core.css/voice-orb.js（引用改到 fj/shared）、hz 空数据与死 config.js、sz 开发文件、sitemap/_headers 死链与死缓存规则。纠正豆包两处误判（wechat-reward.png 实际在用、schema.sql 被 functions 引用，均保留）。commit：facetalk 860d0e0、rcj-shop eab5a4a、rcj-supportly 81fc75c、rcj-exam-hub f078bed，已全部推送。",
+      "type": "chore",
+      "tags": [
+        "cleanup",
+        "refactor",
+        "all-repos"
       ]
     }
   ]
