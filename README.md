@@ -50,6 +50,9 @@ Cloudflare Pages deploys automatically. Hard-refresh (Ctrl / Cmd+F5) to clear ca
 - Exam Hub — https://exam.955827.xyz
 - FaceTalk — https://facetalk.955827.xyz
 - Supportly (customer support) — https://support.955827.xyz
+- Shop (storefront — custom question banks & done-for-you websites) — https://shop.955827.xyz
+- Dinner for You (couple-order system) — https://dinner.955827.xyz
+- RCJ Stack (site-building template & live demo) — https://rcj-stack-9xe.pages.dev
 
 ---
 
